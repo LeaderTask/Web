@@ -28,6 +28,9 @@ defineProps({
     default: () => []
   }
 })
+// const toggleLightDark = () => {
+//   store.dispatch('darkMode')
+// }
 
 const localization = computed(() => store.state.localization.localization)
 const navigator = computed(() => store.state.navigator.navigator)
@@ -52,21 +55,21 @@ const updateSettings = () => {
   store.dispatch(
     PATCH_SETTINGS,
     {
-      show_completed_tasks: navigator.value.settings.show_completed_tasks ? 1 : 0,
-      add_task_to_begin: navigator.value.settings.add_task_to_begin,
-      cal_number_of_first_week: navigator.value.settings.cal_number_of_first_week,
-      cal_show_week_number: navigator.value.settings.cal_show_week_number,
-      nav_show_tags: navigator.value.settings.nav_show_tags,
-      nav_show_overdue: navigator.value.settings.nav_show_overdue,
-      nav_show_summary: navigator.value.settings.nav_show_summary,
-      nav_show_emps: navigator.value.settings.nav_show_emps,
-      nav_show_markers: navigator.value.settings.nav_show_markers,
-      language: navigator.value.settings.language,
-      stopwatch: navigator.value.settings.stopwatch,
-      cal_work_time: navigator.value.settings.cal_work_time,
-      reminders_in_n_minutes: navigator.value.settings.reminders_in_n_minutes,
-      cal_work_week: navigator.value.settings.cal_work_week,
-      compact_mode: navigator.value.settings.compact_mode
+      show_completed_tasks: navigator.value.show_completed_tasks,
+      add_task_to_begin: navigator.value.add_task_to_begin,
+      cal_number_of_first_week: navigator.value.cal_number_of_first_week,
+      cal_show_week_number: navigator.value.cal_show_week_number,
+      nav_show_tags: navigator.value.nav_show_tags,
+      nav_show_overdue: navigator.value.nav_show_overdue,
+      nav_show_summary: navigator.value.nav_show_summary,
+      nav_show_emps: navigator.value.nav_show_emps,
+      nav_show_markers: navigator.value.nav_show_markers,
+      language: navigator.value.language,
+      stopwatch: navigator.value.stopwatch,
+      cal_work_time: navigator.value.cal_work_time,
+      reminders_in_n_minutes: navigator.value.reminders_in_n_minutes,
+      cal_work_week: navigator.value.cal_work_week,
+      compact_mode: navigator.value.compact_mode
     }
   )
 }
@@ -85,8 +88,8 @@ const clickOnGridCard = (item, index) => {
     store.commit('basic', { key: 'greedSource', value: item.value })
   }
 }
-</script>
 
+</script>
 <template>
   <nav
     v-show="isNavBarVisible"
@@ -114,7 +117,7 @@ const clickOnGridCard = (item, index) => {
         />
       </nav-bar-item>
       <nav-bar-item
-        class="bg-gray-50 dark:bg-gray-700 rounded-lg mr-1"
+        class="bg-gray-50 dark:bg-gray-700 rounded-lg mr-1 mt-1"
         @click="clickOnGridCard(navStack[navStack.length - 2], navStack.length - 2)"
       >
         <icon
@@ -124,6 +127,8 @@ const clickOnGridCard = (item, index) => {
           :box="arrowBack.viewBox"
         />
       </nav-bar-item>
+    </div>
+    <div class="nav-scroll">
       <nav-bar-item
         v-for="(navItem, index) in navStack"
         :key="index"
@@ -141,20 +146,21 @@ const clickOnGridCard = (item, index) => {
     <div class="flex-none items-stretch flex h-14">
       <nav-bar-item class="px-3">
         <Popper
-          class="items-center"
+          class="w-full items-center"
           arrow
           :class="isDark ? 'dark' : 'light'"
           placement="bottom"
         >
-          <template #content>
+          <template #content="{ close }">
             <div
-              class="w-60 flex flex-col"
+              class="flex flex-col"
+              @click="close"
             >
-              <div class="flex items-center justify-between">
-                <p class="text-sm font-semibold mr-1">{{ localization.show_completed_tasks }}</p>
+              <div class="flex items-center">
+                <p>{{ localization.show_completed_tasks }}</p>
                 <input
-                  class="w-6 h-6"
-                  v-model="navigator.show_completed_tasks" type="checkbox"
+                  v-model="navigator.show_completed_tasks"
+                  type="checkbox"
                   @change="updateSettings"
                 >
               </div>
@@ -190,5 +196,26 @@ const clickOnGridCard = (item, index) => {
         <nav-bar-search :placeholder="localization.search" />
       </nav-bar-item>
     </div>
+    <!--
+    <div
+      class="absolute w-screen top-14 left-0
+        lg:w-auto lg:items-stretch lg:flex lg:grow lg:static dark:bg-gray-800"
+      :class="[isMenuNavBarActive ? 'block' : 'hidden']"
+    >
+      <div class="max-h-screen-menu overflow-y-auto lg:overflow-visible lg:flex lg:items-stretch lg:justify-end lg:ml-auto">
+        <nav-bar-item
+          has-divider
+          is-desktop-icon-only
+          @click.prevent="toggleLightDark"
+        >
+          <nav-bar-item-label
+            :icon="mdiBrightness6"
+            label="Light/Dark"
+            is-desktop-icon-only
+          />
+        </nav-bar-item>
+      </div>
+    </div>
+    -->
   </nav>
 </template>

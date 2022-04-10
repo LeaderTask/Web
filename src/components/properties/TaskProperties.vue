@@ -8,15 +8,17 @@ import FileMessage from '@/components/properties/FileMessage.vue'
 import close from '@/icons/close.js'
 import TreeTagsItem from '@/components/TreeTagsItem.vue'
 import { CREATE_MESSAGE_REQUEST, DELETE_MESSAGE_REQUEST } from '@/store/actions/taskmessages'
-import { CREATE_FILES_REQUEST } from '@/store/actions/taskfiles'
+import { CREATE_FILES_REQUEST, SET_UPLOADED_FILE } from '@/store/actions/taskfiles'
 import * as TASK from '@/store/actions/tasks'
 import { copyText } from 'vue3-clipboard'
 import sanitizeHtml from 'sanitize-html'
 import linkify from 'vue-linkify'
 import { Tabs, Tab } from 'vue3-tabs-component'
 import ModalBoxConfirm from '@/components/modals/ModalBoxConfirm.vue'
+import FileUploadProgress from '@/components/properties/FileUploadProgress'
 export default {
   components: {
+    FileUploadProgress,
     DatePicker,
     TreeItem,
     TreeTagsItem,
@@ -42,6 +44,8 @@ export default {
     const taskFiles = computed(() => store.state.taskfilesandmessages.files)
     const myFiles = computed(() => store.state.taskfilesandmessages.files.myFiles)
     const selectedTask = computed(() => store.state.tasks.selectedTask)
+    const uploadStarted = computed(() => store.state.taskfilesandmessages.uploadStarted)
+    const uploadFilesVariants = ['jpg', 'png', 'jpeg', 'git', 'bmp', 'gif', 'PNG', 'JPG', 'JPEG', 'BMP', 'GIF', 'mov', 'mp4', 'avi']
 
     watch(selectedTask, (currentValue, oldValue) => {
       this.showAllMessages = false
@@ -169,10 +173,22 @@ export default {
         }
       )
     }
-    const createTaskFile = (event) => {
+    const createTaskFile = async (event) => {
+      const file = event.target.files[0]
+      const fileExtension = file?.name.split('.').pop()
+      const reader = new FileReader()
+      reader.onload = (e) => store.commit(SET_UPLOADED_FILE, e.target.result)
+
+      if (uploadFilesVariants.some((variant) => variant === fileExtension)) {
+        await reader.readAsDataURL(file)
+      } else {
+        await reader.readAsText(file)
+      }
+
       const data = {
         uid_task: selectedTask.value.uid,
-        name: event.target.files[0]
+        name: file,
+        fileExtension
       }
       store.dispatch(CREATE_FILES_REQUEST, data).then(
         resp => {
@@ -560,6 +576,7 @@ export default {
       tasks: tasks,
       navigator: navigator,
       employeesByEmail: employeesByEmail,
+      uploadStarted: uploadStarted,
       tags: computed(() => store.state.tasks.tags),
       employees: computed(() => store.state.employees.employees),
       projects: computed(() => store.state.projects.projects),
@@ -2535,6 +2552,7 @@ export default {
           </div>
         </div>
       </div>
+      <FileUploadProgress v-if="uploadStarted" />
     </div>
   </div>
   <div class="form-send-message">

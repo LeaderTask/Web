@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
 import { darkModeKey } from '@/config.js'
+
 import auth from './modules/auth'
 import navigator from './modules/navigator'
 import calendar from './modules/calendar'

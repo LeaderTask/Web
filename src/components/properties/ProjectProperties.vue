@@ -142,11 +142,11 @@ const removeProject = (project) => {
       </p>
       <input
         v-model="selectedProject.name"
-        @input="hasChanged = true"
         type="text"
         placeholder="Название проекта"
         class="mt-2 rounded-xl bg-gray-100 font-bold text-gray-700 dark:text-gray-100 w-full border-none ring-0 outline-none p-3 bg-transparent"
         :disabled="selectedProject.email_creator != user.current_user_email"
+        @input="hasChanged = true"
       >
       <div
         class="mt-8"
@@ -167,9 +167,9 @@ const removeProject = (project) => {
         </p>
         <Toggle
           v-model="selectedProject.quiet"
-          @change="hasChanged = true"
           class="outline-none ring-0"
           :classes="{ toggleOn: 'bg-blue-400 border-blue-400 justify-start text-white', container: 'focus:ring-0' }"
+          @change="hasChanged = true"
         />
       </div>
       <p class="dark:text-gray-200">
@@ -235,9 +235,9 @@ const removeProject = (project) => {
           :key="pindex"
         >
           <div
-            class="flex items-center bg-white dark:bg-gray-700 rounded-xl shadow h-30 px-3 py-5 mt-1"
             v-if="employeesByEmail[employee]"
             v-show="pindex < 4 || showAllMembers"
+            class="flex items-center bg-white dark:bg-gray-700 rounded-xl shadow h-30 px-3 py-5 mt-1"
           >
             <img
               :src="employeesByEmail[employee].fotolink"
@@ -258,8 +258,8 @@ const removeProject = (project) => {
                   :width="10"
                   :height="10"
                   :box="close.viewBox"
-                  @click="removeMember(employeesByEmail[employee])"
                   class="text-grayemployeesByEmail[employee]-400 cursor-pointer hover:text-gray-800"
+                  @click="removeMember(employeesByEmail[employee])"
                 />
               </div>
               <p class="font-light text-xs break-all">
@@ -268,13 +268,13 @@ const removeProject = (project) => {
             </div>
           </div>
         </template>
-      <p
-        v-if="selectedProject.members && selectedProject.members.length > 4 && !showAllMembers"
-        class="text-gray-500 text-center decoration-dashed underline mt-3 cursor-pointer"
-        @click="showAllMembers = true"
-      >
-        Show all members
-      </p>
+        <p
+          v-if="selectedProject.members && selectedProject.members.length > 4 && !showAllMembers"
+          class="text-gray-500 text-center decoration-dashed underline mt-3 cursor-pointer"
+          @click="showAllMembers = true"
+        >
+          Show all members
+        </p>
       </div>
       <button
         v-if="selectedProject.email_creator == user.current_user_email"

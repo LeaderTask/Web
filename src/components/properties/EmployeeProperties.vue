@@ -85,10 +85,10 @@ const removeEmployee = (employee) => {
       </p>
       <input
         v-model="selectedEmployee.name"
-        @input="hasChanged = true"
         type="text"
         placeholder="Имя сотрудника"
         class="mt-2 p-3 rounded-xl bg-gray-100 font-bold text-gray-700 w-full border-none ring-0 outline-none"
+        @input="hasChanged = true"
       >
       <p
         class="mt-4"
@@ -98,10 +98,10 @@ const removeEmployee = (employee) => {
       <input
         v-model="selectedEmployee.email"
         type="text"
-        @input="hasChanged = true"
         placeholder="Email"
         class="mt-2 p-3 rounded-xl bg-gray-100 font-bold text-gray-700 w-full border-none ring-0 outline-none"
         :disabled="selectedEmployee.uid"
+        @input="hasChanged = true"
       >
       <div
         v-if="!selectedEmployee.uid"
@@ -114,10 +114,10 @@ const removeEmployee = (employee) => {
         <input
           v-model="selectedEmployee.password"
           type="text"
-          @input="hasChanged = true"
           placeholder="Пароль"
           class="mt-2 p-3 rounded-xl bg-gray-100 font-bold text-gray-700 w-full border-none ring-0 outline-none"
           :disabled="employees[user.current_user_uid].type == 3"
+          @input="hasChanged = true"
         >
       </div>
       <button

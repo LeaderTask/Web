@@ -1003,7 +1003,7 @@ fieldset[disabled] .btn {
   width: 100%;
   height: auto;
   margin: auto;
-  overflow: visible;
+  overflow: auto;
   justify-content: flex-start;
 }
 
@@ -1240,11 +1240,6 @@ label
 {
   float: right;
 }
-.ready-button
-{
-  margin: 5px auto;
-  display: table;
-}
 .btn-save-repeat
 {
   width: 85px;
@@ -1270,8 +1265,7 @@ label
 }
 .top-panel-repeat
 {
-  margin:0 auto;
-  display: table;
+  height: 40px;
 }
 .repeat-seleclist label
 {
@@ -1288,15 +1282,13 @@ label
 {
   display: flex;
   font-size:12px;
+  float: left;
 
 }
-.top-panel-repeat label
+.every-content label
 {
   margin-right: 5px;
-  margin-top: 0;
-  font-size: 14px;
-  display: inline-block;
-  width: 100%;
+  margin-top: 0px;
 }
 
 .everyweek-content
@@ -1336,28 +1328,34 @@ label
 .everymonth-content
 {
   font-size:12px;
+  float: left;
 }
 .everymonth-content label
 {
+  margin-right: 5px;
   margin-top: 0;
 }
 .form-everymonth-container
 {
+  display: inline-block;
+  width: 225px;
 }
 .btn-day-month
 {
+  background: #F0F0F0;
   padding: 5px;
-  height: 31px;
-  width: 31px;
-  margin: 2px;
-  border-radius:25px;
-  color: black;
-  font-size: 14px;
+  height: 20px;
+  width: 30px;
+  border: 1px solid #F0F0F0;
+  display: inline;
+  color: gray;
+  font-size: 12px;
   line-height: 8px;
+  margin-right: 2px;
 }
 .btn-day-month:hover, .btn-day-month.active
 {
-  background: #F5B44A;
+  border:1px solid gray;
 }
 
 .everyyear-content
@@ -1372,49 +1370,50 @@ label
 }
 .form-everyyear-container
 {
-
+  display: inline-block;
+  width: 225px;
 }
 .btn-day-year
 {
+  background: #F0F0F0;
   padding: 5px;
-  height: 30px;
+  height: 20px;
   width: 30px;
-  margin: 2px;
-  border-radius:25px;
+  border: 1px solid #F0F0F0;
   display: inline;
-  color: black;
-  font-size: 14px;
+  color: gray;
+  font-size: 12px;
   line-height: 8px;
+  margin-right: 2px;
 }
 .btn-day-year:hover, .btn-day-year.active
 {
-  background: #F5B44A;
+  border:1px solid black;
 }
 .btn-month-year
 {
+  background: #F0F0F0;
   padding: 5px;
-  height: 30px;
-  width: 30px;
-  margin: 2px;
-  border-radius:25px;
+  height: 20px;
+  width: 38px;
+  border: 1px solid #F0F0F0;
   display: inline;
-  color: black;
-  font-size: 14px;
+  color: gray;
+  font-size: 12px;
   line-height: 8px;
+  margin-right: 2px;
 }
 .btn-month-year:hover, .btn-month-year.active
 {
-  background: #F5B44A;
+  border:1px solid black;
 }
 .everymonthtype
 {
   display: none;
-  margin: 0 auto;
 }
 .everymonthtype.showselect
 {
-  width: 100%;
-  display: table;
+  display: flex;
 }
 .everyyeartype
 {
@@ -1427,11 +1426,12 @@ label
 .everyyearbuttontype
 {
   display: none;
+  width: 225px;
+  float: left;
 }
 .everyyearbuttontype.showselect
 {
-  display: table;
-  width: 100%;
+  display: block;
 }
 .title-repeat-custom {
   color: black;
@@ -1485,6 +1485,16 @@ label
   cursor: pointer;
   color:#007AFF;
 }
+.form-control-select-repeat
+{
+  width: 85px;
+  margin-right: 5px;
+  font-size: 12px;
+  padding: 0px;
+  color: black;
+  background-color: #f0f0f0;
+  height: 25px;
+}
 #tooltip {
 
 }
@@ -1527,7 +1537,8 @@ label
 }
 .breadcrumbs
 {
-  padding: 7px 3px;
+  background-color: white;
+  padding: 10px;
   display: table;
 }
 .nopadding {
@@ -1871,16 +1882,6 @@ label
   width:50%;
   float:left
 }
-.col-md-4
-{
-  width:33.33333%;
-  float:left
-}
-.col-md-3
-{
-  width:25%;
-  float:left
-}
 .checklistadd
 {
   display: none;
@@ -1918,223 +1919,4 @@ label
 .checklist-list li
 {
 
-}
-.checkdellist
-{
-  text-decoration: none;
-}
-.checkdellist.linethoud
-{
-  text-decoration: line-through;
-}
-.сopypastefiles
-{
-  min-height: 40px;
-}
-.lineloadfile
-{
-  padding:5px;
-  border-top:1px solid #DDDFE0;
-  border-bottom:1px solid #DDDFE0;
-  width:100%;
-  display:inline-block;
-  margin:2px
-}
-.img-title-custom
-{
-  margin-left:10px;
-  margin-top:10px;
-  float:left;
-}
-.img-preview-custom
-{
-  width:50px;
-  float:left;
-}
-.timestamp-custom
-{
-  margin-left: 20px;
-  font-weight: bold;
-  font-size: 16px;
-  margin-top: 5px;
-  margin-bottom: 10px;
-}
-.form-arrow
-{
-  position: relative;
-  width: 150px;
-  margin-left: 20px;
-}
-.form-arrow input
-{
-  border-top:1px solid #cbcbcb;
-  border-bottom:1px solid #cbcbcb;
-  border-left:1px solid #cbcbcb;
-  border-bottom-left-radius: 5px;
-  border-top-left-radius: 5px;
-  height: 30px;
-  width: 150px;
-  font-size: 16px;
-  padding: 6px 12px;
-}
-.input-group-time-addon
-{
-  border-right: 1px solid #cbcbcb;
-  border-bottom: 1px solid #cbcbcb;
-  border-top: 1px solid #cbcbcb;
-  border-bottom-right-radius: 5px;
-  border-top-right-radius: 5px;
-}
-.vc-timestamp-select-arrow
-{
-}
-.timeselectstart
-{
-
-  display: flex;
-  margin-bottom: 10px;
-  font-size: 14px;
-  padding: 5px;
-}
-.timeselectend
-{
-
-  display: flex;
-  margin-bottom: 10px;
-  font-size: 14px;
-  padding: 5px;
-}
-.col-time-custome
-{
-  line-height: 23px;
-  text-align: center;
-}
-audio
-{
-  width: 268px;
-  border-bottom: 1px solid #c9c7c7;
-}
-audio::-webkit-media-controls-enclosure {
-  background-color: transparent;
-  border-bottom: 1px solid #f0f0f0;
-}
-audio::-webkit-media-controls-timeline {}
-audio::-webkit-media-controls-volume-control-container {}
-audio::-webkit-media-controls-volume-control-container.closed {}
-audio::-webkit-media-controls-volume-slider-container {}
-audio::-webkit-media-controls-volume-slider {}
-audio::-webkit-media-controls-seek-back-button {}
-audio::-webkit-media-controls-seek-forward-button {}
-audio::-webkit-media-controls-fullscreen-button {}
-audio::-webkit-media-controls-rewind-button {}
-audio::-webkit-media-controls-return-to-realtime-button {}
-audio::-webkit-media-controls-toggle-closed-captions-button {}
-.btn-timestamp
-{
-  background-color: white;
-  padding: 2px;
-}
-.btn-timestamp.timeBtnActive
-{
-  background-color: #F5B44A;
-  border-radius:5px;
-}
-.form_radio_btn {
-  line-height: 20px;
-}
-.form_radio_btn input[type=radio] {
-  display: none;
-}
-.form_radio_btn label {
-  display: inline-block;
-  cursor: pointer;
-  padding: 0 8px;
-  line-height: 27px;
-  border-radius: 6px;
-  user-select: none;
-}
-
-/* Checked */
-.form_radio_btn input[type=radio]:checked + label {
-  background: #ffe0a6;
-}
-
-/* Hover */
-.form_radio_btn label:hover {
-  color: #666;
-}
-
-/* Disabled */
-.form_radio_btn input[type=radio]:disabled + label {
-  background: #efefef;
-  color: #666;
-}
-.form-control-select-repeat
-{
-  padding: 6px 12px;
-  border-radius: 5px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  width: 155px;
-}
-.select-repeat-control
-{
-  padding: 6px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  margin:0 auto;
-  display: table;
-}
-.form_radio_btn-custom {
-  line-height: 20px;
-  float: left;
-  text-align: center;
-  height: 31px;
-  width: 31px;
-  margin: 2px;
-  border-radius:25px;
-  color: black;
-  font-size: 14px;
-}
-.form_radio_btn-custo:hover
-{
-  background: #F5B44A;
-}
-.form_radio_btn-custom input[type=radio] {
-  display: none;
-}
-.form_radio_btn-custom {
-}
-.form_radio_btn-custom label {
-  cursor: pointer;
-  user-select: none;
-  line-height: 20px;
-  float: left;
-  text-align: center;
-  padding: 5px;
-  height: 31px;
-  width: 31px;
-  margin: 2px;
-  border-radius:25px;
-  color: black;
-  font-size: 14px;
-}
-
-/* Checked */
-.form_radio_btn-custom input[type=radio]:checked + label {
-  background: #F5B44A;
-  height: 31px;
-  border-radius:25px;
-  width: 31px;
-  padding: 5px;
-}
-
-/* Hover */
-.form_radio_btn-custom label:hover {
-  color: #666;
-}
-
-/* Disabled */
-.form_radio_btn-custom input[type=radio]:disabled + label {
-  background: #efefef;
-  color: #666;
 }

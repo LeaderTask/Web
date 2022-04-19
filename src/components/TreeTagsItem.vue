@@ -9,19 +9,21 @@ export default {
   data () {
     const store = useStore()
     const selectedTask = computed(() => store.state.tasks.selectedTask)
+    //  const tagselect = computed(() => store.state.tasks.tags)
     const changetags = (tags) => {
+      console.log(selectedTask.value.tags)
       if (!selectedTask.value.tags.includes(tags)) {
         selectedTask.value.tags.push(tags)
       } else {
         if (selectedTask.value.tags.length > 0) {
           selectedTask.value.tags.splice(selectedTask.value.tags.indexOf(tags), 1)
         } else {
-          selectedTask.value.tags = []
+          selectedTask.value.tags = {}
         }
       }
     }
     return {
-      selectTags: selectedTask.value.tags,
+      selectTags: [],
       changetags,
       selectedTask: selectedTask,
       isOpen: false
@@ -30,6 +32,22 @@ export default {
   computed: {
     isFolder () {
       return this.model.children && this.model.children.length
+    },
+    selectAll: {
+      get: function () {
+        return this.model ? this.selectTags.length === this.selectedTask.tags.length : false
+      },
+      set: function (value) {
+        const select = []
+
+        if (value) {
+          this.model.forEach(function (user) {
+            select.push(user.uid)
+          })
+        }
+
+        this.selectTags = select
+      }
     }
   },
   methods: {
@@ -123,16 +141,19 @@ export default {
         />
       </svg>
       <input
+        :id="model.uid"
         ref="check_tags"
+        v-model="selectedTask.tags"
         type="checkbox"
         name="check_tags"
         class="check-custom-empployee custom-checkbox"
         :value="model.uid"
-        :id="model.uid"
-        v-model="selectTags"
         @click="changetags(model.uid)"
       >
-      <label class="break-words" :for="model.uid">{{ model.name.substring(0, 15) }}</label>
+      <label
+        class="break-words"
+        :for="model.uid"
+      >{{ model.name.substring(0, 15) }}</label>
     </div>
     <ul
       v-show="isOpen"

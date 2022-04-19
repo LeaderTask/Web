@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeMount, onMounted, computed } from 'vue'
+import { onBeforeMount, computed } from 'vue'
 import { useStore } from 'vuex'
 import { visitChildren } from '@/store/helpers/functions'
 import TasksListNew from '@/components/TasksListNew.vue'
@@ -10,7 +10,6 @@ import Employees from '@/components/Employees.vue'
 import Tags from '@/components/Tags.vue'
 import Colors from '@/components/Colors.vue'
 import Assignments from '@/components/Assignments.vue'
-import Dashboard from '@/components/Dashboard.vue'
 
 import { NAVIGATOR_REQUEST } from '@/store/actions/navigator'
 import { USER_REQUEST } from '@/store/actions/user'
@@ -25,7 +24,6 @@ const storeTasks = computed(() => store.state.tasks.newtasks)
 const newConfig = computed(() => store.state.tasks.newConfig)
 const navStack = computed(() => store.state.navbar.navStack)
 const storeNavigator = computed(() => store.state.navigator.navigator)
-const selectedTask = computed(() => store.state.tasks.selectedTask)
 
 const UID_TO_ACTION = {
   '901841d9-0016-491d-ad66-8ee42d2b496b': TASK.TASKS_REQUEST, // get today's day
@@ -44,15 +42,6 @@ const UID_TO_ACTION = {
   '511d871c-c5e9-43f0-8b4c-e8c447e1a823': TASK.DELEGATED_TO_USER_TASKS_REQUEST,
   'd35fe0bc-1747-4eb1-a1b2-3411e07a92a0': TASK.READY_FOR_COMPLITION_TASKS_REQUEST
 }
-
-onMounted(() => {
-  const fm = document.createElement('script')
-  const websync = document.createElement('script')
-  fm.setAttribute('src', 'https://web.leadertask.com/scripts/websync/fm.min.js')
-  websync.setAttribute('src', 'https://web.leadertask.com/scripts/websync/fm.websync.min.js')
-  document.head.appendChild(fm)
-  document.head.appendChild(websync)
-})
 
 const getTasks = () => {
   if (store.state.auth.token) {
@@ -84,47 +73,6 @@ const getNavigator = () => {
   if (store.state.auth.token) {
     store.dispatch(NAVIGATOR_REQUEST)
       .then(() => {
-        // Web sync
-        // avoid error with Capital constructor name
-        const clientProperty = 'client'
-        const client = new window.fm.websync[clientProperty]('https://sync.leadertask.net/websync.ashx?uid_session=' + storeNavigator.value.push_channel)
-        client.connect({
-          onSuccess: function (e) {
-            console.log('websync connected success!')
-          },
-          onFailure: function (e) {
-            console.log('websync onfailure connect fail ' + e.getException().message)
-          },
-          onStreamFailure: function (e) {
-            console.log('websync on stream failer connect fail ' + e.getException().message)
-          }
-        })
-
-        client.subscribe({
-          channel: '/' + storeNavigator.value.push_channel,
-          onSuccess: function (e) {
-            console.log('websync subscribe success')
-          },
-          onFailure: function (e) {
-            console.log('websync subscribe fail' + e.getException().message)
-            e.setRetry(true)
-          },
-          onReceive: function (e) {
-            try {
-              const str = e.getDataJson()
-              const obj = JSON.parse(str)
-              // we got the message we want to push
-              if (obj.operation === 1 && obj.type === 13) {
-                if ('uid_task' in obj && obj.uid_task === selectedTask.value.uid) {
-                  store.commit('CREATE_MESSAGE_REQUEST', obj.obj)
-                }
-              }
-            } catch (e) {
-              console.log('error in get Data Json')
-            }
-          }
-        })
-
         // After navigator is loaded we are trying to set up last visited navElement
         // Checking if last navElement is a gridSource
         if (navStack.value.length && navStack.value.length > 0) {
@@ -151,10 +99,6 @@ const getNavigator = () => {
 
               // nested lookup for shared and private projects
               if (navStack.value[navStack.value.length - 1].greedPath === 'projects_children') {
-                // Requests project's tasks
-                store.dispatch(UID_TO_ACTION[navStack.value[navStack.value.length - 1].global_property_uid], navStack.value[navStack.value.length - 1].uid)
-                store.commit('basic', { key: 'taskListSource', value: { uid: navStack.value[navStack.value.length - 1].global_property_uid, param: navStack.value[navStack.value.length - 1].uid } })
-
                 visitChildren(storeNavigator.value.new_private_projects[0].items, value => {
                   if (value.uid === navStack.value[navStack.value.length - 1].uid) {
                     store.commit('basic', { key: navStack.value[navStack.value.length - 1].key, value: value.children })
@@ -181,6 +125,7 @@ onBeforeMount(() => {
   getTasks()
   store.dispatch(USER_REQUEST)
 })
+
 </script>
 
 <template>
@@ -195,9 +140,6 @@ onBeforeMount(() => {
       <projects
         v-if="greedPath === 'new_private_projects'"
         :projects="greedSource"
-      />
-      <dashboard
-        v-if="greedPath === 'dashboard'"
       />
       <projects-children
         v-if="greedPath === 'projects_children'"

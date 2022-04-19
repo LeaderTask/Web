@@ -92,11 +92,11 @@ const removeColor = (color) => {
       </p>
       <input
         v-model="selectedColor.name"
-        @input="hasChanged = true"
         type="text"
         placeholder="Название проекта"
         class="mt-2 p-3 rounded-xl bg-gray-100 font-bold text-gray-700 w-full border-none ring-0 outline-none"
         :class="{ 'uppercase': selectedColor.uppercase }"
+        @input="hasChanged = true"
       >
       <div
         class="mt-8"
@@ -126,9 +126,9 @@ const removeColor = (color) => {
         </p>
         <Toggle
           v-model="selectedColor.uppercase"
-          @change="hasChanged = true"
           class="outline-none ring-0"
           :classes="{ toggleOn: 'bg-blue-400 border-blue-400 justify-start text-white', container: 'focus:ring-0' }"
+          @change="hasChanged = true"
         />
       </div>
       <p class="text-sm text-gray-500 dark:text-gray-200">

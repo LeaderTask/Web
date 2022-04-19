@@ -1,31 +1,30 @@
-html,  #aside, .scroll-style {
+html,  #aside {
   scrollbar-width: thin;
 }
 
-html::-webkit-scrollbar, #aside::-webkit-scrollbar, .scroll-style::-webkit-scrollbar {
+html::-webkit-scrollbar, #aside::-webkit-scrollbar {
   width: 6px;
   height: 6px;
-  scrollbar-color: #9ca3af #e5e7eb;
 }
 
-html::-webkit-scrollbar-thumb, #aside::-webkit-scrollbar-thumb, .scroll-style::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb, #aside::-webkit-scrollbar-thumb {
   @apply rounded;
 }
 
-html, .scroll-style {
+html {
   @apply overflow-auto;
   scrollbar-color: #9ca3af #e5e7eb;
 }
 
-html::-webkit-scrollbar-track, .scroll-style::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track {
   @apply bg-gray-100;
 }
 
-html::-webkit-scrollbar-thumb, .scroll-style::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb {
   @apply bg-gray-400;
 }
 
-html::-webkit-scrollbar-thumb:hover, .scroll-style::-webkit-scrollbar-thub:hover {
+html::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-500;
 }
 

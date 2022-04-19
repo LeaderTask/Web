@@ -87,10 +87,10 @@ const removeTag = (tag) => {
       </p>
       <input
         v-model="selectedTag.name"
-        @input="hasChanged = true"
         type="text"
         placeholder="Название проекта"
         class="mt-2 p-3 rounded-xl bg-gray-100 font-bold text-gray-700 w-full border-none ring-0 outline-none"
+        @input="hasChanged = true"
       >
       <div
         class="mt-8"

@@ -112,12 +112,27 @@ export default {
         />
       </svg>
       <label class="break-words">{{ model.name.substring(0, 15) }}</label>
-      <span class="inline-flex justify-center items-center" data-v-5784ed69-s="" v-if="selectedTask.uid_project === model.uid">
-                          <svg viewBox="0 0 26 20" width="10" height="10" class="inline-block" data-v-5784ed69-s="">
-                            <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M24.4107 1.30299C25.2766 2.02718 25.3681 3.2892 24.6148 4.1218L11.8142 18.2718C10.8103 19.3815 9.06094 19.4991 7.9062 18.5344L0.902667 12.6839C0.0362917 11.9601 -0.0558157 10.6982 0.69694 9.86518C1.44969 9.0322 2.76226 8.94364 3.62864 9.66738L9.58691 14.6447L21.4789 1.49931C22.2321 0.666707 23.5447 0.578813 24.4107 1.30299Z" data-v-5784ed69-s="">
-                            </path>
-                          </svg><!--v-if-->
-                        </span>
+      <span
+        v-if="selectedTask.uid_project === model.uid"
+        class="inline-flex justify-center items-center"
+        data-v-5784ed69-s=""
+      >
+        <svg
+          viewBox="0 0 26 20"
+          width="10"
+          height="10"
+          class="inline-block"
+          data-v-5784ed69-s=""
+        >
+          <path
+            fill="currentColor"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M24.4107 1.30299C25.2766 2.02718 25.3681 3.2892 24.6148 4.1218L11.8142 18.2718C10.8103 19.3815 9.06094 19.4991 7.9062 18.5344L0.902667 12.6839C0.0362917 11.9601 -0.0558157 10.6982 0.69694 9.86518C1.44969 9.0322 2.76226 8.94364 3.62864 9.66738L9.58691 14.6447L21.4789 1.49931C22.2321 0.666707 23.5447 0.578813 24.4107 1.30299Z"
+            data-v-5784ed69-s=""
+          />
+        </svg><!--v-if-->
+      </span>
       <input
         v-model="selecteProject[model.uid]"
         type="radio"
@@ -125,7 +140,8 @@ export default {
         name="check_projects"
         class="check-custom-project"
         :checked="selectedTask.uid_project === model.uid"
-        @click="changeProject(selectedTask.uid, model.uid)" style="display:none;"
+        style="display:none;"
+        @click="changeProject(selectedTask.uid, model.uid)"
       >
     </div>
     <ul

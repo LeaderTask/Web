@@ -10,8 +10,6 @@ import Icon from '@/components/Icon.vue'
 import AccModal from '@/components/AccModal.vue'
 import AccTarif from '@/components/AccTarif.vue'
 import AsideMenuList from '@/components/AsideMenuList.vue'
-import AccModalPass from '@/components/AccModalPass.vue'
-import AccOption from '@/components/AccOption.vue'
 import 'v-calendar/dist/style.css'
 
 import * as TASK from '@/store/actions/tasks'
@@ -31,14 +29,6 @@ defineProps({
 let modalOneActive = ref(false)
 // Serves as linkage between requests from storage and tree view navigator
 const UID_TO_ACTION = {
-  '2bad1413-a373-4926-8a3c-58677a680714': [
-    TASK.TASKS_REQUEST,
-    TASK.OPENED_TASKS_REQUEST,
-    TASK.UNSORTED_TASKS_REQUEST,
-    TASK.OVERDUE_TASKS_REQUEST,
-    TASK.IN_WORK_TASKS_REQUEST,
-    TASK.IN_FOCUS_TASKS_REQUEST
-  ],
   '901841d9-0016-491d-ad66-8ee42d2b496b': TASK.TASKS_REQUEST, // get today's day
   '46418722-a720-4c9e-b255-16db4e590c34': TASK.OVERDUE_TASKS_REQUEST,
   '017a3e8c-79ac-452c-abb7-6652deecbd1c': TASK.OPENED_TASKS_REQUEST,
@@ -113,23 +103,9 @@ const asideLgClose = () => {
 }
 
 // TODO: clean up messy logic
-
 const menuClick = (event, item) => {
   if (isPropertiesMobileExpanded.value) {
     store.dispatch('asidePropertiesToggle', false)
-  }
-
-  // desktop check
-  if (item.uid === '2bad1413-a373-4926-8a3c-58677a680714') {
-    store.commit('basic', { key: 'mainSectionState', value: 'greed' })
-    store.commit('basic', { key: 'greedPath', value: 'dashboard' })
-    const navElem = {
-      name: 'Рабочий стол',
-      key: 'greedSoure',
-      uid: '2bad1413-a373-4926-8a3c-58677a680714'
-    }
-    store.commit('updateStackWithInitValue', navElem)
-    return
   }
 
   // Tasks list source
@@ -173,8 +149,6 @@ const menuClick = (event, item) => {
 const TitleName = () => {
   if (navig.value === 0) return ('Аккаунт')
   else if (navig.value === 1) return ('Тариф')
-  else if (navig.value === 2) return ('Основное')
-  else if (navig.value === 3) return ('Изменение пароля')
 }
 const accS = () => {
   store.commit('basic', { key: 'navig', value: 0 })
@@ -197,18 +171,10 @@ const tarifS = () => {
       v-if="navig === 0"
       class="text-lg"
       @AccLogout="logout()"
+      @AccToTarif="tarifS()"
     />
     <acc-tarif
       v-if="navig === 1"
-      class="text-lg"
-    />
-    <acc-modal-pass
-      v-if="navig === 3"
-      class="text-lg"
-    />
-    <acc-option
-      v-if="navig === 2"
-      class="text-lg"
     />
   </modal-box>
   <!-- /Profile modal -->
@@ -260,17 +226,17 @@ const tarifS = () => {
     </div>
     <nav-bar-item class="rounded-b-3xl pt-0 mt-0">
       <DatePicker
-        dot="true"
         id="Maincalendar"
+        ref="calendarclass"
         v-model="navigatorMenu.currentDate"
+        dot="true"
         class="border-none text-xs px-3 calendar-custom calendar-nav-custom"
         style="border: none!important;"
         :style="{ backgroundColor: datePickerBG }"
         show-weeknumbers="left"
         days="-1"
         color="#CCC"
-        ref="calendarclass"
-        weekFromEnd="6"
+        week-from-end="6"
         from-page="fromPage"
         to-page="toPage"
         is-expanded
@@ -280,9 +246,9 @@ const tarifS = () => {
         :is-dark="isDark"
         mode="single"
         is-inline
-        inNextMonth="true"
-        inMonth="true"
-        inPrevMonth="true"
+        in-next-month="true"
+        in-month="true"
+        in-prev-month="true"
         select-attribute="dates"
       />
     </nav-bar-item>

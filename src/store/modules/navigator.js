@@ -27,7 +27,6 @@ import { computed } from 'vue'
 
 // icons for navigator
 import calendar from '@/icons/calendar.js'
-import desktop from '@/icons/desktop.js'
 import overdue from '@/icons/overdue.js'
 import unsorted from '@/icons/unsorted.js'
 import unread from '@/icons/unread.js'
@@ -199,17 +198,6 @@ const mutations = {
       iconBox: calendar.viewBox,
       type: 'uid',
       iconBackgroundClass: 'bg-blue-400'
-    }])
-    state.menu.push([{
-      label: 'Рабочий стол',
-      uid: '2bad1413-a373-4926-8a3c-58677a680714',
-      bold: 0,
-      icon: desktop.path,
-      width: desktop.width,
-      height: desktop.height,
-      iconBox: desktop.viewBox,
-      type: 'uid',
-      iconBackgroundClass: 'bg-white-500'
     }])
     state.menu.push([{
       label: localization.value.overdue,
@@ -389,7 +377,6 @@ const mutations = {
       items: resp.data.common_projects.items
     })
     resp.data.new_private_projects = newCommonProjects
-
     state.navigator = resp.data
   },
   [NAVIGATOR_PUSH_PROJECT]: (state, projects) => {

@@ -19,10 +19,6 @@ function pad2 (n) {
 
 const state = {
   tasks: false,
-  unread: '',
-  inWork: {},
-  unreadCustomersUid: [],
-  customersTasks: {},
   tags: {},
   selectedTag: null,
   subtasks: false,
@@ -243,7 +239,6 @@ const actions = {
       axios({ url: url, method: 'GET' })
         .then(resp => {
           commit(TASK.TASKS_SUCCESS, resp)
-          commit(TASK.UNREAD_TASKS_REQUEST, resp)
           if (resp.data.anothers_tags.length) {
             commit(TASK.ADD_TASK_TAGS, resp.data.anothers_tags)
           }
@@ -271,7 +266,6 @@ const actions = {
       axios({ url: url, method: 'GET' })
         .then(resp => {
           commit(TASK.TASKS_SUCCESS, resp)
-          commit(TASK.IN_WORK_TASKS_REQUEST, resp)
           if (resp.data.anothers_tags.length) {
             commit(TASK.ADD_TASK_TAGS, resp.data.anothers_tags)
           }
@@ -713,6 +707,9 @@ const actions = {
   },
   [TASK.CHANGE_TASK_PERFORMER]: ({ commit, dispatch }, data) => {
     return new Promise((resolve, reject) => {
+      if (data.value !== '') {
+        data.value = null
+      }
       const url = 'https://web.leadertask.com/api/v1/task/performer?uid=' + data.uid + '&value=' + data.value
       axios({
         url: url,
@@ -788,7 +785,7 @@ const actions = {
             group: 'api',
             title: 'REST API Error, please make screenshot',
             action: TASK.CHANGE_TASK_CHEKCLIST,
-            text: 'error while uploading checklist'
+            text: err.response.data
           }, 15000)
           reject(err)
         })
@@ -817,13 +814,9 @@ const actions = {
     })
   },
   [TASK.CHANGE_TASK_DATE]: ({ commit, dispatch }, data) => {
-    const dataSend = { ...data }
-    if (dataSend.str_date_end === '' || dataSend.str_date_end === null) {
-      dataSend.str_date_end = '0001-01-01T23:59:59'
-    }
     return new Promise((resolve, reject) => {
       const url = 'https://web.leadertask.com/api/v1/task/term'
-      axios({ url: url, method: 'PATCH', data: dataSend })
+      axios({ url: url, method: 'PATCH', data: data })
         .then(resp => {
           resolve(resp)
           commit(TASK.CHANGE_TASK_DATE, data)
@@ -908,92 +901,6 @@ const actions = {
           reject(err)
         })
     })
-  },
-  //  Повтор API
-  [TASK.RESET_REPEAT_CHANGE]: ({ commit, dispatch }, data) => {
-    return new Promise((resolve, reject) => {
-      const url = 'https://web.leadertask.com/api/v1/taskrepeat/reset?uid=' + data.uid
-      axios({ url: url, method: 'PATCH' })
-        .then(resp => {
-          resolve(resp)
-        }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'REST API Error, please make screenshot',
-            action: TASK.RESET_REPEAT_CHANGE,
-            text: err.response.data
-          }, 15000)
-          reject(err)
-        })
-    })
-  },
-  [TASK.EVERY_DAY_CHANGE]: ({ commit, dispatch }, data) => {
-    return new Promise((resolve, reject) => {
-      const url = 'https://web.leadertask.com/api/v1/taskrepeat/everyday?uid=' + data.uid
-      axios({ url: url, method: 'PATCH', data: data })
-        .then(resp => {
-          resolve(resp)
-        }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'REST API Error, please make screenshot',
-            action: TASK.EVERY_DAY_CHANGE,
-            text: err.response.data
-          }, 15000)
-          reject(err)
-        })
-    })
-  },
-  [TASK.EVERY_WEEK_CHANGE]: ({ commit, dispatch }, data) => {
-    return new Promise((resolve, reject) => {
-      const url = 'https://web.leadertask.com/api/v1/taskrepeat/everyweek?uid=' + data.uid
-      axios({ url: url, method: 'PATCH', data: data })
-        .then(resp => {
-          resolve(resp)
-        }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'REST API Error, please make screenshot',
-            action: TASK.EVERY_WEEK_CHANGE,
-            text: err.response.data
-          }, 15000)
-          reject(err)
-        })
-    })
-  },
-  [TASK.EVERY_MONTH_CHANGE]: ({ commit, dispatch }, data) => {
-    return new Promise((resolve, reject) => {
-      const url = 'https://web.leadertask.com/api/v1/taskrepeat/everymonth?uid=' + data.uid
-      axios({ url: url, method: 'PATCH', data: data })
-        .then(resp => {
-          resolve(resp)
-        }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'REST API Error, please make screenshot',
-            action: TASK.EVERY_MONTH_CHANGE,
-            text: err.response.data
-          }, 15000)
-          reject(err)
-        })
-    })
-  },
-  [TASK.EVERY_YEAR_CHANGE]: ({ commit, dispatch }, data) => {
-    return new Promise((resolve, reject) => {
-      const url = 'https://web.leadertask.com/api/v1/taskrepeat/everyyear?uid=' + data.uid
-      axios({ url: url, method: 'PATCH', data: data })
-        .then(resp => {
-          resolve(resp)
-        }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'REST API Error, please make screenshot',
-            action: TASK.EVERY_YEAR_CHANGE,
-            text: err.response.data
-          }, 15000)
-          reject(err)
-        })
-    })
   }
 }
 
@@ -1003,16 +910,6 @@ const mutations = {
       if (taskUid === state.newConfig.leaves[i]) {
         state.newConfig.leaves.splice(i, 1)
       }
-    }
-  },
-  [TASK.IN_WORK_TASKS_REQUEST]: (state, resp) => {
-    state.inWork = resp.data
-  },
-  [TASK.UNREAD_TASKS_REQUEST]: (state, resp) => {
-    state.unread = resp.data.tasks.length
-    for (let i = 0; i < state.unread; i++) {
-      state.unreadCustomersUid.push(resp.data.tasks[i].uid_customer)
-      // state.customersTasks[state.unreadCustomersUid[i]] = state.employees.employees
     }
   },
   [TASK.TASKS_REQUEST]: state => {
@@ -1037,7 +934,6 @@ const mutations = {
         state.newConfig.leaves.push(node.uid)
       }
 
-      node._isEditable = false
       nodes[node.uid] = {
         info: node,
         children: node.has_children ? ['fake-uid'] : [],
@@ -1077,15 +973,10 @@ const mutations = {
       if (!task.has_children) {
         state.newConfig.leaves.push(task.uid)
       }
-      task._isEditable = false
       state.newtasks[task.uid] = {
         info: task,
         children: [],
-        state: {
-          checked: false,
-          opened: false,
-          draggable: task.type === 1
-        }
+        state: { checked: false, opened: false }
       }
     }
   },
@@ -1102,7 +993,6 @@ const mutations = {
     task._justCreated = false
     state.newConfig.leaves.push(task.uid)
     task.type = 1
-    task._isEditable = false
     state.newtasks[task.uid] = {
       info: task,
       // even if copy, we would copy without children
@@ -1185,7 +1075,7 @@ const mutations = {
     state.project = data.value
   },
   [TASK.CHANGE_TASK_CHEKCLIST]: (state, data) => {
-    state.newtasks[data.uid_task].info.checklist = data.checklist
+    state.checklist.push(data.value)
   },
   [TASK.CHANGE_TASK_ACCESS]: (state, data) => {
     state.access.push(data.value)

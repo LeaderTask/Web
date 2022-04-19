@@ -4,7 +4,8 @@ import {
   DELETE_MESSAGE_REQUEST,
   MESSAGES_ERROR,
   MESSAGES_SUCCESS,
-  REFRESH_MESSAGES
+  REFRESH_MESSAGES,
+  DELETE_MESSAGE_LOCAL
 } from '../actions/taskmessages'
 import {
   FILES_REQUEST,
@@ -14,10 +15,8 @@ import {
   MYFILES,
   GETFILES,
   FILE_SUCCESS,
-  CREATE_FILE_REQUEST,
   CREATE_FILES_REQUEST,
-  MERGE_FILES_WITH_MESSAGES,
-  TOGGLE_UPLOAD_STATUS
+  MERGE_FILES_WITH_MESSAGES
 } from '../actions/taskfiles'
 import { AUTH_LOGOUT } from '../actions/auth'
 import { notify } from 'notiwind'
@@ -32,8 +31,7 @@ const state = {
   /* files */
   files: [],
   file: '',
-  myfiles: {},
-  uploadStarted: false
+  myfiles: {}
 }
 
 const getters = {}
@@ -77,40 +75,19 @@ const actions = {
   },
   [CREATE_FILES_REQUEST]: ({ commit, dispatch }, data) => {
     return new Promise((resolve, reject) => {
-      const url = 'https://web.leadertask.com/api/v1/tasksfiles/several?uid_task=' + data.uid_task
-      commit(TOGGLE_UPLOAD_STATUS)
-      console.log(data)
+      const formData = new FormData()
+      formData.append('files', data.name)
+      const url = 'https://web.leadertask.com/api/v1/tasksfiles?uid_task=' + data.uid_task
       axios({
         url: url,
         method: 'POST',
-        data: data.name,
+        data: formData,
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       })
         .then(resp => {
-          commit(CREATE_FILES_REQUEST, resp)
-          commit(TOGGLE_UPLOAD_STATUS)
-          resolve(resp)
-        }).catch(err => {
-          reject(err)
-          commit(TOGGLE_UPLOAD_STATUS)
-        })
-    })
-  },
-  [CREATE_FILE_REQUEST]: ({ commit, dispatch }, data) => {
-    return new Promise((resolve, reject) => {
-      const url = 'https://web.leadertask.com/api/v1/tasksfiles/one?uid_task=' + data.uid_task
-      axios({
-        url: url,
-        method: 'POST',
-        data: data.name,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-        .then(resp => {
-          commit(CREATE_FILE_REQUEST, data)
+          commit(CREATE_FILES_REQUEST, data)
           resolve(resp)
         }).catch(err => {
           reject(err)
@@ -186,6 +163,12 @@ const actions = {
       .then(() => {
         commit(MERGE_FILES_WITH_MESSAGES)
       })
+  },
+  DELETE_MESSAGE_ALL ({ commit, dispatch }, data) { // data = {uid, index(current message)}
+    console.log('data')
+    console.log(data)
+    dispatch(DELETE_MESSAGE_REQUEST, data.key)
+    commit(DELETE_MESSAGE_LOCAL, data.value)
   }
 }
 
@@ -221,25 +204,9 @@ const mutations = {
     state.file = resp.data.files
     state.hasLoadedOnce = true
   },
-  [CREATE_FILE_REQUEST]: (state, resp) => {
-    state.status = 'success'
-    state.hasLoadedOnce = true
-  },
-  createLoadingFile (state, data) {
-    data.loading = true
-    state.messages.push(data)
-  },
   [CREATE_FILES_REQUEST]: (state, resp) => {
     state.status = 'success'
     state.hasLoadedOnce = true
-    for (let i = 0; i < state.messages.length; i++) {
-      state.messages = state.messages.filter(item => !item.loading)
-    }
-    for (const file of resp.data.success) {
-      file.msg = file.file_name
-      state.messages.push(file)
-    }
-    console.log('create fileS request', resp)
   },
   [MYFILES]: (state, myfiles) => {
     state.status = 'success'
@@ -256,16 +223,55 @@ const mutations = {
     state.files = []
   },
   [MERGE_FILES_WITH_MESSAGES]: state => {
-    state.files.forEach(item => {
-      item.msg = item.file_name
-    })
-    state.messages = state.messages.concat(state.files)
-    state.messages.sort((a, b) => {
-      return new Date(a.date_create) - new Date(b.date_create)
-    })
+    if (state.messages.length === 0) {
+      for (const file of state.files) {
+        file.msg = file.file_name
+        file._isAdded = true
+        state.messages.push(file)
+      }
+    } else {
+      for (const file of state.files) {
+        const fileDate = new Date(file.date_create)
+        for (let i = 0; i < state.messages.length; i++) {
+          if (state.messages[i].uid_file) {
+            continue
+          }
+          const messageDate = new Date(state.messages[i].date_create)
+          // at the start
+          if (i === 0) {
+            if ((fileDate < messageDate) && (!file._isAdded)) {
+              file.msg = file.file_name
+              file._isAdded = true
+              state.messages.unshift(file)
+            }
+          // at the end
+          } else if (i === state.messages.length - 1) {
+            const fileDate = new Date(file.date_create)
+            if ((fileDate > messageDate) && (!file._isAdded)) {
+              file.msg = file.file_name
+              file._isAdded = true
+              state.messages.push(file)
+            }
+          } else {
+            const secondMessageDate = new Date(state.messages[i + 1].date_create)
+            const fileDate = new Date(file.date_create)
+            if ((fileDate < secondMessageDate) && (!file._isAdded)) {
+              file.msg = file.file_name
+              file._isAdded = true
+              state.messages.splice(i + 1, 0, file)
+            }
+          }
+        }
+      }
+    }
   },
-  [TOGGLE_UPLOAD_STATUS]: state => {
-    state.uploadStarted = !state.uploadStarted
+  DELETE_MESSAGE_LOCAL: (state, data) => {
+    state.messages.splice(data, 1)
+  },
+  CLOSEMESSAGE: (state, value) => {
+    state.messages.forEach((el) => {
+      // el
+    })
   }
 }
 

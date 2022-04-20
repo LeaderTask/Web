@@ -37,7 +37,7 @@ const overlayClick = () => {
     group="api"
     position="bottom"
   >
-    <div class="fixed inset-x-0 bottom-0 flex items-start justify-end p-6 px-4 py-6 z-50" style="position: relative;">
+    <div class="fixed inset-x-0 bottom-0 flex items-start justify-end p-6 px-4 py-6 z-49" style="position: relative;">
       <div class="w-full max-w-sm">
         <Notification
           v-slot="{ notifications, close }"

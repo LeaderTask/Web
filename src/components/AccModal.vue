@@ -20,7 +20,7 @@ const logout = () => {
 
 <template>
 <form class=" mx-12 overscroll-auto">
-  <div class="flex pb-6">
+  <div class="flex pb-3">
     <form class="text-left w-3/4">
       <strong>Тариф</strong>
       <br>
@@ -39,7 +39,7 @@ const logout = () => {
     </form>
   </div>
   <hr>
-  <div class="text-left mt-6 mb-3 flex flex-wrap">
+  <div class="text-left mt-3 mb-3 flex flex-wrap">
     <strong class="w-full">Фото</strong>
     <br>
     <div class="pr-2 pt-3">
@@ -59,17 +59,16 @@ const logout = () => {
     <br>
     <input v-model="user.current_user_name" type="text" class="border mt-2">
     <br>
-    <form>
+    <form class="mb-2">
       <button
       v-if="lab != user.current_user_name"
       class="bg-gray-100 rounded-xl mt-4 px-3 p-1 hover:bg-gray-200">Изменить имя</button>
     </form>
-    <br>
-    <strong>Email</strong>
-    <br>
-    <span>{{ user.current_user_email }}</span>
-    <br>
-    <br>
+    <div class="mb-2">
+      <strong>Email</strong>
+      <br>
+      <span>{{ user.current_user_email }}</span>
+    </div>
     <strong>Пароль</strong>
     <br>
     <form>

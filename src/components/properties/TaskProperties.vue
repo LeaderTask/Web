@@ -972,7 +972,6 @@ export default {
         text: msgtask,
         msg: msgtask
       }
-
       this.$store.dispatch(CREATE_MESSAGE_REQUEST, data).then(
         resp => {
           // Answer last inspector message
@@ -983,11 +982,16 @@ export default {
               lastInspectorMessage.performer_answer = 1
             })
           }
-
           this.selectedTask.has_msgs = true
           if (this.selectedTask.type === 2 || this.selectedTask.type === 3) {
             if ([1, 5, 7, 8].includes(this.selectedTask.status)) {
-              this.selectedTask.status = 9
+              if (((this.selectedTask.uid_customer === this.cusers.current_user_uid) && (this.selectedTask.status === 1))) {
+                this.selectedTask.status = 9
+                this.$store.dispatch(TASK.CHANGE_TASK_STATUS, { uid: this.selectedTask.uid, value: 9 })
+              } else if (((this.selectedTask.uid_customer !== this.cusers.current_user_uid) && (this.selectedTask.status === 1))) {
+                this.selectedTask.status = 1
+                this.$store.dispatch(TASK.CHANGE_TASK_STATUS, { uid: this.selectedTask.uid, value: 1 })
+              }
             }
           }
           this.selectedTask.msg = decodeURIComponent(this.taskMsg)
@@ -1043,7 +1047,13 @@ export default {
               // ставим статус "на доработку" когда прикладываем файл
               if (this.selectedTask.type === 2 || this.selectedTask.type === 3) {
                 if ([1, 5, 7, 8].includes(this.selectedTask.status)) {
-                  this.selectedTask.status = 9
+                  if (((this.selectedTask.uid_customer === this.cusers.current_user_uid) && (this.selectedTask.status === 1))) {
+                    this.selectedTask.status = 9
+                    this.$store.dispatch(TASK.CHANGE_TASK_STATUS, { uid: this.selectedTask.uid, value: 9 })
+                  } else if (((this.selectedTask.uid_customer !== this.cusers.current_user_uid) && (this.selectedTask.status === 1))) {
+                    this.selectedTask.status = 1
+                    this.$store.dispatch(TASK.CHANGE_TASK_STATUS, { uid: this.selectedTask.uid, value: 1 })
+                  }
                 }
               }
               // загрузка завершена - подписываемся опять
@@ -1077,7 +1087,7 @@ export default {
     onChangePerformer: function (userEmail) {
       console.log('onChangePerformer', userEmail)
       const user = this.$store.state.user.user
-      const taskUid = this.selectedTask.uid
+      // const taskUid = this.selectedTask.uid
       const data = {
         uid: this.selectedTask.uid,
         value: userEmail
@@ -1092,7 +1102,7 @@ export default {
         }
       )
       if (user.current_user_email !== userEmail) {
-        this.$store.commit(TASK.REMOVE_TASK, taskUid)
+        // this.$store.commit(TASK.REMOVE_TASK, taskUid)
         this.$store.dispatch('asidePropertiesToggle', false)
       }
     },
@@ -1191,7 +1201,7 @@ export default {
     button="warning"
     has-button
     has-cancel
-    button-label="Delete"
+    button-label="Удалить"
     @confirm="delTask"
   >
     <p
@@ -1262,7 +1272,7 @@ export default {
       >
         <!-- Кнопка Поручить / Взять на исполнение / Перепоручить -->
         <TaskPropsButtonPerform
-          v-if="selectedTask.status !== 3 && selectedTask.type !== 4"
+          v-if="selectedTask.status !== 3 && selectedTask.type !== 4 && !((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           :task-type="selectedTask.type"
           :current-user-uid="cusers.current_user_uid"
           :performer-email="selectedTask.email_performer"
@@ -1271,7 +1281,7 @@ export default {
         />
         <!-- Кнопка Доступ -->
         <TaskPropsButtonAccess
-          v-if="isAccessVisible"
+          v-if="isAccessVisible && !((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           :current-user-uid="cusers.current_user_uid"
           :access-emails="selectedTask.emails ? selectedTask.emails.split('..') : []"
           :can-edit="selectedTask.type === 1 || selectedTask.type === 2"
@@ -1279,6 +1289,7 @@ export default {
         />
         <!-- Кнопка Выбрать дату -->
         <TaskPropsButtonSetDate
+          v-if="!((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           :date-begin="selectedTask.date_begin"
           :date-end="selectedTask.date_end"
           :date-text="selectedTask.term_user"
@@ -1286,7 +1297,7 @@ export default {
         />
         <!-- Повтор -->
         <Popper
-          v-if="selectedTask.term_customer"
+          v-if="selectedTask.term_customer && !((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           class="popper-repeat"
           arrow
           trigger="hover"
@@ -1852,25 +1863,27 @@ export default {
          </Popper>-->
         <!-- Кнопка Проект -->
         <TaskPropsButtonProject
+          v-if="!((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           :selected-project="selectedTask.uid_project"
           :can-edit="selectedTask.type === 1 || selectedTask.type === 2"
           @changeProject="onChangeProject"
         />
         <!-- Кнопка Цвет -->
         <TaskPropsButtonColor
+          v-if="!((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           :selected-color="selectedTask.uid_marker"
           :can-edit="selectedTask.type === 1 || selectedTask.type === 2"
           @changeColor="onChangeColor"
         />
         <!-- Кнопка Метки -->
         <TaskPropsButtonTags
-          v-if="selectedTask.type === 1 || selectedTask.type === 2"
+          v-if="selectedTask.type === 1 || selectedTask.type === 2 && !((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           :selected-tags="selectedTask.tags"
           @changeTags="onChangeTags"
         />
         <!-- Чек лист -->
         <div
-          v-if="!selectedTask.checklist && selectedTask.type!==4 && selectedTask.type!==3"
+          v-if="!selectedTask.checklist && selectedTask.type!==4 && selectedTask.type!==3 && !((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           class="mt-3 tags-custom dark:bg-gray-800 dark:text-gray-100"
           @click="createChecklist"
         >
@@ -1911,6 +1924,7 @@ export default {
         </div>
         <!-- Фокус -->
         <TaskPropsButtonFocus
+          v-if="!((selectedTask.uid_customer !== user.current_user_uid) && (selectedTask.status === 1))"
           :focus="isInFocus"
           @toggle-focus="changeFocus(selectedTask.uid, isInFocus ? 0 : 1)"
         />
@@ -1934,7 +1948,7 @@ export default {
       />
       <!-- Comment -->
       <TaskPropsCommentEditor
-        class="mt-3"
+        class="mt-3 h-32 scroll-style overflow-auto"
         :comment="selectedTask.comment ?? ''"
         :can-edit="canEditComment"
         @endChangeComment="endChangeComment"
@@ -1953,7 +1967,7 @@ export default {
       <TaskPropsChatMessages
         v-if="taskMessages?.length"
         id="content"
-        class="mt-3"
+        class="mt-3 h-3/6 scroll-style overflow-auto"
         :task-messages="taskMessages"
         :current-user-uid="cusers.current_user_uid"
         :show-all-messages="showAllMessages"

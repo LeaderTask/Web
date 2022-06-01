@@ -1102,7 +1102,7 @@ export default {
         }
       )
       if (user.current_user_email !== userEmail) {
-        // this.$store.commit(TASK.REMOVE_TASK, taskUid)
+        // this.$store.commit(TASK.REMOVE_TASK, taskUid)  //после поручения задачи она удаляется до перезагрузки страницы
         this.$store.dispatch('asidePropertiesToggle', false)
       }
     },

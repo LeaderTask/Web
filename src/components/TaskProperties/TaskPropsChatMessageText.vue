@@ -299,10 +299,8 @@ export default {
       copyText(message, undefined, (error, event) => {
         // copyText('lt://planning?{' + selectedTask.value.uid.toUpperCase() + '}', undefined, (error, event) => {
         if (error) {
-          alert('Can not copy')
           console.log(error)
         } else {
-          alert('Copied')
           console.log(event)
         }
       })

@@ -3,7 +3,7 @@ import { createProject } from '@/websync/project.js'
 import { createTask } from '@/websync/task.js'
 import { createCard } from '@/websync/card.js'
 import { createEmployee } from '@/websync/employee.js'
-import { createMessage } from '@/websync/task_message.js'
+import { createTaskMessage } from '@/websync/task_message.js'
 import { createCardMessage } from '@/websync/card_message.js'
 import * as TYPES from '@/websync/types.js'
 import { showNotify } from '@/store/helpers/functions'
@@ -73,19 +73,10 @@ export default function processCreate (obj) {
     case TYPES.TYPE_OBJECT_PROJECT_MEMBER:
       break
     case TYPES.TYPE_OBJECT_TASK_FILE:
+      createTaskMessage(obj)
       break
     case TYPES.TYPE_OBJECT_TASK_MSG:
-      // выводит вообще все сообщения - а надо только те что для меня
-      // в текущем api не сделать
-      // if (obj.obj.uid_creator !== currentUserUid()) {
-      //   showNotify({
-      //     group: 'top',
-      //     title: 'Новое сообщение',
-      //     obj: obj,
-      //     text: obj.obj.msg
-      //   })
-      // }
-      createMessage(obj)
+      createTaskMessage(obj)
       break
     case TYPES.TYPE_OBJECT_TASK_TAG:
       break

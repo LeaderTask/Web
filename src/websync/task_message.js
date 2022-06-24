@@ -3,17 +3,9 @@ import { computed } from 'vue'
 
 const selectedTask = computed(() => store.state.tasks.selectedTask)
 
-export function createMessage (obj) {
+export function createTaskMessage (obj) {
   if ('uid_task' in obj && selectedTask.value && obj.uid_task === selectedTask.value.uid) {
+    console.log('we need to add message into task chat')
     store.commit('CREATE_MESSAGE_REQUEST', obj.obj)
   }
-}
-export function getMessage (obj) {
-  if ('uid_task' in obj && selectedTask.value && obj.uid_task === selectedTask.value.uid) {
-    store.commit('MESSAGE_REQUEST', obj.obj)
-    store.commit('FILES_REQUEST', obj.obj)
-  }
-}
-export function getFiles (obj) {
-  store.commit('FILES_REQUEST', obj.obj)
 }

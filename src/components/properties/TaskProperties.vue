@@ -1328,7 +1328,7 @@ export default {
     @mousedown="selectedFalse"
   >
     <div
-      class="inline-flex justify-center items-center text-[#7E7E80] dark:text-white h-[11px] w-[11px] cursor-pointer absolute top-0 right-0 mr-2 mt-1 z-10"
+      class="inline-flex justify-center items-center text-[#7E7E80] dark:text-white h-[11px] w-[11px] cursor-pointer absolute top-[-3px] right-[-5px] z-10"
       @click="closeProperties"
     >
       <svg

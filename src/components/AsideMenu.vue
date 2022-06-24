@@ -130,7 +130,8 @@ const menuClick = (event, item) => {
     const navElem = {
       name: item.label,
       key: 'greedSource',
-      value: { uid: item.uid, param: null }
+      value: { uid: item.uid, param: null },
+      greedPath: 'doitnow'
     }
     store.commit('updateStackWithInitValue', navElem)
     store.commit('basic', { key: 'mainSectionState', value: 'greed' })

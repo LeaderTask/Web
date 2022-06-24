@@ -86,7 +86,7 @@
     <tree
       :nodes="storeTasks"
       :config="newConfig"
-      class="w-full"
+      class="w-full h-full"
       @nodeOpened="nodeExpanding"
       @nodeFocus="nodeSelected"
       @nodeDragend="nodeDragEnd"

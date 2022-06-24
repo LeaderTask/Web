@@ -6,9 +6,6 @@
     has-cancel
     button-label="Delete"
   />
-  <TasksSkeleton
-    v-if="isLoading"
-  />
   <div
     v-if="tasksCount"
     class="flex items-center mb-5 justify-between"
@@ -78,7 +75,6 @@ import Icon from '@/components/Icon.vue'
 import arrowForw from '@/icons/arrow-forw-sm.js'
 import DoitnowEmpty from '@/components/Doitnow/DoitnowEmpty.vue'
 import DoitnowTask from '@/components/Doitnow/DoitnowTask.vue'
-import TasksSkeleton from '@/components/TasksList/TasksSkeleton.vue'
 import { PUSH_COLOR } from '@/store/actions/colors'
 
 export default {
@@ -86,8 +82,7 @@ export default {
     DoitnowEmpty,
     DoitnowTask,
     InspectorModalBox,
-    Icon,
-    TasksSkeleton
+    Icon
   },
   setup () {
     return {

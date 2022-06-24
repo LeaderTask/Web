@@ -41,7 +41,7 @@
             @dayclick="onDayClick"
           >
             <template #footer>
-              <div v-if="time ? showTime = true : showTime = false">
+              <div>
                 <div class="timestamp-custom">
                   Установить напоминание
                 </div>

@@ -1209,6 +1209,11 @@ export default {
           this.selectedTask.date_begin = resp.str_date_begin
           this.selectedTask.date_end = resp.str_date_end
         })
+
+      if (data.str_date_begin === data.str_date_end) {
+        return
+      }
+
       const navStack = computed(() => this.$store.state.navbar.navStack)
       if (navStack.value.length && navStack.value.length > 0) {
         const navStackUid = navStack.value[0]?.value?.uid

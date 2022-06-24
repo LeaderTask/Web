@@ -4,6 +4,7 @@ import { updateCard } from '@/websync/card.js'
 import { updateEmployee } from '@/websync/employee.js'
 import { updateProject } from '@/websync/project.js'
 import { removeCardMessage } from '@/websync/card_message'
+import { removeTaskMessage } from '@/websync/task_message'
 import { updateColor } from '@/websync/colors_dop'
 import { updateTag } from '@/websync/tag'
 
@@ -20,8 +21,11 @@ export default function processUpdate (obj) {
       break
     case TYPES.TYPE_OBJECT_CONTACT:
       break
+    case TYPES.TYPE_OBJECT_TASK_FILE:
+      removeTaskMessage(obj)
+      break
     case TYPES.TYPE_OBJECT_TASK_MSG:
-      // remove task message right here
+      removeTaskMessage(obj)
       break
     case TYPES.TYPE_OBJECT_CONTACT_GROUP:
       break

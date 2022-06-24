@@ -9,3 +9,10 @@ export function createTaskMessage (obj) {
     store.commit('CREATE_MESSAGE_REQUEST', obj.obj)
   }
 }
+
+export function removeTaskMessage (obj) {
+  if ('uid_task' in obj && selectedTask.value && obj.uid_task === selectedTask.value.uid) {
+    const data = { uid: obj.obj.uid, key: 'deleted', value: 1 }
+    store.commit('TASK_CHANGE_MESSAGE', data)
+  }
+}

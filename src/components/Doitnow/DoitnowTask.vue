@@ -10,12 +10,13 @@
   >
     <div class="w-5/6">
       <div
-        class="flex justify-between items-center mb-6 p-2 rounded-lg"
+        class="flex justify-between items-center mb-6 p-2 rounded-[8px]"
         :style="{ backgroundColor: colors[task.uid_marker] ? colors[task.uid_marker].back_color : '', color: getValidForeColor(colors[task.uid_marker]?.fore_color) }"
       >
         <!-- task info/status -->
         <div class="flex items-center -ml-2">
           <TaskStatus
+            class="pl-2"
             :in-doitnow="true"
             :task="task"
             @nextTask="nextTask"
@@ -24,7 +25,7 @@
             v-model="name"
             v-linkify:options="{ className: 'text-blue-600', tagName: 'a' }"
             tag="div"
-            class="taskName p-0.5 ring-0 outline-none max-w-7xl mt-0.5"
+            class="taskName p-0.5 ring-0 outline-none max-w-7xl mt-0.5 ml-1 flex"
             :contenteditable="task._isEditable"
             placeholder="Введите название задачи"
             :no-nl="false"

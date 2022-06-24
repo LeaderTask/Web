@@ -6,7 +6,8 @@ import {
   MESSAGES_ERROR,
   MESSAGES_SUCCESS,
   INSPECTOR_MESSAGES_SUCCESS,
-  REFRESH_MESSAGES
+  REFRESH_MESSAGES,
+  CHANGE_MESSAGE
 } from '../actions/taskmessages'
 import {
   FILES_REQUEST,
@@ -279,6 +280,14 @@ const mutations = {
   [CREATE_FILE_REQUEST]: (state, resp) => {
     state.status = 'success'
     state.hasLoadedOnce = true
+  },
+  [CHANGE_MESSAGE]: (state, data) => {
+    console.log('changing state in task messages')
+    for (let i = 0; i < state.messages.length; i++) {
+      if (state.messages[i].uid === data.uid) {
+        state.messages[i][data.key] = data.value
+      }
+    }
   },
   createLoadingFile (state, data) {
     data.loading = true

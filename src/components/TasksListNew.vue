@@ -431,6 +431,7 @@ export default {
     }
 
     const nodeExpanding = (arg) => {
+      store.commit(TASK.DELETE_LOADED_TASK, arg.id)
       if (loadedTasks.value[arg.id]) return
       store.dispatch(TASK.SUBTASKS_REQUEST, arg.id)
         .then(() => {

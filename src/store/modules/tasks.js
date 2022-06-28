@@ -1492,6 +1492,9 @@ const mutations = {
   [TASK.ADD_LOADED_TASK]: (state, uid) => {
     state.loadedTasks[uid] = true
   },
+  [TASK.DELETE_LOADED_TASK]: (state, uid) => {
+    delete (state.loadedTasks[uid])
+  },
   [TASK.CLEAN_UP_LOADED_TASKS]: (state) => {
     state.loadedTasks = {}
   },

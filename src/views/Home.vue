@@ -32,6 +32,7 @@ import { USER_REQUEST } from '@/store/actions/user'
 import * as TASK from '@/store/actions/tasks'
 import initWebSync from '@/websync/index.js'
 import initInspectorSocket from '@/inspector/index.js'
+import ModalMobileApp from '@/components/modals/ModalMobileApp.vue'
 
 const store = useStore()
 const router = useRouter()
@@ -345,68 +346,11 @@ if (router.currentRoute.value.name === 'task' && router.currentRoute.value.param
   getTasks()
 }
 
-const mobilePageView = () => {
-  let currentMobileOC = ''
-  if (window.innerWidth < 770) {
-    if (navigator.appVersion.includes('Android')) {
-      currentMobileOC = 'android'
-    }
-    if (navigator.appVersion.includes('iPhone')) {
-      currentMobileOC = 'ios'
-    }
-  }
-
-  return currentMobileOC
-}
-
 </script>
 
 <template>
-  <div
-    v-if="mobilePageView()"
-  >
-    <overlay
-      @overlay-click="cancel"
-    >
-      <div
-        class="rounded-[20px] bg-white dark:bg-zinc-900 shadow-lg w-9/12 md:w-4/5 lg:w-3/5 z-50 h-[23%]"
-      >
-        <div class="follow-us">
-          <div class="social">
-            <div
-              class="title"
-            >
-              <strong>Скачайте наше приложение на Ваш смартфон!</strong>
-            </div>
-            <ul class="networks">
-              <li
-                v-if="mobilePageView()=='android'"
-                class="android"
-                title="Android"
-              >
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.ashberrysoft.leadertask&utm_source=leadertask.ru"
-                  title="Android"
-                  target="_blank"
-                >android</a>
-              </li>
-              <li
-                v-if="mobilePageView()=='ios'"
-                class="ios"
-                title="ios"
-              >
-                <a
-                  href="https://apps.apple.com/ru/app/leadertask/id648864820?ls=1"
-                  title="ios"
-                  target="_blank"
-                >ios</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </overlay>
-  </div>
+  <modal-mobile-app />
+
   <modal-box-notification-instruction
     v-model="shouldShowModalBox"
     button="warning"
@@ -517,81 +461,3 @@ const mobilePageView = () => {
     </div>
   </main-section>
 </template>
-
-<style scoped>
-.follow-us {
-  width: auto !important;
-  margin: 5px 0;
-  text-align: left;
-}
-
-.follow-us .social li {
-  margin: 0 0px 0 10px;
-}
-
-.follow-us .title {
-  text-align: center;
-  font-size: 30px;
-  padding-top: 5px;
-  margin: 0 0 10px;
-  background: none;
-  color: #444;
-  cursor: auto;
-}
-
-.follow-us .networks{
-  display: flex;
-  justify-content: center;
-  padding-right: 11%;
-}
-
-.follow-us .social ul {
-  font-size: 0;
-}
-
-.follow-us .social li {
-  display: inline-block;
-  margin: 0 5px;
-
-  text-indent: 0;
-  color: #fff;
-  border-radius: 0;
-  width: 40px;
-  height: 40px;
-  text-align: center;
-  line-height: 46px;
-}
-
-.follow-us .social a {
-  width: 40px;
-  height: 40px;
-  font-size: 0;
-  display: block;
-  position: relative;
-  z-index: 0;
-}
-
-.follow-us .social a:before {
-  content: '';
-  position: absolute;
-  height: 50px;
-  top: 50%;
-  left: 50%;
-  margin-left: -10px;
-  margin-top: -10px;
-  background-size: 20px;
-}
-
-.follow-us .social .android a:before {
-  background: url('https://www.leadertask.ru/local/media/icons/android-platform.svg') no-repeat;
-  background-size: 50px;
-  width: 50px;
-
-}
-.follow-us .social .ios a:before {
-  background: url('https://www.leadertask.ru/local/media/icons/ios-platform.svg') no-repeat;
-  background-size: 50px;
-  width: 50px;
-}
-
-</style>

@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+
 const emit = defineEmits(['update:modelValue', 'createCardMessage', 'createCardFile', 'onPaste'])
 
 const props = defineProps({
@@ -13,6 +14,13 @@ const computedValue = computed({
     emit('update:modelValue', value)
   }
 })
+
+function sendMessage () {
+  if (computedValue.value !== '') {
+    emit('createCardMessage', computedValue.value)
+  }
+}
+
 </script>
 <template>
   <div class="flex w-full">
@@ -72,7 +80,7 @@ const computedValue = computed({
       type="text"
       placeholder="Напишите сообщение..."
       @paste="$emit('onPaste', $event)"
-      @keydown.enter.exact.prevent="$emit('createCardMessage', computedValue.value)"
+      @keydown.enter.exact.prevent="sendMessage()"
     />
 
     <div
@@ -80,7 +88,7 @@ const computedValue = computed({
     >
       <div
         class="rounded-[8px] flex items-center justify-center min-w-[32px] min-h-[32px] bg-[#E0E1E3] hover:bg-white cursor-pointer"
-        @click="$emit('createCardMessage', computedValue.value)"
+        @click="sendMessage()"
       >
         <svg
           width="14"

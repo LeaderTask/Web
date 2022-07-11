@@ -87,6 +87,12 @@ export default {
 
     changeTaskStatus (uid, status) {
       this.$emit('changeStatus', status)
+    },
+
+    disablePopMenu (task, user) {
+      if (task.type === 4 || (task.email_performer !== user.current_user_email && task.uid_customer !== user.uid)) {
+        return true
+      }
     }
   }
 }
@@ -94,7 +100,7 @@ export default {
 
 <template>
   <PopMenu
-    :disabled="task.type == 4"
+    :disabled="disablePopMenu(task, $store.state.user.user)"
     placement="left"
   >
     <template #menu>

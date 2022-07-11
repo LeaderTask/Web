@@ -795,6 +795,7 @@ export default {
         date_create: new Date(),
         uid: this.uuidv4(),
         uid_customer: this.user.current_user_uid,
+        disabled: parent.disabled,
         email_performer: parent.uid_customer === this.user.current_user_uid ? parent.email_performer : '',
         name: '',
         emails: '',

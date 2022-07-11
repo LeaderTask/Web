@@ -75,16 +75,19 @@ const actions = {
           resp.rootState = rootState
 
           commit(NAVIGATOR_SUCCESS, resp)
+
+          if (resp.data.delegate_iam) {
+            for (const dm of resp.data.delegate_iam.items) {
+              dm.parentID = resp.data.delegate_iam.uid
+              commit(PUSH_EMPLOYEE, dm)
+              commit(PUSH_EMPLOYEE_BY_EMAIL, dm)
+            }
+          }
           if (resp.data.emps.items) {
             for (const employee of resp.data.emps.items) {
               employee.parentID = resp.data.emps.uid
               commit(PUSH_EMPLOYEE, employee)
               commit(PUSH_EMPLOYEE_BY_EMAIL, employee)
-            }
-          }
-          if (resp.data.delegate_iam) {
-            for (const dm of resp.data.delegate_iam.items) {
-              dm.parentID = resp.data.delegate_iam.uid
             }
           }
           if (resp.data.delegate_to_me) {

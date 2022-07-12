@@ -45,7 +45,10 @@ export default {
     comment: {
       immediate: true,
       handler: function (val) {
-        this.currText = val
+        this.currText = ''
+        setTimeout(() => {
+          this.currText = val
+        }, 5)
       }
     }
   },

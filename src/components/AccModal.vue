@@ -96,7 +96,7 @@ export default {
     },
 
     userPhone () {
-      const phone = this.$store.state.user.user.current_user_phone ?? ''
+      const phone = this.$store.state.user.user?.current_user_phone ?? ''
       const index = phone.lastIndexOf(' ("')
       if (index !== -1) {
         return phone.slice(0, index)

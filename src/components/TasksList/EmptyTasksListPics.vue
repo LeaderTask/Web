@@ -1,57 +1,67 @@
-<script setup>
-import { useStore } from 'vuex'
-import { computed, ref } from 'vue'
+<script>
 import Icon from '@/components/Icon.vue'
 import ready from '@/icons/ready.js'
 import * as TASK from '@/store/actions/tasks.js'
 
-const store = useStore()
-const navStack = computed(() => store.state.navbar.navStack)
-const navStackLastPath = computed(() => navStack.value[navStack.value.length - 1].greedPath)
-const shouldShowEmptyPics = computed(() => {
-  const lastNavStackElement = navStack.value[navStack.value.length - 1]
-  if (lastNavStackElement.value.uid === DATE_UID && new Date(lastNavStackElement.value.param).toDateString() === new Date().toDateString()) {
-    return true
-  } else { return false }
-})
+export default {
+  components: {
+    Icon
+  },
+  data () {
+    return {
+      ready,
 
-const isTags = computed(() => navStackLastPath.value === 'tags' || navStackLastPath.value === 'tags_children')
-const isProjects = computed(() => navStackLastPath.value === 'new_private_projects' || navStackLastPath.value === 'projects_children')
-const isColors = computed(() => navStackLastPath.value === 'colors' || navStack.value[navStack.value.length - 1].value?.uid === COLOR_UID)
+      DATE_UID: '901841d9-0016-491d-ad66-8ee42d2b496b',
+      COLOR_UID: 'ed8039ae-f3de-4369-8f32-829d401056e9',
 
-const DATE_UID = '901841d9-0016-491d-ad66-8ee42d2b496b'
-// const TAG_UID = '00a5b3de-9474-404d-b3ba-83f488ac6d30'
-const COLOR_UID = 'ed8039ae-f3de-4369-8f32-829d401056e9'
-// const PRIVATE_PROJECT_UID = '7af232ff-0e29-4c27-a33b-866b5fd6eade'
-const currentImageIndex = ref(Math.floor(Math.random() * 3))
-const dateToLabelFormat = function (calendarDate) {
-  const day = calendarDate.getDate()
-  const month = calendarDate.toLocaleString('default', { month: 'short' })
-  const weekday = calendarDate.toLocaleString('default', {
-    weekday: 'short'
-  })
-  return day + ' ' + month + ', ' + weekday
-}
-const goToNextDay = function () {
-  const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1))
+      currentImageIndex: Math.floor(Math.random() * 3)
+    }
+  },
+  computed: {
+    navStack () { return this.$store.state.navbar.navStack },
+    navStackLastPath () { return this.navStack[this.navStack.length - 1].greedPath },
+    shouldShowEmptyPics () {
+      const lastNavStackElement = this.navStack[this.navStack.length - 1]
+      if (lastNavStackElement.value.uid === this.DATE_UID && new Date(lastNavStackElement.value.param).toDateString() === new Date().toDateString()) {
+        return true
+      } else { return false }
+    },
+    isTags () { return this.navStackLastPath === 'tags' || this.navStackLastPath === 'tags_children' },
+    isProjects () { return this.navStackLastPath === 'new_private_projects' || this.navStackLastPath === 'projects_children' },
+    isColors () { return this.navStackLastPath === 'colors' || this.navStack[this.navStack.length - 1]?.uid === this.COLOR_UID }
+  },
 
-  store.dispatch('asidePropertiesToggle', false)
-  store.commit('basic', { key: 'mainSectionState', value: 'tasks' })
-  store.dispatch(TASK.TASKS_REQUEST, tomorrow)
-  // hardcoded and messy
-  const navElem = {
-    name: dateToLabelFormat(tomorrow),
-    key: 'taskListSource',
-    value: { uid: '901841d9-0016-491d-ad66-8ee42d2b496b', param: tomorrow },
-    typeVal: tomorrow,
-    type: 'date'
+  methods: {
+    dateToLabelFormat (calendarDate) {
+      const day = calendarDate.getDate()
+      const month = calendarDate.toLocaleString('default', { month: 'short' })
+      const weekday = calendarDate.toLocaleString('default', {
+        weekday: 'short'
+      })
+      return day + ' ' + month + ', ' + weekday
+    },
+    goToNextDay () {
+      const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1))
+
+      this.$store.dispatch('asidePropertiesToggle', false)
+      this.$store.commit('basic', { key: 'mainSectionState', value: 'tasks' })
+      this.$store.dispatch(TASK.TASKS_REQUEST, tomorrow)
+      // hardcoded and messy
+      const navElem = {
+        name: this.dateToLabelFormat(tomorrow),
+        key: 'taskListSource',
+        value: { uid: '901841d9-0016-491d-ad66-8ee42d2b496b', param: tomorrow },
+        typeVal: tomorrow,
+        type: 'date'
+      }
+      this.$store.commit('updateStackWithInitValue', navElem)
+      this.$store.commit('basic', {
+        key: 'taskListSource',
+        value: { uid: '901841d9-0016-491d-ad66-8ee42d2b496b', param: tomorrow }
+      })
+      this.$store.commit(TASK.CLEAN_UP_LOADED_TASKS)
+    }
   }
-  store.commit('updateStackWithInitValue', navElem)
-  store.commit('basic', {
-    key: 'taskListSource',
-    value: { uid: '901841d9-0016-491d-ad66-8ee42d2b496b', param: tomorrow }
-  })
-  store.commit(TASK.CLEAN_UP_LOADED_TASKS)
 }
 </script>
 

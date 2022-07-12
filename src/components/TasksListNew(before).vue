@@ -822,18 +822,18 @@ export default {
       for (const elem in storeTasks.value) {
         if (storeTasks.value[elem].children.includes(node.dragged.node.id)) {
           parentUid = elem
-          store.dispatch(
-            TASK.CHANGE_TASK_PARENT_AND_ORDER,
-            {
-              uid: node.dragged.node.id,
-              parent: parentUid ?? '00000000-0000-0000-0000-000000000000',
-              order: node.dragged.node.info.order_new ?? 0
-            }
-          ).then(() => {
-            store.commit(TASK.REMOVE_TASK_FROM_LEAVES, parentUid)
-          })
         }
       }
+      store.dispatch(
+        TASK.CHANGE_TASK_PARENT_AND_ORDER,
+        {
+          uid: node.dragged.node.id,
+          parent: parentUid ?? '00000000-0000-0000-0000-000000000000',
+          order: node.dragged.node.info.order_new ?? 0
+        }
+      ).then(() => {
+        store.commit(TASK.REMOVE_TASK_FROM_LEAVES, parentUid)
+      })
     }
     const shouldShowInspector = () => {
       if (user.value.tarif !== 'alpha') {

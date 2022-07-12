@@ -128,9 +128,8 @@ const getTasks = () => {
       store.commit('basic', { key: 'taskListSource', value: { uid: '901841d9-0016-491d-ad66-8ee42d2b496b', param: null } })
       store.commit(
         'updateStackWithInitValue',
-        { name: 'Сегодня', key: 'taskListSource', value: { uid: '901841d9-0016-491d-ad66-8ee42d2b496b', param: null } }
+        { name: 'Сегодня', key: 'taskListSource', type: 'date', typeVal: new Date(), value: { uid: '901841d9-0016-491d-ad66-8ee42d2b496b', param: new Date() } }
       )
-
       store.dispatch(TASK.TASKS_REQUEST, new Date())
         .then(() => {
           store.commit(TASK.CLEAN_UP_LOADED_TASKS)

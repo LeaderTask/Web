@@ -1607,6 +1607,10 @@ export default {
       this.$store.dispatch(TASK.CHANGE_TASK_ACCESS, data).then(
         resp => {
           this.selectedTask.emails = emails
+          if (this.selectedTask.uid_parent && this.selectedTask.uid_customer !== this.user?.current_user_uid) {
+            this.$store.commit(TASK.REMOVE_TASK, this.selectedTask.uid)
+            this.closeProperties()
+          }
           if (!this.shouldAddTaskIntoList(this.selectedTask)) {
             // (!checkEmails.includes(this.user.current_user_email))
             this.$store.commit(TASK.REMOVE_TASK, this.selectedTask.uid)

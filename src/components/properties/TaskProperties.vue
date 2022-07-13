@@ -680,8 +680,11 @@
         ПОКАЗАТЬ ВСЕ
       </p>
       <!-- Chat messages -->
+      <MessageSkeleton
+        v-if="status == 'loading'"
+      />
       <TaskPropsChatMessages
-        v-if="taskMessages?.length"
+        v-if="taskMessages?.length && status=='success'"
         id="content"
         class="mt-3 h-3/6"
         :task-messages="taskMessages"
@@ -870,7 +873,7 @@ import TaskPropsButtonPerform from '@/components/TaskProperties/TaskPropsButtonP
 import TaskPropsButtonProject from '@/components/TaskProperties/TaskPropsButtonProject.vue'
 import TaskPropsButtonColor from '@/components/TaskProperties/TaskPropsButtonColor.vue'
 import TaskPropsChecklist from '@/components/TaskProperties/TaskPropsChecklist.vue'
-
+import MessageSkeleton from '@/components/TaskProperties/MessageSkeleton.vue'
 import RepeatLimit from '@/components/properties/RepeatLimit'
 import ChecklistLimit from '@/components/properties/ChecklistLimit'
 import ChatLimit from '@/components/properties/ChatLimit'
@@ -886,6 +889,7 @@ export default {
     ChecklistLimit,
     RepeatLimit,
     ChatLimit,
+    MessageSkeleton,
     TaskPropsButtonSetDate,
     TaskPropsButtonTags,
     TaskPropsButtonPerform,
@@ -987,6 +991,7 @@ export default {
     isPropertiesMobileExpanded () { return this.$store.state.isPropertiesMobileExpanded },
     taskMessagesAndFiles () { return this.$store.state.taskfilesandmessages.messages },
     user () { return this.$store.state.user.user },
+    status () { return this.$store.state.taskfilesandmessages.status },
     tasks () { return this.$store.state.tasks.newtasks },
     isDark () { return this.$store.state.darkMode },
     calendarDates () { return this.$store.state.calendar[1].dates },

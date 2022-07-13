@@ -34,8 +34,10 @@ import BoardModalBoxDelete from '@/components/Board/BoardModalBoxDelete.vue'
 import CardModalBoxBudget from '@/components/CardProperties/CardModalBoxBudget.vue'
 import CardMessageQuoteUnderInput from '@/components/CardProperties/CardMessageQuoteUnderInput.vue'
 import CardMessagesModalBoxLimit from '../CardProperties/CardMessagesModalBoxLimit.vue'
+import MessageSkeleton from '@/components/TaskProperties/MessageSkeleton.vue'
 
 const store = useStore()
+const status = computed(() => store.state.cardfilesandmessages.status)
 const selectedCard = computed(() => store.state.cards.selectedCard)
 const user = computed(() => store.state.user.user)
 const boards = computed(() => store.state.boards.boards)
@@ -367,9 +369,11 @@ const removeCard = () => {
       @endChangeComment="endChangeComment"
       @blur="endChangeComment"
     />
-
+    <!-- Chat skeleton -->
+    <MessageSkeleton v-if="status=='loading'"/>
     <!-- Card chat -->
     <card-chat
+      v-if="status=='success'"
       :key="`${Math.random()}`"
       :messages="cardMessages"
       :current-user-uid="user.current_user_uid"

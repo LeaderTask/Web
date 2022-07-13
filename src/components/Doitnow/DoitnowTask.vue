@@ -83,9 +83,15 @@
       </div>
       <div class="flex text-sm text-left justify-between w-[400px]">
         <div class="flex flex-col font-medium w-[720px]">
+          <div
+            v-if="task.emails.includes(user.current_user_email) && task.uid_performer !== user.current_user_uid"
+            class="border-[#FF912380] w-[150px] text-center py-1 px-2 mb-2 border-2 rounded-[8px] inline-block"
+          >
+            Задача в доступе
+          </div>
           <!-- customer -->
           <div
-            v-show="(task.uid_customer !== task.uid_performer) && (task.uid_customer !== user.current_user_uid)"
+            v-show="task.type !== 1"
             class="flex mb-2"
           >
             <span
@@ -103,34 +109,9 @@
               <span class="ml-1 text-black">{{ employees[task.uid_customer]?.name }}</span>
             </div>
           </div>
-          <!-- task received -->
-          <div v-show="(task.uid_customer === task.uid_performer) && (task.uid_customer !== user.current_user_uid)">
-            <div class="border-[#FF912380] py-1 px-2 mb-2 border-2 rounded-[8px] inline-block">
-              Задача в доступе
-            </div>
-            <div
-              v-show="(task.uid_customer === task.uid_performer) && (task.uid_customer !== user.current_user_uid)"
-              class="flex mb-2"
-            >
-              <span
-                class="mr-2 w-[90px] shrink-0"
-              >
-                Задача от:
-              </span>
-              <div
-                class="flex"
-              >
-                <img
-                  :src="employees[task.uid_customer] ? employees[task.uid_customer]?.fotolink : ''"
-                  class="rounded-lg ml-1 h-[20px] w-[20px]"
-                >
-                <span class="ml-1 text-black">{{ employees[task.uid_customer]?.name }}</span>
-              </div>
-            </div>
-          </div>
           <!-- performer -->
           <div
-            v-show="(task.uid_customer !== task.uid_performer) && (task.uid_customer !== user.current_user_uid)"
+            v-show="(task.type !== 1) && (task.uid_performer !== task.uid_customer)"
             class="flex mb-2"
           >
             <span
@@ -317,7 +298,7 @@
         />
         <!-- Change access -->
         <button
-          v-if="task.status !== 3 && task.type !== 4 && task.uid_customer !== user.current_user_uid && task.uid_performer !== user.current_user_uid"
+          v-if="task.status !== 3 && (task.type !== 4 || task.emails.includes(user.current_user_email)) && task.uid_customer !== user.current_user_uid && task.uid_performer !== user.current_user_uid"
           class="flex py-0.5 items-center justify-center text-sm bg-gray-100 w-[181px] hover:bg-red-200 hover:border hover:border-red-300 min-h-[40px] hover:bg-opacity-90 font-medium rounded-lg hover:text-red-500 mb-2 hover:animate-fadeIn"
           @click="() => onChangeAccess(task.emails)"
         >

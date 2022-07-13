@@ -177,7 +177,7 @@
     <div
       v-if="isCanChangeDepartments"
       class="flex items-center w-full my-[28px] text-[#7e7e80] hover:text-[#424242] cursor-pointer"
-      @click.stop="showAddDep = true"
+      @click.stop="clickAddDep"
     >
       <p class="font-roboto text-[17px] leading-[22px]">
         Добавить отдел
@@ -359,6 +359,13 @@ export default {
           (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
         ).toString(16)
       )
+    },
+    clickAddDep () {
+      if (this.user.days_left <= 0) {
+        this.showUsersLimit = true
+        return
+      }
+      this.showAddDep = true
     },
     onAddNewDep (name) {
       this.showAddDep = false

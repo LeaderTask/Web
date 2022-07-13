@@ -84,8 +84,13 @@ export default {
         const commentEditor = document.getElementById('taskPropsCommentEditor')
         commentEditor.focus({ preventScroll: false })
         const range = document.createRange()
-        range.setStart(commentEditor, 1)
-        range.setEnd(commentEditor, 1)
+        // condition for removing console errors
+        if (this.comment.length !== 0) {
+          range.setStart(commentEditor, 1)
+          range.setEnd(commentEditor, 1)
+        } else {
+          range.setStart(commentEditor, 0)
+        }
         const sel = document.getSelection()
         sel.removeAllRanges()
         sel.addRange(range)
@@ -100,18 +105,22 @@ export default {
       // в котором сейчас идет ввод через Selection
       if (typeof window.getSelection !== 'undefined') {
         const sel = window.getSelection()
-        const tempRange = sel.getRangeAt(0)
-        sel.removeAllRanges()
-        const range = document.createRange()
-        range.selectNodeContents(el)
-        sel.addRange(range)
-        const text = sel.toString()
-        sel.removeAllRanges()
-        sel.addRange(tempRange)
-        return text.trim()
+        // condition for removing console errors
+        if (sel && sel.rangeCount > 0) {
+          const tempRange = sel.getRangeAt(0)
+          sel.removeAllRanges()
+          const range = document.createRange()
+          range.selectNodeContents(el)
+          sel.addRange(range)
+          const text = sel.toString()
+          sel.removeAllRanges()
+          sel.addRange(tempRange)
+          return text.trim()
+        }
       }
       return el.innerText.trim()
     },
+
     removeEditComment (e) {
       if (!this.canEdit) return
       this.isEditable = false

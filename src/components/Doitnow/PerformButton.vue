@@ -6,7 +6,7 @@
     <!-- Поручить -->
     <div
       v-if="taskType === 1"
-      class="text-center w-[181px] min-h-[40px] bg-gray-100 hover:cursor-pointer flex items-center justify-center text-sm font-medium rounded-lg mb-2 hover:border hover:border-gray-500"
+      class="text-center w-[181px] min-h-[40px] bg-gray-100 hover:cursor-pointer flex items-center justify-center text-sm font-medium rounded-lg mb-2 hover:border hover:border-gray-500 border border-transparent"
     >
       <span class="ml-8 w-[70px]"> Поручить </span>
       <Icon
@@ -20,7 +20,7 @@
     <!-- Исполнитель -->
     <div
       v-else-if="taskType === 2"
-      class="w-[181px] min-h-[40px] bg-gray-100 hover:cursor-pointer flex items-center justify-center text-sm font-medium rounded-lg mb-2 hover:border hover:border-gray-500"
+      class="w-[181px] min-h-[40px] bg-gray-100 hover:cursor-pointer flex items-center justify-center text-sm font-medium rounded-lg mb-2 hover:border hover:border-gray-500 border border-transparent"
     >
       <span class="text-center ml-8 w-[70px]"> Изменить исполнителя </span>
       <Icon
@@ -52,7 +52,7 @@
     <!-- Перепоручить -->
     <div
       v-else-if="taskType === 3"
-      class="w-[181px] min-h-[40px] bg-gray-100 hover:cursor-pointer flex items-center justify-center text-sm font-medium rounded-lg mb-2 hover:border hover:border-gray-500"
+      class="w-[181px] min-h-[40px] bg-gray-100 hover:cursor-pointer flex items-center justify-center text-sm font-medium rounded-lg mb-2 hover:border hover:border-gray-500 border border-transparent"
     >
       <span class="text-center w-[70px] ml-8"> Изменить исполнителя </span>
       <Icon
@@ -66,7 +66,7 @@
     <!-- Взять на исполнение -->
     <div
       v-else-if="taskType === 5"
-      class="w-[181px] min-h-[40px] bg-gray-100 hover:cursor-pointer flex items-center justify-center text-sm font-medium rounded-lg mb-2 hover:border hover:border-gray-500"
+      class="w-[181px] min-h-[40px] bg-gray-100 hover:cursor-pointer flex items-center justify-center text-sm font-medium rounded-lg mb-2 hover:border hover:border-gray-500 border border-transparent"
       @click.stop="setPerformerCurrentUser"
     >
       <span class="text-center w-[70px] ml-8"> Взять на исполнение </span>
@@ -145,11 +145,6 @@ export default {
     Popper,
     Icon
   },
-  setup () {
-    return {
-      change
-    }
-  },
   props: {
     currentUserUid: {
       type: String,
@@ -165,6 +160,11 @@ export default {
     }
   },
   emits: ['changePerformer', 'reAssign'],
+  setup () {
+    return {
+      change
+    }
+  },
   computed: {
     employees () {
       return this.$store.state.employees.employees

@@ -310,6 +310,14 @@ const removeCard = () => {
   />
   <div class="relative min-h-full">
     <!-- Close icon -->
+    <Icon
+      :path="close.path"
+      class="text-[#7E7E80] dark:text-white cursor-pointer fixed top-[26px] right-[25px]"
+      :box="close.viewBox"
+      :width="close.width"
+      :height="close.height"
+      @click="closeProperties"
+    />
     <div class="flex items-center justify-between mb-[10px]">
       <card-options
         :date-create="selectedCard?.date_create"
@@ -319,16 +327,7 @@ const removeCard = () => {
         @clickRemoveButton="showDeleteCard = true"
         @toggleShowOnlyFiles="showFilesOnly = !showFilesOnly"
       />
-      <Icon
-        :path="close.path"
-        class="text-[#7E7E80] dark:text-white cursor-pointer"
-        :box="close.viewBox"
-        :width="close.width"
-        :height="close.height"
-        @click="closeProperties"
-      />
     </div>
-
     <card-cover
       :cover-color="
         selectedCard?.cover_color === '#A998B6' ? '' : selectedCard?.cover_color
@@ -371,6 +370,7 @@ const removeCard = () => {
 
     <!-- Card chat -->
     <card-chat
+      :key="`${Math.random()}`"
       :messages="cardMessages"
       :current-user-uid="user.current_user_uid"
       :employees="employees"

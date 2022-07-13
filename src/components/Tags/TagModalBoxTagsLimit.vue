@@ -1,6 +1,6 @@
 <template>
   <ModalBox
-    title="Добавить метку"
+    title="Обновите тариф"
     @cancel="onCancel"
   >
     <div class="flex flex-col">

@@ -8,6 +8,7 @@ import axios from 'axios'
 import { notify } from 'notiwind'
 import { PUSH_COLOR } from '../actions/colors'
 import * as TASK from '../actions/tasks'
+import { visitChildren } from '@/store/helpers/functions'
 
 function arrayRemove (arr, value) {
   return arr.filter(function (ele) {
@@ -177,6 +178,20 @@ const actions = {
             15000
           )
           commit(TASK.TASKS_ERROR, err)
+          reject(err)
+        })
+    })
+  },
+  [TASK.GET_TASK_CHILDRENS]: ({ commit, dispatch }, uid) => {
+    return new Promise((resolve, reject) => {
+      const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasks/withparent?value=' + uid
+      axios({ url: url, method: 'GET' })
+        .then((resp) => {
+          console.log(resp.data)
+          resolve(resp)
+        })
+        .catch((err) => {
+          console.log(err)
           reject(err)
         })
     })
@@ -1411,6 +1426,7 @@ const actions = {
 
 const mutations = {
   [TASK.REMOVE_TAG_REQUEST]: (state, uid) => {
+    visitChildren([state.tags[uid]], value => (delete state.tags[value.uid]))
     delete state.tags[uid]
   },
   [TASK.PUSH_TAG]: (state, resp) => {

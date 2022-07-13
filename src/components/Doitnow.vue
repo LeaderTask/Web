@@ -114,7 +114,8 @@ export default {
         this.unreadTasks.length +
         this.overdueTasks.length +
         this.readyTasks.length +
-        this.todayTasks.length
+        this.todayTasks.length +
+        this.openedTasks.length
       )
     },
     firstTask () {
@@ -129,6 +130,9 @@ export default {
       }
       if (this.todayTasks.length) {
         return this.todayTasks[0]
+      }
+      if (this.openedTasks.length) {
+        return this.openedTasks[0]
       }
       return null
     },

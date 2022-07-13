@@ -1,6 +1,4 @@
-<script setup>
-import { computed, ref } from 'vue'
-import { useStore } from 'vuex'
+<script>
 import {
   mdiForwardburger,
   mdiBackburger,
@@ -10,6 +8,7 @@ import NavBarItem from '@/components/NavBarItem.vue'
 import Icon from '@/components/Icon.vue'
 import Popper from 'vue3-popper'
 import NavButtonsRight from '@/components/Navbar/NavBarButtonsRight.vue'
+
 import propertiesproject from '@/icons/propertiesproject.js'
 import add from '@/icons/add.js'
 import arrowForward from '@/icons/arrow-forward.js'
@@ -17,97 +16,118 @@ import arrowDown from '@/icons/arrow-down.js'
 
 import { SELECT_PROJECT } from '@/store/actions/projects'
 
-const showNoneUid = [
-  '46418722-a720-4c9e-b255-16db4e590c34',
-  '017a3e8c-79ac-452c-abb7-6652deecbd1c',
-  'fa042915-a3d2-469c-bd5a-708cf0339b89',
-  '2a5cae4b-e877-4339-8ca1-bd61426864ec',
-  'd35fe0bc-1747-4eb1-a1b2-3411e07a92a0'
-]
-
-const store = useStore()
-
-defineProps({
-  item: {
-    type: Object,
-    required: true
+export default {
+  components: {
+    NavBarItem,
+    Icon,
+    Popper,
+    NavButtonsRight
   },
-  menu: {
-    type: Array,
-    default: () => []
-  }
-})
-
-const closeProperties = () => {
-  store.dispatch('asidePropertiesToggle', false)
-}
-
-const isTaskHoverPopperActive = ref(false)
-const toggleTaskHoverPopper = (val) => {
-  isTaskHoverPopperActive.value = val
-}
-
-const isNavBarVisible = computed(() => !store.state.isFullScreen)
-
-const user = computed(() => store.state.user.user)
-const isAsideMobileExpanded = computed(() => store.state.isAsideMobileExpanded)
-const isPropertiesMobileExpanded = computed(() => store.state.isPropertiesMobileExpanded)
-
-const navStack = computed(() => store.state.navbar.navStack)
-const projects = computed(() => store.state.projects.projects)
-
-const menuToggleMobileIcon = computed(() => isAsideMobileExpanded.value ? mdiBackburger : mdiForwardburger)
-const menuToggleMobile = () => {
-  store.dispatch('asideMobileToggle')
-}
-
-const menuOpenLg = () => {
-  store.dispatch('asideLgToggle', true)
-}
-
-// Copypasted from Home.vue
-// TODO: DRY
-
-const clickOnGridCard = (item, index) => {
-  store.dispatch('gotoNavStackItem', index)
-}
-
-const openProjectProperties = (project, parentProjectUid = '') => {
-  if (!isPropertiesMobileExpanded.value) {
-    store.dispatch('asidePropertiesToggle', true)
-  }
-
-  store.commit('basic', { key: 'propertiesState', value: 'project' })
-
-  // create empty instanse of project
-  if (!project || parentProjectUid) {
-    project = {
-      uid_parent: parentProjectUid,
-      color: '',
-      comment: '',
-      plugin: '',
-      collapsed: 0,
-      isclosed: 0,
-      order: 0,
-      group: 0,
-      show: 0,
-      favorite: 0,
-      quiet: 0,
-      email_creator: user.value.current_user_email,
-      members: [user.value.current_user_email],
-      children: [],
-      uid: '',
-      name: '',
-      bold: 0
+  props: {
+    item: {
+      type: Object,
+      required: true
+    },
+    menu: {
+      type: Array,
+      default: () => []
     }
-  } else {
-    project = projects.value[project]
-  }
-  store.commit(SELECT_PROJECT, project)
-}
+  },
+  data () {
+    return {
+      showNoneUid: [
+        '46418722-a720-4c9e-b255-16db4e590c34',
+        '017a3e8c-79ac-452c-abb7-6652deecbd1c',
+        'fa042915-a3d2-469c-bd5a-708cf0339b89',
+        '2a5cae4b-e877-4339-8ca1-bd61426864ec',
+        'd35fe0bc-1747-4eb1-a1b2-3411e07a92a0'
+      ],
+      mdiForwardburger,
+      mdiBackburger,
+      mdiMenu,
+      propertiesproject,
+      add,
+      arrowForward,
+      arrowDown,
+      isTaskHoverPopperActive: false
+    }
+  },
+  computed: {
+    isNavBarVisible () {
+      return !this.$store.state.isFullScreen
+    },
+    user () {
+      return this.$store.state.user.user
+    },
+    isAsideMobileExpanded () {
+      return this.$store.state.isAsideMobileExpanded
+    },
+    isPropertiesMobileExpanded () {
+      return this.$store.state.isPropertiesMobileExpanded
+    },
+    navStack () {
+      return this.$store.state.navbar.navStack
+    },
+    projects () {
+      return this.$store.state.projects.projects
+    },
+    menuToggleMobileIcon () {
+      return this.isAsideMobileExpanded ? this.mdiBackburger : this.mdiForwardburger
+    }
+  },
+  methods: {
+    closeProperties () {
+      this.$store.dispatch('asidePropertiesToggle', false)
+    },
+    toggleTaskHoverPopper (val) {
+      this.isTaskHoverPopperActive = val
+    },
+    menuToggleMobile () {
+      this.$store.dispatch('asideMobileToggle')
+    },
+    menuOpenLg () {
+      this.$store.dispatch('asideLgToggle', true)
+    },
+    clickOnGridCard (item, index) {
+      this.$store.dispatch('gotoNavStackItem', index)
+    },
+    openProjectProperties (project, parentProjectUid = '') {
+      if (!this.isPropertiesMobileExpanded) {
+        this.$store.dispatch('asidePropertiesToggle', true)
+      }
 
-const popNavBar = () => {
-  store.dispatch('popNavStack')
+      this.$store.commit('basic', { key: 'propertiesState', value: 'project' })
+
+      // create empty instanse of project
+      if (!project || parentProjectUid) {
+        project = {
+          uid_parent: parentProjectUid,
+          color: '',
+          comment: '',
+          plugin: '',
+          collapsed: 0,
+          isclosed: 0,
+          order: 0,
+          group: 0,
+          show: 0,
+          favorite: 0,
+          quiet: 0,
+          email_creator: this.user.current_user_email,
+          members: [this.user.current_user_email],
+          children: [],
+          uid: '',
+          name: '',
+          bold: 0
+        }
+      } else {
+        project = this.projects[project]
+      }
+      this.$store.commit(SELECT_PROJECT, project)
+    },
+    popNavBar () {
+      this.$store.dispatch('popNavStack')
+    }
+  }
 }
 </script>
 

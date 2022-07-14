@@ -7,11 +7,12 @@
       id="taskPropsCommentEditor"
       v-linkify:options="{ className: 'text-blue-600' }"
       class="font-[400] text-[14px] leading-[21px] text-[#4C4C4D]"
-      :contenteditable="canEdit"
+      :contenteditable="isEditable"
       :data-placeholder="placeholderComment()"
       @blur="changeComment($event)"
       @keyup="changeComment($event)"
       @focusout="removeEditComment($event)"
+      @keydown.esc="removeEditComment($event)"
       @paste="OnPaste_StripFormatting(this, $event);"
       v-html="getFixedCommentText()"
     />
@@ -80,6 +81,21 @@ export default {
       if (!this.canEdit) return
       if (this.isEditable) return
       this.isEditable = true
+      this.$nextTick(function () {
+        const commentEditor = document.getElementById('taskPropsCommentEditor')
+        commentEditor.focus({ preventScroll: false })
+        const range = document.createRange()
+        // condition for removing console errors
+        if (this.comment.length !== 0) {
+          range.setStart(commentEditor, 1)
+          range.setEnd(commentEditor, 1)
+        } else {
+          range.setStart(commentEditor, 0)
+        }
+        const sel = document.getSelection()
+        sel.removeAllRanges()
+        sel.addRange(range)
+      })
     },
     /**
      * @param {Element} el

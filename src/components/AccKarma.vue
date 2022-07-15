@@ -96,14 +96,14 @@ export default {
       <p class="text-center text-2xl font-bold">
         Графики
       </p>
-      <p class="text-left text-sm font-semibold">
+      <p class="text-left text-sm font-semibold px-2.5">
         В срок
       </p>
       <line-chart
         :data="successChartData"
         class="max-h-[120px]"
       />
-      <p class="text-left text-sm font-semibold mt-4">
+      <p class="text-left text-sm font-semibold mt-4 px-2.5">
         Просрочено
       </p>
       <line-chart

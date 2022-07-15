@@ -1157,7 +1157,7 @@ export default {
 .level-enter-active,
 .level-leave-active {
   position: relative;
-  transition: all 1s ease;
+  transition: transform 1s ease;
   z-index: -100;
 }
 
@@ -1166,8 +1166,7 @@ export default {
   position: relative;
   z-index: -100;
   transform: translate(0, -100%);
-  transition: all 1s ease;
-  transform: 0;
+  transition: transform 1s ease;
 }
 
 .tree-node {

@@ -90,7 +90,7 @@
   <!-- vue3-treeview -->
   <div
     v-if="status == 'success'"
-    class="overflow-y-auto pt-[4px] px-px min-h-[300px] w-full"
+    class="overflow-y-auto mt-[4px] px-px min-h-[300px] w-full"
   >
     <tree
       :nodes="storeTasks"
@@ -999,7 +999,7 @@ export default {
   margin-left: 0rem;
   word-wrap: break-word;
   font-size: 14px;
-  outline: none
+  outline: none;
 }
 
 .node-wrapper.disabled .checkbox-wrapper.checked {
@@ -1153,14 +1153,18 @@ export default {
 
 .level-enter-active,
 .level-leave-active {
-  transition: opacity 0.2s ease;
+  position: relative;
+  transition: all 1s ease;
+  z-index: -100;
 }
 
 .level-enter-from,
 .level-leave-to {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  transform: 0
+  position: relative;
+  z-index: -100;
+  transform: translate(0, -100%);
+  transition: all 1s ease;
+  transform: 0;
 }
 
 .tree-node {

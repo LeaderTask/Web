@@ -361,10 +361,11 @@ export default {
       )
     },
     clickAddDep () {
-      if (this.user.days_left <= 0) {
-        this.showUsersLimit = true
-        return
-      }
+      // ограничение на добавление отдела на аккаунте с истекшей лицензией(не удалять)
+      // if (this.user.days_left <= 0) {
+      //   this.showUsersLimit = true
+      //   return
+      // }
       this.showAddDep = true
     },
     onAddNewDep (name) {

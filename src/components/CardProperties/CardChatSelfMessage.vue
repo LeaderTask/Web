@@ -1,22 +1,34 @@
-<script setup>
+<script>
+
 import CardChatMessageOptionsPopMenu from '@/components/CardProperties/CardChatMessageOptionsPopMenu.vue'
 import CardChatDeletedMessageContent from '@/components/CardProperties/CardChatDeletedMessageContent.vue'
-defineEmits(['onQuoteMessage, onDeleteMessage'])
-const props = defineProps({
-  message: Object
-})
 
-const getMessageTimeString = (dateCreate) => {
-  if (!dateCreate) return ''
-  // добавляем Z в конец, чтобы он посчитал что это UTC время
-  if (dateCreate[dateCreate.length - 1] !== 'Z') {
-    dateCreate += 'Z'
+export default {
+  components: {
+    CardChatMessageOptionsPopMenu,
+    CardChatDeletedMessageContent
+  },
+  props: {
+    message: Object
+  },
+
+  emits: ['onQuoteMessage, onDeleteMessage'],
+
+  methods: {
+
+    getMessageTimeString (dateCreate) {
+      if (!dateCreate) return ''
+      // добавляем Z в конец, чтобы он посчитал что это UTC время
+      if (dateCreate[dateCreate.length - 1] !== 'Z') {
+        dateCreate += 'Z'
+      }
+      const date = new Date(dateCreate)
+      return date.toLocaleString('default', {
+        hour: 'numeric',
+        minute: 'numeric'
+      })
+    }
   }
-  const date = new Date(dateCreate)
-  return date.toLocaleString('default', {
-    hour: 'numeric',
-    minute: 'numeric'
-  })
 }
 </script>
 
@@ -24,7 +36,7 @@ const getMessageTimeString = (dateCreate) => {
   <div
     class="bg-[#F4F5F7] py-[10px] px-[15px] rounded-t-[12px] rounded-bl-[12px] mb-[5px] float-right max-w-[300px] group"
   >
-    <card-chat-deleted-message-content v-if="props.message.deleted" />
+    <card-chat-deleted-message-content v-if="message.deleted" />
     <div
       v-else
       class="flex break-words"
@@ -33,7 +45,7 @@ const getMessageTimeString = (dateCreate) => {
         v-linkified:options="{ className: 'text-blue-600', tagName: 'a' }"
         class="mr-[8px] font-[400] text-[14px] text-[#4C4C4D] leading-[19px] whitespace-pre-line break-words max-w-[230px]"
       >
-        {{ props.message.msg }}
+        {{ message.msg }}
       </span>
       <p
         class="text-right font-[700] leading-[14px] text-[11px] self-end group-hover:hidden min-w-[30px]"
@@ -43,8 +55,8 @@ const getMessageTimeString = (dateCreate) => {
       </p>
       <div class="self-end group-hover:flex hidden">
         <card-chat-message-options-pop-menu
-          @onQuoteMessage="$emit('onQuoteMessage', props.message)"
-          @onDeleteMessage="$emit('onDeleteMessage', props.message.uid)"
+          @onQuoteMessage="$emit('onQuoteMessage', message)"
+          @onDeleteMessage="$emit('onDeleteMessage', message.uid)"
         >
           <div class="min-w-[30px] min-h-[16px] flex cursor-pointer items-end justify-center">
             <svg

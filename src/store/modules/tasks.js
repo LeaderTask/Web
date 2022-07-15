@@ -413,7 +413,7 @@ const actions = {
           resolve([unreadTasks, overdueTasks, todayTasks])
         })
         .catch((err) => {
-          if (err?.message !== 'canceled') {
+          if (err?.message !== 'canceled' && err?.response?.data) {
             notify(
               {
                 group: 'api',

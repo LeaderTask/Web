@@ -1,6 +1,4 @@
-<script setup>
-import { computed, ref, nextTick, watch } from 'vue'
-import { useStore } from 'vuex'
+<script>
 import {
   CREATE_MESSAGE_REQUEST,
   DELETE_MESSAGE_REQUEST,
@@ -36,257 +34,280 @@ import CardMessageQuoteUnderInput from '@/components/CardProperties/CardMessageQ
 import CardMessagesModalBoxLimit from '../CardProperties/CardMessagesModalBoxLimit.vue'
 import MessageSkeleton from '@/components/TaskProperties/MessageSkeleton.vue'
 
-const store = useStore()
-const status = computed(() => store.state.cardfilesandmessages.status)
-const selectedCard = computed(() => store.state.cards.selectedCard)
-const user = computed(() => store.state.user.user)
-const boards = computed(() => store.state.boards.boards)
-const employees = computed(() => store.state.employees.employees)
-const employeesByEmail = computed(() => store.state.employees.employeesByEmail)
-const cardMessages = computed(() => store.state.cardfilesandmessages.messages)
-const canAddFiles = computed(() => {
-  const user = store.state.user.user
-  if (user.days_left <= 0) {
-    return false
-  }
-  return true
-})
+export default {
+  components: {
+    CardName,
+    CardCover,
+    CardChat,
+    CardResponsibleUser,
+    CardOptions,
+    CardBudget,
+    CardMessageInput,
+    Icon,
+    TaskPropsCommentEditor,
+    BoardModalBoxDelete,
+    CardModalBoxBudget,
+    CardMessageQuoteUnderInput,
+    CardMessagesModalBoxLimit,
+    MessageSkeleton
+  },
+  data () {
+    return {
+      close,
 
-const showMessagesLimit = ref(false)
-const showChangeCardBudget = ref(false)
-const showFilesOnly = ref(false)
-const currentQuote = ref(false)
+      showMessagesLimit: false,
+      showChangeCardBudget: false,
+      showFilesOnly: false,
+      currentQuote: false,
+      showDeleteCard: false,
+      cardMessageInputValue: ''
+    }
+  },
+  computed: {
+    status () { return this.$store.state.cardfilesandmessages.status },
+    selectedCard () { return this.$store.state.cards.selectedCard },
+    user () { return this.$store.state.user.user },
+    boards () { return this.$store.state.boards.boards },
+    employees () { return this.$store.state.employees.employees },
+    employeesByEmail () { return this.$store.state.employees.employeesByEmail },
+    cardMessages () { return this.$store.state.cardfilesandmessages.messages },
+    canAddFiles () {
+      if (this.user.days_left <= 0) {
+        return false
+      }
+      return true
+    },
+    canEdit () { return this.boards[this.selectedCard?.uid_board]?.type_access !== 0 }
+  },
+  watch: {
+    selectedCard (oldValue, newValue) {
+      this.currentQuote = false
+    }
+  },
+  methods: {
+    onPasteEvent (e) {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items
+      for (const index in items) {
+        const item = items[index]
+        if (item.kind === 'file') {
+          const blob = item.getAsFile()
+          const formData = new FormData()
+          formData.append('files', blob)
+          const data = {
+            uid_card: this.selectedCard?.uid,
+            name: formData
+          }
+          this.$store.dispatch(CREATE_FILES_REQUEST, data).then(() => {
+            this.scrollDown()
+          })
+        }
+      }
+    },
 
-const onPasteEvent = (e) => {
-  const items = (e.clipboardData || e.originalEvent.clipboardData).items
-  for (const index in items) {
-    const item = items[index]
-    if (item.kind === 'file') {
-      const blob = item.getAsFile()
+    scrollDown () {
+      const asideRight = document.getElementById('aside-right')
+      asideRight.scroll({ top: asideRight.scrollHeight + 100000 })
+    },
+
+    focusMessageInput () {
+      const messageInput = document.getElementById('card-message-textarea')
+      messageInput.focus()
+    },
+
+    changeResponsible (userEmail) {
+      this.$store
+        .dispatch(CHANGE_CARD_RESPONSIBLE_USER, {
+          cardUid: this.selectedCard?.uid,
+          email: userEmail
+        })
+        .then(() => {
+          if (this.selectedCard) this.selectedCard.user = userEmail
+        })
+    },
+
+    changeName (arg) {
+      const data = { cardUid: this.selectedCard?.uid, name: arg.target.innerText }
+      this.$store.dispatch(CHANGE_CARD_NAME, data)
+    },
+
+    changeCardBudget (budget) {
+      const data = { cardUid: this.selectedCard?.uid, budget: budget * 100 }
+      this.$store.dispatch(CHANGE_CARD_BUDGET, data).then((resp) => {
+        if (this.selectedCard) this.selectedCard.cost = resp.data.cost
+        this.showChangeCardBudget = false
+      })
+    },
+
+    closeProperties () {
+      this.$store.dispatch('asidePropertiesToggle', false)
+    },
+
+    uuidv4 () {
+      return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
+        (
+          c ^
+      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
+        ).toString(16)
+      )
+    },
+
+    endChangeComment (text) {
+      const data = { cardUid: this.selectedCard?.uid, comment: text }
+      this.$store.dispatch(CHANGE_CARD_COMMENT, data)
+    },
+
+    createCardFile (event) {
+      if (event === false) {
+        this.showMessagesLimit = true
+        return
+      }
+      const files = event.target.files
       const formData = new FormData()
-      formData.append('files', blob)
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        formData.append('files[' + i + ']', file)
+      }
       const data = {
-        uid_card: selectedCard.value?.uid,
+        uid_card: this.selectedCard?.uid,
         name: formData
       }
-      store.dispatch(CREATE_FILES_REQUEST, data).then(() => {
-        scrollDown()
+      console.log(data)
+      this.$store.dispatch(CREATE_FILES_REQUEST, data).then(() => {
+        if (this.selectedCard) this.selectedCard.has_files = true
+        this.scrollDown()
       })
-    }
-  }
-}
+    },
 
-watch(selectedCard, (oldValue, newValue) => {
-  currentQuote.value = false
-})
+    setCurrentQuote (quote) {
+      this.currentQuote = quote
+      this.focusMessageInput()
+    },
 
-const scrollDown = () => {
-  const asideRight = document.getElementById('aside-right')
-  asideRight.scroll({ top: asideRight.scrollHeight + 100000 })
-}
+    deleteCardMessage (uid) {
+      this.$store.dispatch(DELETE_MESSAGE_REQUEST, uid)
+    },
 
-const focusMessageInput = () => {
-  const messageInput = document.getElementById('card-message-textarea')
-  messageInput.focus()
-}
+    deleteCardFileMessage (uid) {
+      console.log('DLEETING FILE MESSAGE')
+      this.$store.dispatch(DELETE_FILE_REQUEST, uid)
+    },
 
-const changeResponsible = (userEmail) => {
-  store
-    .dispatch(CHANGE_CARD_RESPONSIBLE_USER, {
-      cardUid: selectedCard.value?.uid,
-      email: userEmail
-    })
-    .then(() => {
-      if (selectedCard.value) selectedCard.value.user = userEmail
-    })
-}
-
-const changeName = (arg) => {
-  const data = { cardUid: selectedCard.value?.uid, name: arg.target.innerText }
-  store.dispatch(CHANGE_CARD_NAME, data)
-}
-
-const changeCardBudget = (budget) => {
-  const data = { cardUid: selectedCard.value?.uid, budget: budget * 100 }
-  store.dispatch(CHANGE_CARD_BUDGET, data).then((resp) => {
-    if (selectedCard.value) selectedCard.value.cost = resp.data.cost
-    showChangeCardBudget.value = false
-  })
-}
-
-const closeProperties = () => {
-  store.dispatch('asidePropertiesToggle', false)
-}
-
-function uuidv4 () {
-  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
-    (
-      c ^
-      (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
-    ).toString(16)
-  )
-}
-
-const cardMessageInputValue = ref('')
-
-const canEdit = computed(
-  () => boards.value[selectedCard.value?.uid_board]?.type_access !== 0
-)
-const endChangeComment = (text) => {
-  const data = { cardUid: selectedCard.value?.uid, comment: text }
-  store.dispatch(CHANGE_CARD_COMMENT, data)
-}
-
-const createCardFile = (event) => {
-  if (event === false) {
-    showMessagesLimit.value = true
-    return
-  }
-  const files = event.target.files
-  const formData = new FormData()
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i]
-    formData.append('files[' + i + ']', file)
-  }
-  const data = {
-    uid_card: selectedCard.value?.uid,
-    name: formData
-  }
-  console.log(data)
-  store.dispatch(CREATE_FILES_REQUEST, data).then(() => {
-    if (selectedCard.value) selectedCard.value.has_files = true
-    scrollDown()
-  })
-}
-
-const setCurrentQuote = (quote) => {
-  currentQuote.value = quote
-  focusMessageInput()
-}
-
-const deleteCardMessage = (uid) => {
-  store.dispatch(DELETE_MESSAGE_REQUEST, uid)
-}
-
-const deleteCardFileMessage = (uid) => {
-  console.log('DLEETING FILE MESSAGE')
-  store.dispatch(DELETE_FILE_REQUEST, uid)
-}
-
-const createCardMessage = () => {
-  // если лицензия истекла
-  if (user.value.days_left <= 0) {
-    showMessagesLimit.value = true
-    return
-  }
-  const uid = uuidv4()
-  const data = {
-    uid_card: selectedCard.value?.uid,
-    uid_msg: uid,
-    uid: uid,
-    date_create: new Date().toISOString(),
-    uid_creator: user.value.current_user_uid,
-    uid_quote: currentQuote?.value?.uid ?? '',
-    text: cardMessageInputValue.value,
-    msg: cardMessageInputValue.value,
-    order: 0,
-    deleted: 0
-  }
-  store.dispatch(CREATE_MESSAGE_REQUEST, data).then(() => {
-    if (selectedCard.value) selectedCard.value.has_msgs = true
-    cardMessageInputValue.value = ''
-    currentQuote.value = false
-    scrollDown()
-  })
-}
-
-const changeCardClearCover = () => {
-  store
-    .dispatch(CHANGE_CARD_CLEAR_COVER, { cardUid: selectedCard.value?.uid })
-    .then((resp) => {
-      if (selectedCard.value) {
-        selectedCard.value.cover_color = '#A998B6'
-        selectedCard.value.cover_link = ''
+    createCardMessage () {
+      // если лицензия истекла
+      if (this.user.days_left <= 0) {
+        this.showMessagesLimit = true
+        return
       }
-      // Replacing old cover file with new cover file
-      for (const message of resp.data.deletefiles) {
-        store.commit(REMOVE_MESSAGE_LOCALLY, message)
+      const uid = this.uuidv4()
+      const data = {
+        uid_card: this.selectedCard?.uid,
+        uid_msg: uid,
+        uid: uid,
+        date_create: new Date().toISOString(),
+        uid_creator: this.user.current_user_uid,
+        uid_quote: this.currentQuote?.uid ?? '',
+        text: this.cardMessageInputValue,
+        msg: this.cardMessageInputValue,
+        order: 0,
+        deleted: 0
       }
-      // Here I use nextTick because if we instantly start adding new files, then onMounted hook won't be triggered, MAGIC but works
-      nextTick(() => {
-        for (const message of resp.data.newfiles) {
-          store.commit(ADD_MESSAGE_LOCALLY, message)
-        }
+      this.$store.dispatch(CREATE_MESSAGE_REQUEST, data).then(() => {
+        if (this.selectedCard) this.selectedCard.has_msgs = true
+        this.cardMessageInputValue = ''
+        this.currentQuote = false
+        this.scrollDown()
       })
-    })
-}
+    },
 
-const changeCardColor = (color) => {
-  if (color) {
-    store
-      .dispatch(CHANGE_CARD_COLOR, {
-        cardUid: selectedCard.value?.uid,
-        color: color
-      })
-      .then((resp) => {
-        if (selectedCard.value) {
-          selectedCard.value.cover_color = color
-          selectedCard.value.cover_link = ''
+    changeCardClearCover () {
+      this.$store
+        .dispatch(CHANGE_CARD_CLEAR_COVER, { cardUid: this.selectedCard?.uid })
+        .then((resp) => {
+          if (this.selectedCard) {
+            this.selectedCard.cover_color = '#A998B6'
+            this.selectedCard.cover_link = ''
+          }
+          // Replacing old cover file with new cover file
+          for (const message of resp.data.deletefiles) {
+            this.$store.commit(REMOVE_MESSAGE_LOCALLY, message)
+          }
+          // Here I use nextTick because if we instantly start adding new files, then onMounted hook won't be triggered, MAGIC but works
+          this.$nextTick(() => {
+            for (const message of resp.data.newfiles) {
+              this.$store.commit(ADD_MESSAGE_LOCALLY, message)
+            }
+          })
+        })
+    },
+
+    changeCardColor (color) {
+      if (color) {
+        this.$store
+          .dispatch(CHANGE_CARD_COLOR, {
+            cardUid: this.selectedCard?.uid,
+            color: color
+          })
+          .then((resp) => {
+            if (this.selectedCard) {
+              this.selectedCard.cover_color = color
+              this.selectedCard.cover_link = ''
+            }
+            // Replacing old cover file with new cover file
+            for (const message of resp.data.deletefiles) {
+              this.$store.commit(REMOVE_MESSAGE_LOCALLY, message)
+            }
+            // Here I use nextTick because if we instantly start adding new files, then onMounted hook won't be triggered, MAGIC but works
+            this.$nextTick(() => {
+              for (const message of resp.data.newfiles) {
+                this.$store.commit(ADD_MESSAGE_LOCALLY, message)
+              }
+            })
+          })
+      } else {
+        this.changeCardClearCover()
+      }
+    },
+
+    changeCardCover (event) {
+      const files = event.target.files
+      const formData = new FormData()
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        formData.append('files[' + i + ']', file)
+      }
+      const data = {
+        cardUid: this.selectedCard?.uid,
+        file: formData
+      }
+      console.log(data)
+      this.$store.dispatch(CHANGE_CARD_COVER, data).then((resp) => {
+        if (this.selectedCard) {
+          this.selectedCard.cover_color = resp.data.card.cover_color
+          this.selectedCard.cover_link = resp.data.card.cover_link
         }
         // Replacing old cover file with new cover file
         for (const message of resp.data.deletefiles) {
-          store.commit(REMOVE_MESSAGE_LOCALLY, message)
+          this.$store.commit(REMOVE_MESSAGE_LOCALLY, message)
         }
         // Here I use nextTick because if we instantly start adding new files, then onMounted hook won't be triggered, MAGIC but works
-        nextTick(() => {
+        this.$nextTick(() => {
           for (const message of resp.data.newfiles) {
-            store.commit(ADD_MESSAGE_LOCALLY, message)
+            this.$store.commit(ADD_MESSAGE_LOCALLY, message)
           }
         })
       })
-  } else {
-    changeCardClearCover()
+    },
+
+    removeCard () {
+      this.$store.dispatch(DELETE_CARD, { uid: this.selectedCard?.uid })
+        .then(() => {
+          this.closeProperties()
+          this.showDeleteCard = false
+        })
+    }
   }
 }
 
-const changeCardCover = (event) => {
-  const files = event.target.files
-  const formData = new FormData()
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i]
-    formData.append('files[' + i + ']', file)
-  }
-  const data = {
-    cardUid: selectedCard.value?.uid,
-    file: formData
-  }
-  console.log(data)
-  store.dispatch(CHANGE_CARD_COVER, data).then((resp) => {
-    if (selectedCard.value) {
-      selectedCard.value.cover_color = resp.data.card.cover_color
-      selectedCard.value.cover_link = resp.data.card.cover_link
-    }
-    // Replacing old cover file with new cover file
-    for (const message of resp.data.deletefiles) {
-      store.commit(REMOVE_MESSAGE_LOCALLY, message)
-    }
-    // Here I use nextTick because if we instantly start adding new files, then onMounted hook won't be triggered, MAGIC but works
-    nextTick(() => {
-      for (const message of resp.data.newfiles) {
-        store.commit(ADD_MESSAGE_LOCALLY, message)
-      }
-    })
-  })
-}
-
-const showDeleteCard = ref(false)
-const removeCard = () => {
-  store.dispatch(DELETE_CARD, { uid: selectedCard.value?.uid })
-    .then(() => {
-      closeProperties()
-      showDeleteCard.value = false
-    })
-}
 </script>
 
 <template>
@@ -370,11 +391,10 @@ const removeCard = () => {
       @blur="endChangeComment"
     />
     <!-- Chat skeleton -->
-    <MessageSkeleton v-if="status=='loading'"/>
+    <MessageSkeleton v-if="status=='loading'" />
     <!-- Card chat -->
     <card-chat
       v-if="status=='success'"
-      :key="`${Math.random()}`"
       :messages="cardMessages"
       :current-user-uid="user.current_user_uid"
       :employees="employees"

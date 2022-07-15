@@ -115,7 +115,6 @@
               <TaskStatus
                 :task="props.node.info"
                 @changeStatus="onChangeStatus($event, props.node.info)"
-                @click.stop
               />
             </div>
 
@@ -330,6 +329,7 @@ import fortomorrow from '@/icons/for-tomorrow.js'
 import copy from '@/icons/copy.js'
 import cut from '@/icons/cut.js'
 import bin from '@/icons/bin.js'
+import linkify from 'vue-linkify'
 /* /Icons */
 
 export default {
@@ -347,6 +347,9 @@ export default {
     contenteditable,
     TaskListActionHoverPanel,
     TaskListModalBoxLicenseLimit
+  },
+  directives: {
+    linkify
   },
   data () {
     return {

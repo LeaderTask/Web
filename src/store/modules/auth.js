@@ -83,11 +83,12 @@ const actions = {
         })
     })
   },
-  [AUTH_CHANGE_PASSWORD]: ({ commit }, password) => {
+  [AUTH_CHANGE_PASSWORD]: ({ commit }, data) => {
+    console.log(data)
     return new Promise((resolve, reject) => {
-      // commit(AUTH_CHANGE_PASSWORD)
+      commit(AUTH_CHANGE_PASSWORD)
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/users/password'
-      axios({ url: url, data: password, method: 'PATCH' })
+      axios({ url: url, data: data, method: 'PATCH' })
         .then((resp) => {
           setLocalStorageItem('user-token', resp.data.access_token)
           setLocalStorageItem('user-refresh-token', resp.data.refresh_token)

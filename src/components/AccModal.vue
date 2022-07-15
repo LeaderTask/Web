@@ -15,6 +15,7 @@ export default {
   data () {
     return {
       showEditname: false,
+      oldPassword: '',
       newPassword: '',
       confirmNewPassword: '',
       showError: false,
@@ -57,11 +58,13 @@ export default {
       this.$store.dispatch(USER_CHANGE_PHOTO, data)
     },
     changeUserPassword () {
-      const password = this.newPassword
+      const oldPassword = this.oldPassword
+      const newPassword = this.newPassword
       const data = {
-        password: password
+        old_password: oldPassword,
+        new_password: newPassword
       }
-      if (this.newPassword === this.confirmNewPassword) {
+      if (oldPassword && this.newPassword === this.confirmNewPassword) {
         this.$store.dispatch(AUTH_CHANGE_PASSWORD, data)
         this.showEditpassword = false
         this.showError = false
@@ -133,6 +136,18 @@ export default {
     @cancel="showEditpassword = false"
   >
     <div class="flex flex-col w-full">
+      <div>
+        <p class="mb-[10px] mt-[10px]">
+          Введите старый пароль
+        </p>
+        <input
+          v-model="oldPassword"
+          type="text"
+          style="-webkit-text-security: disc;"
+          autocomplete=""
+          class="bg-[#f4f5f7]/50 rounded-[6px] border border-[#4c4c4d] focus:border-[#ff9123] w-full px-[14px] py-[11px] text-[14px] leading-[16px] text-[#4c4c4d] font-roboto"
+        >
+      </div>
       <div>
         <p class="mb-[10px] mt-[10px]">
           Введите новый пароль

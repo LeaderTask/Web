@@ -3,7 +3,7 @@
     <BoardModalBoxRename
       v-if="showAdd"
       :show="showAdd"
-      title="Добавить проект"
+      title="Добавить подпроект"
       @cancel="showAdd = false"
       @save="onAddNewProject"
     />

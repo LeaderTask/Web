@@ -32,6 +32,7 @@ import { USER_REQUEST } from '@/store/actions/user'
 import * as TASK from '@/store/actions/tasks'
 import initWebSync from '@/websync/index.js'
 import initInspectorSocket from '@/inspector/index.js'
+import ModalMobileApp from '@/components/modals/ModalMobileApp.vue'
 
 const store = useStore()
 const router = useRouter()
@@ -343,9 +344,12 @@ if (router.currentRoute.value.name === 'task' && router.currentRoute.value.param
 } else {
   getTasks()
 }
+
 </script>
 
 <template>
+  <modal-mobile-app />
+
   <modal-box-notification-instruction
     v-model="shouldShowModalBox"
     button="warning"

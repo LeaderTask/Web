@@ -7,7 +7,7 @@
     button-label="Delete"
   />
   <div
-    v-if="tasksCount"
+    v-if="tasksCount && !isLoading"
     class="flex items-center mb-5 justify-between"
   >
     <!-- header -->
@@ -43,9 +43,10 @@
       />
     </button>
   </div>
+  <DoitnowSkeleton v-if="isLoading"/>
   <transition :name="taskTransition">
     <DoitnowTask
-      v-if="tasksCount"
+      v-if="tasksCount && !isLoading"
       :key="firstTask.uid"
       :task="firstTask"
       :sub-tasks="subTasks"
@@ -75,6 +76,7 @@ import * as TASK from '@/store/actions/tasks.js'
 import InspectorModalBox from '@/components/Inspector/InspectorModalBox.vue'
 import DoitnowEmpty from '@/components/Doitnow/DoitnowEmpty.vue'
 import DoitnowTask from '@/components/Doitnow/DoitnowTask.vue'
+import DoitnowSkeleton from '@/components/Doitnow/DoitnowSkeleton.vue'
 import Icon from '@/components/Icon.vue'
 
 import arrowForw from '@/icons/arrow-forw-sm.js'
@@ -83,6 +85,7 @@ import { PUSH_COLOR } from '@/store/actions/colors'
 export default {
   components: {
     DoitnowEmpty,
+    DoitnowSkeleton,
     DoitnowTask,
     InspectorModalBox,
     Icon

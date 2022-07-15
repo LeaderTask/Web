@@ -188,7 +188,6 @@ const actions = {
   },
   [CREATE_MESSAGE_REQUEST]: ({ commit, dispatch }, data) => {
     return new Promise((resolve, reject) => {
-      commit(MESSAGES_REQUEST)
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasksmsgs'
       axios({ url: url, method: 'POST', data: data })
         .then((resp) => {
@@ -377,6 +376,7 @@ const mutations = {
     })
 
     state.messages = state.messages.concat(state.files)
+    state.files = []
     state.messages = state.messages.concat(state.inspectorMessages)
     state.messages.sort((a, b) => {
       if (!a.file_name && !a.date_create.includes('Z')) {

@@ -28,7 +28,7 @@ export default {
     },
     isTags () { return this.navStackLastPath === 'tags' || this.navStackLastPath === 'tags_children' },
     isProjects () { return this.navStackLastPath === 'new_private_projects' || this.navStackLastPath === 'projects_children' },
-    isColors () { return this.navStackLastPath === 'colors' || this.navStack[this.navStack.length - 1]?.uid === this.COLOR_UID }
+    isColors () { return this.navStackLastPath === 'colors' || this.navStack[this.navStack.length - 1].value?.uid === this.COLOR_UID }
   },
 
   methods: {

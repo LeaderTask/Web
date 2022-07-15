@@ -1,30 +1,32 @@
-<script setup>
-defineProps({
-  path: {
-    type: [String, Array],
-    required: true
-  },
-  w: {
-    type: String,
-    default: ''
-  },
-  h: {
-    type: String,
-    default: ''
-  },
-  box: {
-    type: String,
-    default: ''
-  },
-  width: {
-    type: [String, Number],
-    default: 24
-  },
-  height: {
-    type: [String, Number],
-    default: 24
+<script>
+export default {
+  props: {
+    path: {
+      type: [String, Array],
+      required: true
+    },
+    w: {
+      type: String,
+      default: ''
+    },
+    h: {
+      type: String,
+      default: ''
+    },
+    box: {
+      type: String,
+      default: ''
+    },
+    width: {
+      type: [String, Number],
+      default: 24
+    },
+    height: {
+      type: [String, Number],
+      default: 24
+    }
   }
-})
+}
 </script>
 
 <template>

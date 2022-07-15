@@ -7,7 +7,7 @@
       id="taskPropsCommentEditor"
       v-linkify:options="{ className: 'text-blue-600' }"
       class="font-[400] text-[14px] leading-[21px] text-[#4C4C4D]"
-      :contenteditable="isEditable"
+      :contenteditable="canEdit"
       :data-placeholder="placeholderComment()"
       @blur="changeComment($event)"
       @keyup="changeComment($event)"
@@ -77,24 +77,16 @@ export default {
       if (this.canEdit) return 'Добавить заметку...'
       return ''
     },
-    editComment () {
+    /**
+     * @param {Element} e
+     * @returns {String}
+     */
+    editComment (e) {
       if (!this.canEdit) return
       if (this.isEditable) return
       this.isEditable = true
       this.$nextTick(function () {
-        const commentEditor = document.getElementById('taskPropsCommentEditor')
-        commentEditor.focus({ preventScroll: false })
-        const range = document.createRange()
-        // condition for removing console errors
-        if (this.comment.length !== 0) {
-          range.setStart(commentEditor, 1)
-          range.setEnd(commentEditor, 1)
-        } else {
-          range.setStart(commentEditor, 0)
-        }
-        const sel = document.getSelection()
-        sel.removeAllRanges()
-        sel.addRange(range)
+        this.getElementText(e.target)
       })
     },
     /**
@@ -105,7 +97,7 @@ export default {
       // пытаемся достать текст из едита браузера
       // в котором сейчас идет ввод через Selection
       if (typeof window.getSelection !== 'undefined') {
-        const sel = window.getSelection()
+        const sel = document.getElementById('taskPropsCommentEditor')
         // condition for removing console errors
         if (sel && sel.rangeCount > 0) {
           const tempRange = sel.getRangeAt(0)
@@ -122,7 +114,7 @@ export default {
       return el.innerText.trim()
     },
 
-    removeEditComment (e) {
+    removeEditComment () {
       if (!this.canEdit) return
       this.isEditable = false
       // чтобы у нас в интерфейсе поменялось

@@ -18,6 +18,7 @@ export function shouldAddTaskIntoList (task) {
   //  check type 2 then check date_end < than selected date then add, if date_end > then throw away
 
   if (
+    ifTaskHasParent(lastNavStackElement, task) ||
     checkShouldAddByDateRequest(lastNavStackElement, task) ||
     checkShouldAddTaskToAssignToRequest(lastNavStackElement, task) ||
     checkShouldAddTaskToAssignByRequest(lastNavStackElement, task) ||
@@ -29,7 +30,6 @@ export function shouldAddTaskIntoList (task) {
     checkShouldAddTaskToFocusRequest(lastNavStackElement, task) ||
     checkShouldAddTaskToTagRequest(lastNavStackElement, task) ||
     checkShouldAddTaskToColorRequest(lastNavStackElement, task) ||
-    ifTaskHasParent(lastNavStackElement, task) ||
     addToUnsortedList(lastNavStackElement, task)
   ) {
     return true
@@ -251,7 +251,7 @@ function checkShouldAddTaskToColorRequest (lastNavStackElement, task) {
 }
 
 function ifTaskHasParent (lastNavStackElement, task) {
-  if (task.uid_parent && task.uid_parent !== '00000000-0000-0000-0000-000000000000') {
+  if (task.uid_parent && task.uid_parent !== '00000000-0000-0000-0000-000000000000' && task.uid_customer === user.value.current_user_uid) {
     return true
   }
 }

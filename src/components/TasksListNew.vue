@@ -1154,20 +1154,44 @@ export default {
   }
 }
 
-.level-enter-active,
-.level-leave-active {
-  transition: opacity 0.2s ease;
+.level-enter-active {
+  animation: hide-tree 0.3s ease-in-out;
+  position: relative;
+}
+@keyframes hide-tree {
+  from {
+    position: relative;
+    z-index: -1;
+    transform: translateY(-52px);
+    opacity: 0;
+  }
+  to {
+    z-index: -1;
+  }
 }
 
-.level-enter-from,
-.level-leave-to {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  transform: 0
+.level-leave-active {
+  animation: tree 0.3s ease-in-out;
+  position: relative;
 }
+@keyframes tree {
+  from {
+    z-index: -1;
+  }
+  to {
+    z-index: -1;
+    transform: translateY(-52px);
+    opacity: 0;
+  }
+}
+
+/* .level-enter-from,
+.level-leave-to {
+} */
 
 .tree-node {
-  @apply ring-0 border-0
+  /* @apply ring-0 border-0; */
+  animation: hide-tree 0.3s ease-in-out;
 }
 
 .dark {

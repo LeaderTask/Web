@@ -1155,12 +1155,11 @@ export default {
 }
 
 .level-enter-active {
-  animation: hide-tree 0.3s ease-in-out;
+  animation: hide-tree 0.2s ease-in-out;
   position: relative;
 }
 @keyframes hide-tree {
   from {
-    position: relative;
     z-index: -1;
     transform: translateY(-52px);
     opacity: 0;
@@ -1171,7 +1170,7 @@ export default {
 }
 
 .level-leave-active {
-  animation: tree 0.3s ease-in-out;
+  animation: tree 0.2s ease-in-out;
   position: relative;
 }
 @keyframes tree {

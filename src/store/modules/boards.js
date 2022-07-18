@@ -59,6 +59,7 @@ const actions = {
       const url = process.env.VUE_APP_LEADERTASK_API + '/api/v1/board'
       axios({ url: url, method: 'PATCH', data: data })
         .then((resp) => {
+          console.log(url, 'reps patch update')
           resolve(resp)
         })
         .catch((err) => {
@@ -306,6 +307,30 @@ const actions = {
       //
       // отправляем на сервер изменения
       dispatch(BOARD.UPDATE_BOARD_REQUEST, board)
+        .then((resp) => {
+          resolve(resp)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
+  },
+  [BOARD.DROP_BOARD]: ({ commit, dispatch, rootState }, data) => {
+    return new Promise((resolve, reject) => {
+      const dragBoard = { ...state.boards[data.dragUidBoard] }
+      const dropBoard = { ...state.boards[data.dropUidBoard] }
+      if (!dragBoard) return reject(new Error(`not find board ${data.dragUidBoard}`))
+      if (!dropBoard) return reject(new Error(`not find board ${data.dropUidBoard}`))
+      dragBoard.order = state.boards[data.dropUidBoard].order
+      dropBoard.order = state.boards[data.dragUidBoard].order
+      dispatch(BOARD.UPDATE_BOARD_REQUEST, dropBoard)
+        .then((resp) => {
+          resolve(resp)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+      dispatch(BOARD.UPDATE_BOARD_REQUEST, dragBoard)
         .then((resp) => {
           resolve(resp)
         })

@@ -63,12 +63,17 @@
         }"
       >
         <template
-          v-for="board in value.items"
+          v-for="(board) in value.items"
           :key="board.uid"
         >
           <BoardBlocItem
+            draggable="true"
             :board="board"
             @click.stop="gotoChildren(board)"
+            @dragstart="$emit('dragstart', board.uid, value.items)"
+            @dragover.prevent
+            @dragenter.prevent
+            @drop="$emit('drop', board.uid)"
           />
         </template>
         <ListBlocAdd
@@ -102,6 +107,7 @@ export default {
     BoardBlocItem,
     ListBlocAdd
   },
+  emits: ['dragstart', 'drop'],
   props: {
     boards: {
       type: Array,

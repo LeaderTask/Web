@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { visitChildren, UID_TO_ACTION, setLocalStorageItem } from '@/store/helpers/functions'
+import * as BOARD from '@/store/actions/boards'
 import AsideMenu from '@/components/AsideMenu.vue'
 import NavBar from '@/components/NavBar.vue'
 import PropertiesRight from '@/components/PropertiesRight.vue'
@@ -343,6 +344,23 @@ if (router.currentRoute.value.name === 'task' && router.currentRoute.value.param
 } else {
   getTasks()
 }
+
+const dragBoard = (uidDragBoard, value) => {
+  event.dataTransfer.dropEffect = 'move'
+  event.dataTransfer.effectAllowed = 'move'
+  event.dataTransfer.setData('uid', uidDragBoard)
+}
+const dropBoard = (dropBoardUid) => {
+  const dragBoardUid = event.dataTransfer.getData('uid')
+  const startBoardReset = dragBoardUid !== dropBoardUid
+  if (startBoardReset) {
+    store.dispatch({
+      type: BOARD.DROP_BOARD,
+      dragUidBoard: dragBoardUid,
+      dropUidBoard: dropBoardUid
+    })
+  }
+}
 </script>
 
 <template>
@@ -415,6 +433,8 @@ if (router.currentRoute.value.name === 'task' && router.currentRoute.value.param
       <boards
         v-if="greedPath === 'new_private_boards'"
         :boards="greedSource"
+        @dragstart="dragBoard"
+        @drop="dropBoard"
       />
       <doitnow
         v-if="greedPath === 'doitnow'"

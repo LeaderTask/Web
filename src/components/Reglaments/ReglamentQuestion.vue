@@ -37,6 +37,15 @@ export default {
     gotoNode (uid) {
       this.$refs[uid][0].onFocus()
     },
+    rightAnswersAmount (question) {
+      let count = 0
+      for (let i = 0; i < question.answers.length; i++) {
+        if (question.answers[i].is_right) {
+          count++
+        }
+      }
+      return count
+    },
     onAddAnswer () {
       const data = {
         name: '',
@@ -133,7 +142,7 @@ export default {
   <div
     class="bg-white p-3 rounded-[10px] mb-2"
   >
-    <div class="px-1 flex justify-between items-start group">
+    <div class="px-1 flex justify-between items-center group">
       <div
         :ref="question.uid + 'input'"
         placeholder="Текст вопроса"
@@ -143,6 +152,18 @@ export default {
         @keydown.enter.exact.prevent="$emit('addQuestion')"
         v-html="question.name"
       />
+      <span
+        v-if="rightAnswersAmount(question) === 1"
+        class="font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] breadcrumbs font-medium"
+      >
+        В данном вопросе один правильный ответ.
+      </span>
+      <span
+        v-if="rightAnswersAmount(question) > 1"
+        class="font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] breadcrumbs font-medium"
+      >
+        В данном вопросе более одного правильного ответа.
+      </span>
       <ReglamentQuestionPopMenu
         v-if="isEditing && canEdit"
         :question="question"

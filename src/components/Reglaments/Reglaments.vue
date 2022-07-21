@@ -49,12 +49,12 @@
         }"
       >
         <template
-          v-for="project in items"
-          :key="project.uid"
+          v-for="reglament in items"
+          :key="reglament.uid"
         >
           <ReglamentBlocItem
-            :project="project"
-            @click.stop="gotoReglamentContent(project)"
+            :reglament="reglament"
+            @click.stop="gotoReglamentContent(reglament)"
           />
         </template>
         <ListBlocAdd
@@ -70,7 +70,7 @@
 import Icon from '@/components/Icon.vue'
 import BoardModalBoxRename from '@/components/Board/BoardModalBoxRename.vue'
 import { setLocalStorageItem } from '@/store/helpers/functions'
-import ReglamentBlocItem from '@/components/Projects/ProjectBlocItem.vue'
+import ReglamentBlocItem from '@/components/Reglaments/ReglamentBlockItem.vue'
 import ListBlocAdd from '@/components/Common/ListBlocAdd.vue'
 import EmptyTasksListPics from '@/components/TasksList/EmptyTasksListPics'
 
@@ -130,26 +130,25 @@ export default {
       this.$store.commit('basic', { key: 'isGridView', value: value })
       setLocalStorageItem('isGridView', value)
     },
-    gotoReglamentContent (project) {
-      // this.$store.dispatch(TASK.PROJECT_TASKS_REQUEST, project.uid)
+    gotoReglamentContent (reglament) {
       this.$store.commit('basic', {
         key: 'reglamentSource',
-        value: { uid: '92413f6c-2ef3-476e-9429-e76d7818685d', param: project.uid }
+        value: { uid: '92413f6c-2ef3-476e-9429-e76d7818685d', param: reglament.uid }
       })
 
       this.$store.commit(TASK.CLEAN_UP_LOADED_TASKS)
 
       const navElem = {
-        name: project.name,
+        name: reglament.name,
         key: 'greedSource',
-        uid: project.uid,
+        uid: reglament.uid,
         global_property_uid: '92413f6c-2ef3-476e-9429-e76d7818685d',
         greedPath: 'reglament_content',
         value: []
       }
 
       this.$store.commit('pushIntoNavStack', navElem)
-      this.$store.commit('basic', { key: 'greedSource', value: project })
+      this.$store.commit('basic', { key: 'greedSource', value: reglament })
       this.$store.commit('basic', { key: 'greedPath', value: 'reglament_content' })
     },
     uuidv4 () {

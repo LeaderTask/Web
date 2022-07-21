@@ -26,13 +26,6 @@
           >
             Удалить
           </PopMenuItem>
-          <PopMenuItem
-            v-else
-            icon="delete"
-            @click="showConfirmQuit = true"
-          >
-            Покинуть регламент
-          </PopMenuItem>
         </template>
       </PopMenu>
       <PropsButtonClose @click="closeProperties" />

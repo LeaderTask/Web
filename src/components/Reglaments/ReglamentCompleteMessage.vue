@@ -23,13 +23,13 @@ export default {
       v-else
       class="font-[500] text-center text-[22px]"
     >
-      Вы не прошли регламент
+      Пожалуйста, еще раз внимательно ознакомьтесь с регламентом и пройдите текст повторно
     </p>
     <button
       class="flex items-end bg-[#FF912380] p-3 px-10 rounded-[8px] text-black text-sm mr-1 hover:bg-[#F5DEB3]"
       @click="$emit('confirm')"
     >
-      К регламентам
+      Завершить
     </button>
   </div>
 </template>

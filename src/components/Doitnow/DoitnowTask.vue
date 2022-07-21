@@ -338,7 +338,7 @@ import Popper from 'vue3-popper'
 import SetDate from '@/components/Doitnow/SetDate.vue'
 import Checklist from '@/components/Doitnow/Checklist.vue'
 import TaskPropsChatMessages from '@/components/TaskProperties/TaskPropsChatMessages.vue'
-import TaskPropsInputForm from '@/components/TaskProperties/TaskPropsInputForm'
+import TaskPropsInputForm from '@/components/TaskProperties/TaskPropsInputForm.vue'
 import TaskStatus from '@/components/TasksList/TaskStatus.vue'
 import Icon from '@/components/Icon.vue'
 
@@ -983,11 +983,13 @@ export default {
       const seconds = this.pad2(date.getUTCSeconds())
       const dateCreate = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes + ':' + seconds
       const msgtask = this._linkify(msg)
+      const uid = this.uuidv4()
 
       const data = {
         uid_task: this.task.uid,
         uid_creator: this.user.current_user_uid,
-        uid: this.uuidv4(),
+        uid: uid,
+        uid_msg: uid,
         date_create: dateCreate,
         deleted: 0,
         text: msg,

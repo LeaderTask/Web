@@ -110,10 +110,12 @@ export default {
       msgtask = this.taskMsg.replaceAll('&', '&amp;')
       msgtask = this.taskMsg.replaceAll('<', '&lt;')
       msgtask = this.taskMsg.replaceAll('>', '&gt;')
+      const uid = this.uuidv4()
       const data = {
         uid_task: this.selectedTask.uid,
         uid_creator: this.cusers.current_user_uid,
-        uid: this.uuidv4(),
+        uid: uid,
+        uid_msg: uid,
         date_create: new Date().toISOString(),
         deleted: 0,
         uid_quote: this.currentAnswerMessageUid,
@@ -153,11 +155,13 @@ export default {
       const minutes = this.pad2(date.getUTCMinutes())
       const seconds = this.pad2(date.getUTCSeconds())
       const dateCreate = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes + ':' + seconds
+      const uid = this.uuidv4()
 
       const data = {
         uid_task: this.task.uid,
         uid_creator: this.user.current_user_uid,
-        uid: this.uuidv4(),
+        uid: uid,
+        uid_msg: uid,
         date_create: dateCreate,
         text: this.taskMsg,
         msg: this.taskMsg

@@ -377,7 +377,6 @@ export default {
       <DatePicker
         id="Maincalendar"
         ref="calendarclass"
-        v-model="navStack[0].typeVal"
         dot="true"
         class="border-none pl-[22px] pr-[16px] calendar-nav-custom"
         :style="{ backgroundColor: datePickerBG }"

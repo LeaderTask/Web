@@ -449,6 +449,7 @@ const mutations = {
     for (let i = 0; i < state.navigator.reglaments.items.length; i++) {
       if (state.navigator.reglaments.items[i].uid === reglament.uid) {
         state.navigator.reglaments.items.splice(i, 1)
+        return
       }
     }
   },

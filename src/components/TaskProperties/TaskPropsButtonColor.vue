@@ -22,7 +22,14 @@
         <div class="text-white body-popover-custom">
           <div class="container-color-popover">
             <div
+              v-if="!myColors.length"
+              class="text-sm text-center max-w-[176px]"
+            >
+              На данный момент у Вас нет цветов. Их можно добавить на вкладке "Прочее > Цвета"
+            </div>
+            <div
               v-for="(color, index) in myColors"
+              v-else
               :key="index"
               class="list-color-access"
               :class="{ 'list-color-access_active': color.uid === currColor }"

@@ -196,7 +196,7 @@ export default {
   </div>
 </template>
 
-<style>
+<style scoped>
 [placeholder]:empty::before {
     content: attr(placeholder);
     color: #555;

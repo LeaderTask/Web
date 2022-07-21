@@ -60,6 +60,15 @@ const routes = [
     meta: {
       // title: 'Application'
     },
+    path: '/reglament/:id',
+    name: 'reglament',
+    component: Home,
+    beforeEnter: ifAuthenticated
+  },
+  {
+    meta: {
+      // title: 'Application'
+    },
     path: '/board/:id',
     name: 'board',
     component: Home,

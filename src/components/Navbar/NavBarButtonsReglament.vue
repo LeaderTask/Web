@@ -16,12 +16,18 @@
         >
           Свойства регламента
         </PopMenuItem>
+        <PopMenuItem
+          @click="сlickCopyLink"
+        >
+          Скопировать ссылку на регламент
+        </PopMenuItem>
       </template>
     </PopMenu>
   </div>
 </template>
 
 <script>
+import { copyText } from 'vue3-clipboard'
 import NavBarButtonIcon from '@/components/Navbar/NavBarButtonIcon.vue'
 import PopMenu from '@/components/modals/PopMenu.vue'
 import PopMenuItem from '@/components/modals/PopMenuItem.vue'
@@ -50,28 +56,7 @@ export default {
   emits: ['popNavBar', 'toggleCompletedTasks'],
   data () {
     return {
-      showDeleteProject: false,
-      fakeReglament: {
-        uid_parent: '00000000-0000-0000-0000-000000000000',
-        color: '#000000',
-        comment: '',
-        plugin: '',
-        collapsed: 0,
-        isclosed: 0,
-        order: 1,
-        group: 0,
-        show: 1,
-        favorite: 0,
-        quiet: 0,
-        email_creator: 'term@gmail.com',
-        members: [
-          'term@gmail.com',
-          'gepard@yandex.ru'
-        ],
-        uid: 'd3b1abe4-a626-4b64-92fb-04161c964b58',
-        name: 'Системная работа',
-        bold: 0
-      }
+      showDeleteProject: false
     }
   },
   computed: {
@@ -88,7 +73,12 @@ export default {
         this.$store.dispatch('asidePropertiesToggle', true)
       }
       this.$store.commit('basic', { key: 'propertiesState', value: 'reglament' })
-      this.$store.commit(SELECT_PROJECT, this.fakeReglament)
+      this.$store.commit(SELECT_PROJECT)
+    },
+    сlickCopyLink () {
+      copyText(`${window.location.origin}/reglament/${this.projectUid}`, undefined, (error, event) => {
+        console.log(error, event)
+      })
     },
     clickDeleteProject () {
       this.showDeleteProject = true

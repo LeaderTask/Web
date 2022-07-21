@@ -18,7 +18,5 @@ export function updateTask (obj) {
     store.commit('ADD_TASK', obj.obj)
   } else { // Если меняется дата
     store.commit('REMOVE_TASK', obj.obj.uid)
-    // Добавление точки на календарь, если дата перенесена, а не удалена
-    store.commit('addDot', new Date(obj.obj.date_begin))
   }
 }

@@ -57,12 +57,13 @@ const componentClass = computed(() => {
 
 const computedHeaderIcon = computed(() => props.headerIcon ?? mdiCog)
 const changeSettingsTab = (tabName) => {
-  if (user.value.tarif !== 'alpha' && user.value.tarif !== 'trial') {
-    showFreeModal.value = true
-    return
-  }
   currentTab.value = tabName
   emit('tab', tabName)
+  if (user.value.tarif !== 'alpha' && user.value.tarif !== 'trial' && currentTab.value === 'karma') {
+    showFreeModal.value = true
+    currentTab.value = 'tarif'
+    emit('tab', 'tarif')
+  }
 }
 
 const headerIconClick = () => {

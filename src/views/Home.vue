@@ -187,6 +187,25 @@ const initNavStackWithFoundBoards = (boardUid) => {
   store.commit('pushIntoNavStack', navElem)
 }
 
+const initNavStackWithFoundReglaments = (reglamentUid) => {
+  let reglament
+  visitChildren(storeNavigator.value.reglaments.items, value => {
+    if (value.uid === reglamentUid) {
+      reglament = value
+    }
+  })
+
+  const navElem = {
+    name: reglament.name,
+    key: 'greedSource',
+    uid: reglamentUid,
+    global_property_uid: reglament.global_property_uid,
+    greedPath: 'reglament_content',
+    value: reglament.children
+  }
+  store.commit('pushIntoNavStack', navElem)
+}
+
 const getProject = (uid) => {
   const navElem = {
     name: 'Проекты',
@@ -211,12 +230,27 @@ const getBoard = (uid) => {
   window.history.replaceState(null, null, '/')
 }
 
+const getReglamentByLink = (uid) => {
+  const navElem = {
+    name: 'Регламенты',
+    key: 'greedSource',
+    greedPath: 'reglament_content',
+    value: storeNavigator.value.reglaments.uid
+  }
+  store.commit('updateStackWithInitValue', navElem)
+  initNavStackWithFoundReglaments(uid)
+  window.history.replaceState(null, null, '/')
+}
+
 const initNavStackGreedView = () => {
   if (router.currentRoute.value.name === 'project' && router.currentRoute.value.params.id) {
     getProject(router.currentRoute.value.params.id)
   }
   if (router.currentRoute.value.name === 'board' && router.currentRoute.value.params.id) {
     getBoard(router.currentRoute.value.params.id)
+  }
+  if (router.currentRoute.value.name === 'reglament' && router.currentRoute.value.params.id) {
+    getReglamentByLink(router.currentRoute.value.params.id)
   }
   // After navigator is loaded we are trying to set up last visited navElement
   // Checking if last navElement is a gridSource

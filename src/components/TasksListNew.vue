@@ -124,13 +124,13 @@
                 v-model="props.node.info.name"
                 tag="div"
                 class="taskName p-0 ring-0 outline-none w-[calc(100%-26px)] overflow-x-clip break-words cursor-default"
-                :contenteditable="false"
+                :contenteditable="props.node.info._isEditable"
+                placeholder="Введите название задачи"
                 :no-nl="true"
                 :no-html="true"
                 :class="{ 'uppercase': !props.node.info._isEditable && colors[props.node.info.uid_marker] && colors[props.node.info.uid_marker].uppercase, 'text-gray-500': props.node.info.status == 1 || props.node.info.status == 7, 'line-through': props.node.info.status == 1 || props.node.info.status == 7, 'font-extrabold': props.node.info.readed == 0 }"
                 :style="{ color: getValidForeColor(colors[props.node.info.uid_marker]?.fore_color) }"
                 @focusout="clearTaskFocus(props.node.info)"
-                @dblclick.stop="editTaskName(props.node.id)"
                 @keydown.enter="updateTask($event, props.node.info); props.node.info._isEditable = false;"
               />
             </div>

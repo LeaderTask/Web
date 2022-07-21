@@ -4,6 +4,7 @@
     class="flex justify-end mb-2"
   >
     <PopMenuItem
+      v-if="!isTesting"
       class="bg-white mr-1"
       icon="edit"
       @click="isEdit"
@@ -67,6 +68,7 @@
     class="flex justify-end"
   >
     <button
+      v-if="!isPassed"
       class="flex items-end bg-[#FF912380] p-3 px-10 rounded-[8px] text-black text-sm mr-1 hover:bg-[#F5DEB3]"
       @click="isTesting = true"
     >

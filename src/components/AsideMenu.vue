@@ -8,6 +8,7 @@ import Icon from '@/components/Icon.vue'
 import AccModal from '@/components/AccModal.vue'
 import AccTarif from '@/components/AccTarif.vue'
 import AsideMenuList from '@/components/AsideMenuList.vue'
+import AsideMenuSkeleton from './AsideMenuSkeleton.vue'
 import AccOption from '@/components/AccOption.vue'
 import AccKarma from '@/components/AccKarma.vue'
 import 'v-calendar/dist/style.css'
@@ -30,6 +31,7 @@ export default {
     Icon,
     AccModal,
     AccTarif,
+    AsideMenuSkeleton,
     AsideMenuList,
     AccOption,
     AccKarma
@@ -51,6 +53,9 @@ export default {
     }
   },
   computed: {
+    status () {
+      return this.$store.state.navigator.status
+    },
     isFullScreen () {
       return this.$store.state.isFullScreen
     },
@@ -318,7 +323,6 @@ export default {
     />
   </modal-box>
   <!-- /Profile modal -->
-
   <aside
     v-show="!isFullScreen"
     id="aside"
@@ -326,109 +330,112 @@ export default {
     class="w-[292px] fixed top-0 z-30 h-screen transition-position lg:left-0 bg-[#f4f5f7] font-SfProDisplayNormal text-sm"
     :class="[ isAsideMobileExpanded ? 'left-0' : '-left-[292px]', isAsideLgActive ? 'block' : 'lg:hidden xl:block' ]"
   >
-    <div class="flex flex-row w-full text-dark px-[16px] mt-[22px] h-[32px] items-center">
-      <nav-bar-item
-        type="hidden lg:flex xl:hidden"
-        active-color="text-dark"
-        active
-        @click="asideLgClose"
-      >
-        <icon
-          :path="mdiMenu"
-          class="cursor-pointer"
-          size="24"
-        />
-      </nav-bar-item>
-      <div
-        class="group w-full cursor-pointer"
-        @click="modalOneActive = true"
-      >
-        <div class="flex items-center">
-          <img
-            v-if="user?.foto_link"
-            :src="user?.foto_link"
-            width="32"
-            height="32"
-            class="rounded-[8px] ml-[5px] mr-[2px] border-2 border-white"
-          >
-          <svg
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M10.7602 3.56099C11.0027 3.80668 11.0001 4.2024 10.7544 4.44486L6.70104 8.44486C6.47133 8.67154 6.10681 8.68606 5.8598 8.47836L1.46869 4.78606C1.2045 4.56391 1.17041 4.16965 1.39256 3.90546C1.61471 3.64126 2.00897 3.60718 2.27316 3.82933L6.22839 7.15512L9.87636 3.55514C10.1221 3.31269 10.5178 3.31531 10.7602 3.56099Z"
-              fill="#7e7e80"
-            />
-          </svg>
-          <span
-            class="ml-[6px] text-[15px] group-hover:text-[#4c4c4d]/75 text-[#4c4c4d] font-roboto"
-          >
-            {{ user?.current_user_name ?? '' }}
-          </span>
+    <AsideMenuSkeleton v-if="status == 'loading'" />
+    <div v-if="status == 'success'">
+      <div class="flex flex-row w-full text-dark px-[16px] mt-[22px] h-[32px] items-center">
+        <nav-bar-item
+          type="hidden lg:flex xl:hidden"
+          active-color="text-dark"
+          active
+          @click="asideLgClose"
+        >
+          <icon
+            :path="mdiMenu"
+            class="cursor-pointer"
+            size="24"
+          />
+        </nav-bar-item>
+        <div
+          class="group w-full cursor-pointer"
+          @click="modalOneActive = true"
+        >
+          <div class="flex items-center">
+            <img
+              v-if="user?.foto_link"
+              :src="user?.foto_link"
+              width="32"
+              height="32"
+              class="rounded-[8px] ml-[5px] mr-[2px] border-2 border-white"
+            >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M10.7602 3.56099C11.0027 3.80668 11.0001 4.2024 10.7544 4.44486L6.70104 8.44486C6.47133 8.67154 6.10681 8.68606 5.8598 8.47836L1.46869 4.78606C1.2045 4.56391 1.17041 4.16965 1.39256 3.90546C1.61471 3.64126 2.00897 3.60718 2.27316 3.82933L6.22839 7.15512L9.87636 3.55514C10.1221 3.31269 10.5178 3.31531 10.7602 3.56099Z"
+                fill="#7e7e80"
+              />
+            </svg>
+            <span
+              class="ml-[6px] text-[15px] group-hover:text-[#4c4c4d]/75 text-[#4c4c4d] font-roboto"
+            >
+              {{ user?.current_user_name ?? '' }}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="mt-[10px]">
-      <DatePicker
-        id="Maincalendar"
-        ref="calendarclass"
-        dot="true"
-        class="border-none pl-[22px] pr-[16px] calendar-nav-custom"
-        :style="{ backgroundColor: datePickerBG }"
-        show-weeknumbers="left"
-        days="-1"
-        color="#CCC"
-        week-from-end="6"
-        is-expanded
-        :locale="getNavigatorLanguage"
-        :masks="{ weekdays: 'WWW' }"
-        :attributes="attrs"
-        :is-dark="isDark"
-        mode="single"
-        is-inline
-        in-next-month="true"
-        in-month="true"
-        in-prev-month="true"
-        @dayclick="onDayClick"
-      />
-    </div>
-    <EventAlert
-      v-if="user?.tarif === 'free' || user?.tarif === 'trial'"
-      :bg-color="'#FF912380'"
-      :text-color="'white'"
-      :user-icon="warn"
-      :link="'https://www.leadertask.ru/alpha'"
-      :message-text="user?.tarif === 'trial' ? 'Пробный тариф.' : 'Закончилась лицензия.'"
-    />
-    <div class="my-[10px]">
-      <template v-for="(menuGroup, index) in menu">
-        <div
-          v-if="typeof menuGroup === 'string'"
-          :key="`a-${index}`"
-          class="my-2"
-        >
-          <hr
-            :key="`a-${index}`"
-            class="text-xs mx-3 custom-border-divider"
-            :class="[ asideMenuLabelStyle ]"
-          >
-        </div>
-        <aside-menu-list
-          v-else
-          :key="`b-${index}`"
-          :menu="menuGroup"
-          :favorite-boards="favoriteBoards"
-          :favorite-projects="favoriteProjects"
-          @menu-click="menuClick"
-          @go-to-favorite-board="board => goToBoard(board)"
-          @go-to-favorite-project="proj => goToProject(proj)"
+      <div class="mt-[10px]">
+        <DatePicker
+          id="Maincalendar"
+          ref="calendarclass"
+          dot="true"
+          class="border-none pl-[22px] pr-[16px] calendar-nav-custom"
+          :style="{ backgroundColor: datePickerBG }"
+          show-weeknumbers="left"
+          days="-1"
+          color="#CCC"
+          week-from-end="6"
+          is-expanded
+          :locale="getNavigatorLanguage"
+          :masks="{ weekdays: 'WWW' }"
+          :attributes="attrs"
+          :is-dark="isDark"
+          mode="single"
+          is-inline
+          in-next-month="true"
+          in-month="true"
+          in-prev-month="true"
+          @dayclick="onDayClick"
         />
-      </template>
+      </div>
+      <EventAlert
+        v-if="user?.tarif === 'free' || user?.tarif === 'trial'"
+        :bg-color="'#FF912380'"
+        :text-color="'white'"
+        :user-icon="warn"
+        :link="'https://www.leadertask.ru/alpha'"
+        :message-text="user?.tarif === 'trial' ? 'Пробный тариф.' : 'Закончилась лицензия.'"
+      />
+      <div class="my-[10px]">
+        <template v-for="(menuGroup, index) in menu">
+          <div
+            v-if="typeof menuGroup === 'string'"
+            :key="`a-${index}`"
+            class="my-2"
+          >
+            <hr
+              :key="`a-${index}`"
+              class="text-xs mx-3 custom-border-divider"
+              :class="[ asideMenuLabelStyle ]"
+            >
+          </div>
+          <aside-menu-list
+            v-else
+            :key="`b-${index}`"
+            :menu="menuGroup"
+            :favorite-boards="favoriteBoards"
+            :favorite-projects="favoriteProjects"
+            @menu-click="menuClick"
+            @go-to-favorite-board="board => goToBoard(board)"
+            @go-to-favorite-project="proj => goToProject(proj)"
+          />
+        </template>
+      </div>
     </div>
   </aside>
 </template>

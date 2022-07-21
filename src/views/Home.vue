@@ -293,57 +293,18 @@ const getNavigator = () => {
                 // if last visited navElemen is in nested in children, then we trying to find these children with visitChildren fucntion
                 // from storeNavigator
               } else if (['tags_children', 'projects_children', 'boards_children', 'reglament_content'].includes(navStack.value[navStack.value.length - 1].greedPath)) {
-                if (navStack.value[navStack.value.length - 1].greedPath === 'tags_children') {
-                // nested lookup for tags
+                if (['tags_children', 'projects_children', 'boards_children'].includes(navStack.value[navStack.value.length - 1].greedPath)) {
+                  const pathToNavigatorItem = {
+                    tags_children: 'tags',
+                    projects_children: 'new_private_projects',
+                    boards_children: 'new_private_boards'
+                  }
                   const action = UID_TO_ACTION[navStack.value[navStack.value.length - 1].global_property_uid]
                   if (!action) {
                     console.error('UID_TO_ACTION in undefined', navStack.value[navStack.value.length - 1].global_property_uid)
                     return
                   }
-                  store.dispatch(action, navStack.value[navStack.value.length - 1].uid)
-                    .then(() => {
-                      store.commit('basic', {
-                        key: 'taskListSource',
-                        value: { uid: navStack.value[navStack.value.length - 1].global_property_uid, param: navStack.value[navStack.value.length - 1].uid }
-                      })
-                    })
-                  visitChildren(storeNavigator.value.tags.items, value => {
-                    if (value.uid === navStack.value[navStack.value.length - 1].uid) {
-                      store.commit('basic', { key: navStack.value[navStack.value.length - 1].key, value: value.children })
-                    }
-                  })
-                }
 
-                // nested lookup for shared and private projects
-                if (navStack.value[navStack.value.length - 1].greedPath === 'projects_children') {
-                // Requests project's tasks
-                  const action = UID_TO_ACTION[navStack.value[navStack.value.length - 1].global_property_uid]
-                  if (!action) {
-                    console.error('UID_TO_ACTION in undefined', navStack.value[navStack.value.length - 1].global_property_uid)
-                    return
-                  }
-                  store.dispatch(action, navStack.value[navStack.value.length - 1].uid)
-                  store.commit('basic', { key: 'taskListSource', value: { uid: navStack.value[navStack.value.length - 1].global_property_uid, param: navStack.value[navStack.value.length - 1].uid } })
-
-                  visitChildren(storeNavigator.value.new_private_projects[0].items, value => {
-                    if (value.uid === navStack.value[navStack.value.length - 1].uid) {
-                      store.commit('basic', { key: navStack.value[navStack.value.length - 1].key, value: value.children })
-                    }
-                  })
-                  visitChildren(storeNavigator.value.new_private_projects[1].items, value => {
-                    if (value.uid === navStack.value[navStack.value.length - 1].uid) {
-                      store.commit('basic', { key: navStack.value[navStack.value.length - 1].key, value: value.children })
-                    }
-                  })
-                }
-
-                if (navStack.value[navStack.value.length - 1].greedPath === 'boards_children') {
-                // Requests boards's cards
-                  const action = UID_TO_ACTION[navStack.value[navStack.value.length - 1].global_property_uid]
-                  if (!action) {
-                    console.error('UID_TO_ACTION in undefined', navStack.value[navStack.value.length - 1].global_property_uid)
-                    return
-                  }
                   store.dispatch(action, navStack.value[navStack.value.length - 1].uid)
                   store.commit('basic', { key: 'taskListSource', value: { uid: navStack.value[navStack.value.length - 1].global_property_uid, param: navStack.value[navStack.value.length - 1].uid } })
 
@@ -352,11 +313,22 @@ const getNavigator = () => {
                       store.commit('basic', { key: navStack.value[navStack.value.length - 1].key, value: value.children })
                     }
                   })
-                  visitChildren(storeNavigator.value.new_private_boards[1].items, value => {
-                    if (value.uid === navStack.value[navStack.value.length - 1].uid) {
-                      store.commit('basic', { key: navStack.value[navStack.value.length - 1].key, value: value.children })
+                  // мы здесь смотрим, если у нас элемент из навигатора это массив по типу как projects или boards, мы идем по этому массиву и пытаемся найти детей
+                  if (Array.isArray(storeNavigator.value[pathToNavigatorItem[navStack.value[navStack.value.length - 1].greedPath]])) {
+                    for (let i = 0; i < storeNavigator.value[pathToNavigatorItem[navStack.value[navStack.value.length - 1].greedPath]].length; i++) {
+                      visitChildren(storeNavigator.value[pathToNavigatorItem[navStack.value[navStack.value.length - 1].greedPath]][i].items, value => {
+                        if (value.uid === navStack.value[navStack.value.length - 1].uid) {
+                          store.commit('basic', { key: navStack.value[navStack.value.length - 1].key, value: value.children })
+                        }
+                      })
                     }
-                  })
+                  } else {
+                    visitChildren(storeNavigator.value[pathToNavigatorItem[navStack.value[navStack.value.length - 1].greedPath]].items, value => {
+                      if (value.uid === navStack.value[navStack.value.length - 1].uid) {
+                        store.commit('basic', { key: navStack.value[navStack.value.length - 1].key, value: value.children })
+                      }
+                    })
+                  }
                 }
                 if (navStack.value[navStack.value.length - 1].greedPath === 'reglament_content') {
                   visitChildren(storeNavigator.value.reglaments.items, value => {

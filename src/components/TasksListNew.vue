@@ -95,7 +95,7 @@
     >
       <tree
         :nodes="storeTasks"
-        :config="newConfig"
+        :config="sortedTasksConfig"
         class="w-full h-full"
         @nodeOpened="nodeExpanding"
         @nodeFocus="nodeSelected"
@@ -462,6 +462,20 @@ export default {
     },
     storeTasks () {
       return this.$store.state.tasks.newtasks
+    },
+    sortedTasksConfig () {
+      const roots = this.$store.state.tasks.newConfig.roots
+      const tasks = this.$store.state.tasks.newtasks
+      const sortTasksByOrderNew = (a, b) => {
+        return parseFloat(tasks[a].info.order_new) > parseFloat(tasks[b].info.order_new) ? 1 : -1
+      }
+      const getSortedTasksIDs = (taskKey) => {
+        return roots.includes(taskKey)
+      }
+      const sortedTasks = Object.keys(tasks).sort(sortTasksByOrderNew).filter(getSortedTasksIDs)
+      const sortedConfig = this.$store.state.tasks.newConfig
+      sortedConfig.roots = sortedTasks
+      return sortedConfig
     },
     overdue () {
       return this.$store.state.tasks.overdue

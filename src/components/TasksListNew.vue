@@ -458,7 +458,7 @@ export default {
       return this.$store.state.user.user
     },
     newConfig () {
-      return this.$store.state.tasks.newConfig
+      return this.$store.getters.sortedConfig
     },
     storeTasks () {
       return this.$store.state.tasks.newtasks

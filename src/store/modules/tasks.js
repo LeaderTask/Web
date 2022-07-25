@@ -74,7 +74,21 @@ const state = {
 
 const getters = {
   getTasks: (state) => state.navigator,
-  tasksStatus: (state) => state.status
+  tasksStatus: (state) => state.status,
+  sortedConfig: (state) => {
+    const roots = [...state.newConfig.roots]
+    const tasks = Object.assign(state.newtasks, {})
+    const sortTasksByOrderNew = (a, b) => {
+      return parseFloat(tasks[a].info.order_new) > parseFloat(tasks[b].info.order_new) ? 1 : -1
+    }
+    const getSortedTasksIDs = (taskKey) => {
+      return roots.includes(taskKey)
+    }
+    const sortedTasks = Object.keys(tasks).sort(sortTasksByOrderNew).filter(getSortedTasksIDs)
+    const sortedConfig = Object.assign(state.newConfig, {})
+    sortedConfig.roots = sortedTasks
+    return sortedConfig
+  }
 }
 
 const actions = {

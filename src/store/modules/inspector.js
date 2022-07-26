@@ -1,6 +1,5 @@
 import * as INSPECTOR from '../actions/inspector'
 import axios from 'axios'
-import { notify } from 'notiwind'
 
 const state = {
   karma: [],
@@ -18,12 +17,6 @@ const actions = {
         .then(resp => {
           resolve(resp)
         }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'INSPECTOR API Error, please make screenshot',
-            action: INSPECTOR.CREATE_INSPECTOR_TASK,
-            text: err.response.data
-          }, 15000)
           reject(err)
         })
     })
@@ -35,12 +28,6 @@ const actions = {
         .then(resp => {
           resolve(resp)
         }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'INSPECTOR API Error, please make screenshot',
-            action: INSPECTOR.CREATE_INSPECTOR_TASK,
-            text: err.response.data
-          }, 15000)
           reject(err)
         })
     })
@@ -52,12 +39,6 @@ const actions = {
         .then(resp => {
           resolve(resp)
         }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'INSPECTOR API Error, please make screenshot',
-            action: INSPECTOR.ANSWER_INSPECTOR_TASK,
-            text: err.response.data
-          }, 15000)
           reject(err)
         })
     })
@@ -70,12 +51,6 @@ const actions = {
           commit(INSPECTOR.KARMA_REQUEST, resp.data)
           resolve(resp)
         }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'INSPECTOR API Error, please make screenshot',
-            action: INSPECTOR.KARMA_REQUEST,
-            text: err.response.data
-          }, 15000)
           reject(err)
         })
     })
@@ -88,12 +63,6 @@ const actions = {
           commit(INSPECTOR.UPDATE_SOUND_SETTING, data.value)
           resolve(resp)
         }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'INSPECTOR API Error, please make screenshot',
-            action: INSPECTOR.UPDATE_SOUND_SETTING,
-            text: err.response.data
-          }, 15000)
           reject(err)
         })
     })
@@ -106,12 +75,6 @@ const actions = {
           commit(INSPECTOR.GET_SOUND_SETTING, resp.data.is_notification_sound_on)
           resolve(resp)
         }).catch(err => {
-          notify({
-            group: 'api',
-            title: 'INSPECTOR API Error, please make screenshot',
-            action: INSPECTOR.GET_SOUND_SETTING,
-            text: err.response.data
-          }, 15000)
           reject(err)
         })
     })

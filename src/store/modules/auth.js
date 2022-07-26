@@ -1,15 +1,11 @@
 import { setLocalStorageItem } from '@/store/helpers/functions'
 import axios from 'axios'
-import { notify } from 'notiwind'
 import {
-  AUTH_ERROR,
-  AUTH_LOGOUT,
-  AUTH_REGISTER,
+  AUTH_CHANGE_PASSWORD, AUTH_ERROR,
+  AUTH_LOGOUT, AUTH_REFRESH_TOKEN, AUTH_REGISTER,
   AUTH_REQUEST,
   AUTH_RESET,
-  AUTH_SUCCESS,
-  AUTH_CHANGE_PASSWORD,
-  AUTH_REFRESH_TOKEN
+  AUTH_SUCCESS
 } from '../actions/auth'
 import { RESET_STATE_NAVIGATOR } from '../actions/navigator'
 import { RESET_STATE_PROJECT } from '../actions/projects'
@@ -41,15 +37,6 @@ const actions = {
         .catch((err) => {
           commit(AUTH_ERROR, err)
           localStorage.removeItem('user-token')
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: AUTH_REQUEST,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -60,7 +47,6 @@ const actions = {
       const uri = process.env.VUE_APP_LEADERTASK_API + 'api/v1/users/new'
       axios({ url: uri, data: user, method: 'POST' })
         .then((resp) => {
-          console.log(resp)
           setLocalStorageItem('user-token', resp.data.access_token)
           setLocalStorageItem('user-refresh-token', resp.data.refresh_token)
           axios.defaults.headers.common.Authorization = resp.data.access_token
@@ -70,23 +56,13 @@ const actions = {
         .catch((err) => {
           commit(AUTH_ERROR, err)
           localStorage.removeItem('user-token')
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: AUTH_REGISTER,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })
   },
   [AUTH_CHANGE_PASSWORD]: ({ commit }, data) => {
-    console.log(data)
     return new Promise((resolve, reject) => {
-      commit(AUTH_CHANGE_PASSWORD)
+      // commit(AUTH_CHANGE_PASSWORD) unknown
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/users/password'
       axios({ url: url, data: data, method: 'PATCH' })
         .then((resp) => {
@@ -97,17 +73,7 @@ const actions = {
         })
         .catch((err) => {
           commit(AUTH_ERROR, err)
-          localStorage.removeItem('user-token')
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: AUTH_CHANGE_PASSWORD,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
-          reject(err)
+          reject(err.response?.data)
         })
     })
   },
@@ -130,23 +96,15 @@ const actions = {
         })
         .catch((err) => {
           commit(AUTH_ERROR, err)
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: AUTH_LOGOUT,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })
   },
   [AUTH_REFRESH_TOKEN]: ({ commit }) => {
     return new Promise((resolve, reject) => {
-      axios.defaults.headers.common.RefreshToken = localStorage.getItem('user-refresh-token')
-      const url = process.env.VUE_APP_LEADERTASK_API + 'https://web.leadertask.com/api/v1/tokens/refresh'
+      axios.defaults.headers.common.RefreshToken =
+        localStorage.getItem('user-refresh-token')
+      const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tokens/refresh'
       axios
         .post(url)
         .then((resp) => {
@@ -157,15 +115,6 @@ const actions = {
         })
         .catch((err) => {
           commit(AUTH_ERROR, err)
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: AUTH_LOGOUT,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })

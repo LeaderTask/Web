@@ -43,9 +43,30 @@
       class="mt-3 tags-custom dark:bg-gray-800 dark:text-gray-100 project-hover-close"
     >
       <img
+        v-if="employeesByEmail[performerEmail]?.fotolink"
         :src="employeesByEmail[performerEmail]?.fotolink"
         class="mr-1 mt-0.5 border-fotolink border-solid border-2 border-green-400 rounded-[4px] w-[20px] h-[20px]"
       >
+      <svg
+        v-else
+        class="mr-1 mt-0.5"
+        width="20"
+        height="20"
+        viewBox="0 0 42 42"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect
+          width="42"
+          height="42"
+          rx="8"
+          fill="#EDEDED"
+        />
+        <path
+          d="M15.75 14.583C15.75 17.4775 18.1055 19.833 21 19.833C23.8945 19.833 26.25 17.4775 26.25 14.583C26.25 11.6885 23.8945 9.33301 21 9.33301C18.1055 9.33301 15.75 11.6885 15.75 14.583ZM30.3333 31.4997H31.5V30.333C31.5 25.8308 27.8355 22.1663 23.3333 22.1663H18.6667C14.1633 22.1663 10.5 25.8308 10.5 30.333V31.4997H30.3333Z"
+          fill="#22C55E"
+        />
+      </svg>
       <span> {{ getEmpNameByEmail(performerEmail) }} </span>
       <button
         class="btn-close-popover"
@@ -154,11 +175,32 @@
                 @click="changePerformer(emp.email)"
               >
                 <img
+                  v-if="emp.fotolink"
                   :src="emp.fotolink"
                   class="mr-1 border-fotolink border-solid border-2 border-sky-500"
                   width="30"
                   height="30"
                 >
+                <svg
+                  v-else
+                  class="mr-[10px] mt-[5px] flex-none"
+                  width="30"
+                  height="30"
+                  viewBox="0 0 42 42"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect
+                    width="42"
+                    height="42"
+                    rx="8"
+                    fill="#EDEDED"
+                  />
+                  <path
+                    d="M15.75 14.583C15.75 17.4775 18.1055 19.833 21 19.833C23.8945 19.833 26.25 17.4775 26.25 14.583C26.25 11.6885 23.8945 9.33301 21 9.33301C18.1055 9.33301 15.75 11.6885 15.75 14.583ZM30.3333 31.4997H31.5V30.333C31.5 25.8308 27.8355 22.1663 23.3333 22.1663H18.6667C14.1633 22.1663 10.5 25.8308 10.5 30.333V31.4997H30.3333Z"
+                    fill="#979899"
+                  />
+                </svg>
                 <label class="employee-name-custom">
                   {{ emp.name }}
                   <div class="popover-employee-email">{{ emp.email }}</div>

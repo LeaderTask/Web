@@ -211,6 +211,8 @@
               :animation="100"
               :disabled="!board || board.type_access === 0"
               :move="checkMoveDragCard"
+              :scroll-sensitivity="250"
+              :force-fallback="true"
               @start="startDragCard"
               @end="endDragCard"
               @change="changeDragCard"
@@ -680,9 +682,8 @@ export default {
       const fromColumn = this.storeCards.find(
         (column) => column.UID === fromColumnId
       )
-      // const cardId = start.item.dataset.cardId
       const card = fromColumn?.cards[start.oldIndex] || null
-      //
+
       this.dragCardParam.move.column = fromColumn
       this.dragCardParam.move.card = card
     },

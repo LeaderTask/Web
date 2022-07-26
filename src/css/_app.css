@@ -12,7 +12,7 @@ html
   font-family: 'Roboto'
 }
 #app {
-  @apply w-screen h-full transition-position lg:w-auto;
+  @apply w-screen h-full transition-position xl:w-auto;
 }
 
 .dropdown {

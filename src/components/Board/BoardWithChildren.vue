@@ -12,7 +12,7 @@
       @cancel="showBoardsLimit = false"
       @ok="showBoardsLimit = false"
     />
-    <div class="grid gap-2 mt-3 md:grid-cols-2 lg:grid-cols-4">
+    <div class="grid gap-2 mt-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
       <template
         v-for="(board, pindex) in boards"
         :key="pindex"

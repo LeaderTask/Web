@@ -23,7 +23,7 @@
     "@vueform/toggle": "^2.0.1",
     "@vueup/vue-quill": "^1.0.0-alpha.1",
     "axios": "^0.24.0",
-    "base64-img": "^1.0.4",
+    "base64-img": "^1.0.1",
     "body-parser": "^1.20.0",
     "chart.js": "^3.6.0",
     "core-js": "^3.6.5",

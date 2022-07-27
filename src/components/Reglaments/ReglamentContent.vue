@@ -93,7 +93,6 @@
       class="h-auto mb-5 bg-white"
     />
   </div>
-
   <div
     v-if="(isTesting || isEditing) && !showCompleteMessage"
   >
@@ -166,11 +165,9 @@
   />
   <div class="h-[20px]" />
 </template>
-
 <script>
 import { QuillEditor } from '@vueup/vue-quill'
 import * as REGLAMENTS from '@/store/actions/reglaments.js'
-
 import ReglamentWrong from '@/components/Reglaments/ReglamentWrong.vue'
 import ReglamentInfo from '@/components/Reglaments/ReglamentInfo.vue'
 import ReglamentTestLimit from '@/components/Reglaments/ReglamentTestLimit.vue'
@@ -181,9 +178,7 @@ import ReglamentCompleteMessage from './ReglamentCompleteMessage.vue'
 import ReglamentSmallButton from '@/components/Reglaments/ReglamentSmallButton.vue'
 import PopMenu from '@/components/modals/PopMenu.vue'
 import BoardPropsMenuItemUser from '@/components/Board/BoardPropsMenuItemUser.vue'
-
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-
 export default {
   components: {
     QuillEditor,
@@ -228,12 +223,8 @@ export default {
     needStartEdit () {
       return this.reglament?.needStartEdit ?? false
     },
-    editorsCanEdit () {
-      return this.reglament.editors.includes(this.$store.state.user.user.current_user_email)
-    },
     canEdit () {
-      const userType = this.$store.state.employees.employees[this.$store.state.user.user.current_user_uid].type
-      return (this.reglament?.email_creator === this.user.current_user_email) || (this.editorsCanEdit) || (userType === 2 || userType === 1)
+      return (this.reglament?.email_creator === this.user.current_user_email) || this.editorsCanEdit()
     },
     user () {
       return this.$store.state.user.user
@@ -324,6 +315,13 @@ export default {
     } catch (e) {}
   },
   methods: {
+    editorsCanEdit () {
+      for (let i = 0; i < this.currentEditors.length; i++) {
+        if (this.currentEditors[i] === this.user.current_user_email) {
+          return true
+        }
+      }
+    },
     uuidv4 () {
       return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
         (
@@ -465,7 +463,6 @@ export default {
             }
           ]
         }
-
         this.questions.push(questionToPush)
         this.$nextTick(() => {
           this.gotoNode(questionToPush.uid)

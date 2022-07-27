@@ -47,6 +47,56 @@
           :class="{ 'bg-white p-3 rounded-l-lg cursor-pointer': Object.keys(copiedTasks).length }"
           @click="pasteCopiedTasks('00000000-0000-0000-0000-000000000000')"
         >
+<<<<<<< HEAD
+          <p class="text-white text-sm font-bold">
+            {{ Object.keys(copiedTasks).length }}
+          </p>
+        </div>
+      </div>
+      <TaskListEdit
+        id="task"
+        ref="root"
+        v-model="createTaskText"
+        bg-transperant
+        class="w-full text-black"
+        placeholder="Добавить задачу"
+        @keyup.enter="createTask($event)"
+      />
+    </div>
+  </div>
+
+  <EmptyTasksListPics
+    v-if="!Object.keys(storeTasks).length && status === 'success'"
+  />
+
+  <!-- Skeleton -->
+  <TasksSkeleton
+    v-if="status == 'loading'"
+  />
+  <!-- vue3-treeview -->
+  <div
+    v-if="status == 'success'"
+    class="overflow-y-auto mt-[4px] px-px min-h-[300px] w-full"
+  >
+    <tree
+      :nodes="storeTasks"
+      :config="newConfig"
+      class="w-full h-full"
+      @nodeOpened="nodeExpanding"
+      @nodeFocus="nodeSelected"
+      @nodeDragend="nodeDragEnd"
+    >
+      <template #before-input="props">
+        <div
+          :id="props.node.info.uid"
+          class="border border-gray-300 group shrink-0 w-full pl-[31px] pr-[6px] py-[11px] mb-[4px] min-h-[42px] font-roboto flex flex-col bg-white rounded-[8px] relative"
+          :style="{ backgroundColor: getValidBackColor(colors[props.node.info?.uid_marker]?.back_color) }"
+          :class="{ 'ring-1 ring-orange-400': props.node.id === lastSelectedTaskUid}"
+        >
+          <!-- Name, Status -->
+          <div
+            class="flex gap-[6px] items-center w-full"
+=======
           <svg
             :class="{ 'mr-2': Object.keys(copiedTasks).length }"
             width="14"
@@ -54,6 +104,7 @@
             viewBox="0 0 16 16"
             fill="white"
             xmlns="http://www.w3.org/2000/svg"
+>>>>>>> 04bb1e21f1b3e6696a90b2358d7a3d705d03a244
           >
             <path
               d="M8.00011 2.3457V8.4034M8.00011 8.4034V14.4611M8.00011 8.4034H14.4617M8.00011 8.4034H1.53857"
@@ -1020,7 +1071,7 @@ export default {
   margin-left: 0rem;
   word-wrap: break-word;
   font-size: 14px;
-  outline: none
+  outline: none;
 }
 
 .node-wrapper.disabled .checkbox-wrapper.checked {
@@ -1174,14 +1225,17 @@ export default {
 
 .level-enter-active,
 .level-leave-active {
-  transition: opacity 0.2s ease;
+  position: relative;
+  transition: transform 1s ease;
+  z-index: -100;
 }
 
 .level-enter-from,
 .level-leave-to {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  transform: 0
+  position: relative;
+  z-index: -100;
+  transform: translate(0, -100%);
+  transition: transform 1s ease;
 }
 
 .tree-node {

@@ -36,7 +36,7 @@ const actions = {
         data.user_uid
       axios({ url: url, method: 'GET' })
         .then((resp) => {
-          commit('ChangeReglaments', resp.data)
+          commit(REGLAMENTS.REGLAMENT_CHANGE_REGLAMENTS, resp.data)
           resolve(resp)
         })
         .catch((err) => {
@@ -61,7 +61,7 @@ const actions = {
       const url = process.env.VUE_APP_INSPECTOR_API + 'reglaments'
       axios({ url: url, method: 'PATCH', data: data })
         .then((resp) => {
-          commit('ChangeReglaments', [data])
+          commit(REGLAMENTS.REGLAMENT_CHANGE_REGLAMENTS, [data])
           resolve(resp)
         })
         .catch((err) => {
@@ -272,7 +272,7 @@ const mutations = {
       }
     }
   },
-  ChangeReglaments: (state, reglaments) => {
+  [REGLAMENTS.REGLAMENT_CHANGE_REGLAMENTS]: (state, reglaments) => {
     for (const reglament of reglaments) {
       state.reglaments[reglament.uid] = reglament
     }

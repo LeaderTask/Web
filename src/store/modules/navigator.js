@@ -8,19 +8,26 @@ import {
   NAVIGATOR_CHANGE_EMPLOYEE_DEPARTMENT,
   NAVIGATOR_ERROR,
   NAVIGATOR_PUSH_BOARD,
-  NAVIGATOR_PUSH_COLOR, NAVIGATOR_PUSH_DEPARTAMENT,
+  NAVIGATOR_PUSH_COLOR,
+  NAVIGATOR_PUSH_DEPARTAMENT,
   NAVIGATOR_PUSH_EMPLOYEE,
-  NAVIGATOR_PUSH_PROJECT, NAVIGATOR_PUSH_REGLAMENT, NAVIGATOR_PUSH_TAG,
+  NAVIGATOR_PUSH_PROJECT,
+  NAVIGATOR_PUSH_REGLAMENT,
+  NAVIGATOR_PUSH_TAG,
   NAVIGATOR_REMOVE_BOARD,
   NAVIGATOR_REMOVE_COLOR,
   NAVIGATOR_REMOVE_DEPARTAMENT,
   NAVIGATOR_REMOVE_EMPLOYEE,
-  NAVIGATOR_REMOVE_PROJECT, NAVIGATOR_REMOVE_REGLAMENT, NAVIGATOR_REMOVE_TAG,
+  NAVIGATOR_REMOVE_PROJECT,
+  NAVIGATOR_REMOVE_REGLAMENT,
+  NAVIGATOR_REMOVE_TAG,
   NAVIGATOR_REQUEST,
   NAVIGATOR_SUCCESS,
   NAVIGATOR_UPDATE_ASSIGNMENTS,
   NAVIGATOR_UPDATE_DEPARTMENT,
-  NAVIGATOR_UPDATE_EMPLOYEE, NAVIGATOR_UPDATE_REGLAMENT, PATCH_SETTINGS,
+  NAVIGATOR_UPDATE_EMPLOYEE,
+  NAVIGATOR_UPDATE_REGLAMENT,
+  PATCH_SETTINGS,
   PATCH_SETTINGS_SUCCESS,
   RESET_STATE_NAVIGATOR
 } from '../actions/navigator'
@@ -78,16 +85,6 @@ const actions = {
           if (resp.data.delegate_to_me) {
             for (const dt of resp.data.delegate_to_me.items) {
               dt.parentID = resp.data.delegate_to_me.uid
-            }
-          }
-          if (resp.data.invites) {
-            for (const dt of resp.data.invites.items) {
-              if (!dt.uid_dep) {
-                dt.uid_dep = '00000000-0000-0000-0000-000000000000'
-              }
-              dt.type = 4
-              commit(PUSH_EMPLOYEE, dt)
-              commit(PUSH_EMPLOYEE_BY_EMAIL, dt)
             }
           }
           if (resp.data.emps.items) {
@@ -350,7 +347,7 @@ const mutations = {
     resp.data.new_delegate = newAssignments
 
     // Merge emps to deps like new private projects
-    const dataEmps = [...resp.data.emps?.items, ...resp.data.invites?.items]
+    const dataEmps = [...resp.data.emps?.items]
     const newEmps = []
     newEmps.push({
       dep: { uid: '', name: 'Вне отдела' },
@@ -441,7 +438,7 @@ const mutations = {
   },
   [NAVIGATOR_REMOVE_REGLAMENT]: (state, reglament) => {
     for (let i = 0; i < state.navigator.reglaments.items.length; i++) {
-      if (state.navigator.reglaments.items[i].uid === reglament.uid) {
+      if (state.navigator.reglaments.items[i].uid === reglament) {
         state.navigator.reglaments.items.splice(i, 1)
         return
       }

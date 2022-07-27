@@ -1,25 +1,34 @@
-<script setup>
+<script>
 import CardChatMessageOptionsPopMenu from '@/components/CardProperties/CardChatMessageOptionsPopMenu.vue'
+export default {
+  components: {
+    CardChatMessageOptionsPopMenu
+  },
+  props: {
+    fileUid: String,
+    fileName: String,
+    fileSize: String,
+    fileExtension: String,
+    fileDateCreate: String,
+    canDelete: {
+      type: Boolean,
+      default: true
+    }
+  },
 
-defineEmits(['onQuoteMessage', 'onDeleteMessage'])
-const props = defineProps({
-  fileUid: String,
-  fileName: String,
-  fileSize: String,
-  fileExtension: String,
-  fileDateCreate: String,
-  canDelete: {
-    type: Boolean,
-    default: true
+  emits: ['onQuoteMessage', 'onDeleteMessage'],
+  data () {
+    return {
+      currentLocation: window.location.href
+    }
   }
-})
-const currentLocation = window.location.href
+}
 </script>
 <template>
   <div class="flex space-x-[11px]">
     <a
       class="text-[#4C4C4D] text-[13px] leading-[15px] font-[700]"
-      :href="currentLocation + 'cardfile/' + props.fileUid + '?type=video&format=' + props.fileExtension"
+      :href="currentLocation + 'cardfile/' + fileUid + '?type=video&format=' + fileExtension"
       target="_blank"
     >
       <svg
@@ -42,24 +51,24 @@ const currentLocation = window.location.href
     <div class="flex flex-col space-y-[2px]">
       <a
         class="text-[#4C4C4D] text-[13px] leading-[15px] font-[700]"
-        :href="currentLocation + 'cardfile/' + props.fileUid + '?type=video&format=' + props.fileExtension"
+        :href="currentLocation + 'cardfile/' + fileUid + '?type=video&format=' + fileExtension"
         target="_blank"
       >
-        {{ props.fileName }}
+        {{ fileName }}
       </a>
       <div class="flex justify-between items-center">
         <p class="text-[#7E7E80] text-[12px] leading-[14px] font-[400]">
-          {{ props.fileSize }}
+          {{ fileSize }}
         </p>
         <p
           class="font-[700] text-[11px] leading-[13px] group-hover:hidden min-w-[30px]"
           style="color: rgba(0, 0, 0, 0.4);"
         >
-          {{ props.fileDateCreate }}
+          {{ fileDateCreate }}
         </p>
         <div class="group-hover:flex hidden justify-end">
           <card-chat-message-options-pop-menu
-            :can-delete="props.canDelete"
+            :can-delete="canDelete"
             @onQuoteMessage="$emit('onQuoteMessage')"
             @onDeleteMessage="$emit('onDeleteMessage')"
           >

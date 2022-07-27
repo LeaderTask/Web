@@ -55,7 +55,8 @@
       </div>
       <draggable
         :list="value.items"
-        :move="checkMove"
+        animation="400"
+        @change="updateOrderBords($event, value.items)"
         class="grid gap-2 mt-3 grid-cols-1"
         :class="{
           'md:grid-cols-2 lg:grid-cols-4': isGridView,
@@ -125,10 +126,16 @@ export default {
     }
   },
   methods: {
-    checkMove (e) {
-      window.console.log('Future index: ' + e.draggedContext.futureIndex)
-      window.console.log('Index: ' + e.draggedContext.index)
-      window.console.log('Element: ' + e.draggedContext.element.order)
+    updateOrderBords (e, boards) {
+      boards.forEach((board, i) => {
+        if (board.order !== i) {
+          board.order = i
+          this.$store.dispatch(BOARD.CREATE_BOARD_REQUEST, board).then((res) => {
+            this.$store.commit(BOARD.PUSH_BOARD, [board])
+            window.console.log(res)
+          })
+        }
+      })
     },
     print (val) {
       console.log(val)

@@ -100,8 +100,8 @@ export default {
 <template>
   <div class="flex flex-col pb-[100px]">
     <div
-      v-for="(message, index,key) in cardmessages"
-      :key="`${key}`"
+      v-for="(message, index) in cardmessages"
+      :key="message"
     >
       <div
         v-if="isChangedDate(index)"

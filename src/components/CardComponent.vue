@@ -29,13 +29,13 @@ const props = defineProps({
   hoverable: Boolean
 })
 
-const emit = defineEmits(['header-icon-click', 'submit'])
+const emit = defineEmits(['header-icon-click', 'submit', 'tab'])
 
 const is = computed(() => props.form ? 'form' : 'div')
 
 const showFreeModal = ref(false)
 
-const navig = computed(() => store.state.navig)
+const currentTab = ref('account')
 
 const user = computed(() => store.state.user.user)
 
@@ -56,26 +56,16 @@ const componentClass = computed(() => {
 })
 
 const computedHeaderIcon = computed(() => props.headerIcon ?? mdiCog)
-
-const tarif = () => {
-  store.commit('basic', { key: 'navig', value: 1 })
-}
-
-const karma = () => {
-  if (user.value.tarif !== 'alpha' && user.value.tarif !== 'trial') {
+const changeSettingsTab = (tabName) => {
+  currentTab.value = tabName
+  emit('tab', tabName)
+  if (user.value.tarif !== 'alpha' && user.value.tarif !== 'trial' && currentTab.value === 'karma') {
     showFreeModal.value = true
-    return
+    currentTab.value = 'tarif'
+    emit('tab', 'tarif')
   }
-  store.commit('basic', { key: 'navig', value: 4 })
 }
 
-const acc = () => {
-  store.commit('basic', { key: 'navig', value: 0 })
-}
-
-const option = () => {
-  store.commit('basic', { key: 'navig', value: 2 })
-}
 const headerIconClick = () => {
   emit('header-icon-click')
 }
@@ -106,8 +96,8 @@ const submit = e => {
         <div>
           <div
             class="px-2 py-2 flex text-center rounded-[9px] hover:bg-white"
-            :class="{'bg-white':navig === 0 || navig === 3 }"
-            @click="acc"
+            :class="{'bg-white':currentTab==='account' || currentTab===''}"
+            @click="changeSettingsTab('account')"
           >
             <svg
               width="30"
@@ -133,8 +123,8 @@ const submit = e => {
           </div>
           <div
             class="px-2 py-2 flex text-center rounded-[9px] hover:bg-white"
-            :class="{'bg-white':navig === 1}"
-            @click="tarif"
+            :class="{'bg-white':currentTab==='tarif'}"
+            @click="changeSettingsTab('tarif')"
           >
             <svg
               width="30"
@@ -158,8 +148,8 @@ const submit = e => {
           </div>
           <div
             class="px-2 py-2 flex text-center rounded-[9px] hover:bg-white"
-            :class="{'bg-white':navig === 2}"
-            @click="option"
+            :class="{'bg-white':currentTab==='main'}"
+            @click="changeSettingsTab('main')"
           >
             <svg
               width="30"
@@ -198,8 +188,8 @@ const submit = e => {
           </div>
           <div
             class="px-2 py-2 flex text-center rounded-[9px] hover:bg-white"
-            :class="{'bg-white':navig === 4}"
-            @click="karma"
+            :class="{'bg-white':currentTab==='karma'}"
+            @click="changeSettingsTab('karma')"
           >
             <svg
               width="30"
@@ -282,11 +272,11 @@ const submit = e => {
           class="mt-[35.5px] flex w-full h-[5%] items-stretch mb-1"
         >
           <a
-            v-if="computedHeaderIcon && navig === 3"
+            v-if="computedHeaderIcon && currentTab===''"
             href="#"
             class="hover:bg-gray-200  flex items-center p-2 ml-2 mt-2 rounded-xl justify-center ring-blue-700"
             aria-label="more options"
-            @click="acc"
+            @click="changeSettingsTab('account')"
           >
             <svg
               width="9"

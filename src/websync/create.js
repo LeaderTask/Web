@@ -9,6 +9,7 @@ import { createTag } from '@/websync/tag.js'
 import { createTask } from '@/websync/task.js'
 import { createTaskMessage } from '@/websync/task_message.js'
 import * as TYPES from '@/websync/types.js'
+import { createDepartment } from '@/websync/departments'
 
 function currentUserUid () {
   return store?.state?.user?.user?.current_user_uid
@@ -101,6 +102,7 @@ export default function processCreate (obj) {
     case TYPES.TYPE_OBJECT_CONTACT_FOTO:
       break
     case TYPES.TYPE_OBJECT_USER_GROUP:
+      createDepartment(obj)
       break
     case TYPES.TYPE_OBJECT_INVITE:
       break

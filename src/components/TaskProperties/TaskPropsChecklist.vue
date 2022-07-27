@@ -204,7 +204,9 @@ export default {
       handler: function (val) {
         this.arrChecklist = []
         if (val) {
-          for (const check of val.split('\r\n\r\n')) {
+          // нормализуем перенос строки (разные на windows и на mac)
+          const chlist = val.replaceAll('\r\n', '\n').replaceAll('\r', '\n').replaceAll('\n', '\r\n')
+          for (const check of chlist.split('\r\n\r\n')) {
             const checkValues = check.split('\r\n')
             this.arrChecklist.push({ checked: !!+checkValues[0], text: checkValues[1] })
           }

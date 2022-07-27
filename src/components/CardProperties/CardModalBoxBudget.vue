@@ -46,7 +46,7 @@ export default {
       immediate: true,
       handler: function (val) {
         if (val) {
-          this.currentValue = this.value
+          this.value !== 0 ? this.currentValue = this.value : this.currentValue = ''
           this.$nextTick(function () {
             this.$refs.inputValue.focus({ preventScroll: false })
           })

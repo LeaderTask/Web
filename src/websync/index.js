@@ -1,9 +1,10 @@
+import { computed } from 'vue'
 import store from '@/store/index.js'
+import * as TYPES from '@/websync/types.js'
+
 import processCreate from '@/websync/create.js'
 import processRemove from '@/websync/remove.js'
-import * as TYPES from '@/websync/types.js'
 import processUpdate from '@/websync/update.js'
-import { computed } from 'vue'
 
 const storeNavigator = computed(() => store.state.navigator.navigator)
 
@@ -36,14 +37,14 @@ export default function initWebSync () {
   )
   client.connect({
     onSuccess: function (e) {
-      console.log('Websync connected success!')
+      console.log('websync connected success!')
     },
     onFailure: function (e) {
-      console.log('Websync could not connect: ' + e.getException().message)
+      console.log('websync could not connect: ' + e.getException().message)
     },
     onStreamFailure: function (e) {
       console.log(
-        'Websync network problems: ' +
+        'websync network problems: ' +
           e.getException().message +
           (e.getRetry() ? ' Will' : ' Will not') +
           ' reconnect.'
@@ -67,11 +68,11 @@ export default function initWebSync () {
         // никак не получить доступ к полю obj.obj.type
         // возвращает не то что там записано
         const obj = { ...JSON.parse(str) }
-        console.log(obj)
+        // console.log('websync onReceive object', obj)
 
         parseObject(obj)
       } catch (e) {
-        console.log(e)
+        console.log('websync onReceive catch error', e)
       }
     }
   })

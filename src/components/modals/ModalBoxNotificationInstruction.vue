@@ -53,7 +53,6 @@ const cancel = () => confirmCancel('cancel')
       :title="title"
       class="shadow-3xl border border-gray-300 max-h-modal md:w-4/5 lg:w-2/5 z-50 p-5 rounded-2xl"
       @header-icon-click="cancel"
-      @header-icon2-click="logout"
     >
       <div class="space-y-3 items-center justify-center">
         <slot />

@@ -1,33 +1,87 @@
 <template>
   <div :class="container">
-    <div><hr :class="nick" class="ml-[55%]">
-    <div :class="messageOut">
-      <div class="m-2">
-      <hr :class="text" class="w-full">
-      <hr :class="text" class="mr-[15%]">
-      <hr :class="text" class="mr-[65%]">
-      <hr :class="[text, 'bg-[#a8afca]']" class="ml-[80%]">
+    <div>
+      <hr
+        :class="nick"
+        class="ml-[55%]"
+      >
+      <div :class="messageOut">
+        <div class="m-2">
+          <hr
+            :class="text"
+            class="w-full"
+          >
+          <hr
+            :class="text"
+            class="mr-[15%]"
+          >
+          <hr
+            :class="text"
+            class="mr-[65%]"
+          >
+          <hr
+            :class="[text, 'bg-[#a8afca]']"
+            class="ml-[80%]"
+          >
+        </div>
       </div>
-    </div></div>
-   <div><hr :class="nick" class="mr-[75%]">
-    <div :class="messageIn">
-      <div class="m-2">
-        <hr :class="text" class="w-full">
-        <hr :class="text" class="w-full">
-        <hr :class="text" class="w-full">
-        <hr :class="text" class="mr-[10%]">
-        <hr :class="text" class="mr-[80%]">
-        <hr :class="[text, 'bg-[#a8afca]']" class="ml-[80%]">
+    </div>
+    <div>
+      <hr
+        :class="nick"
+        class="mr-[75%]"
+      >
+      <div :class="messageIn">
+        <div class="m-2">
+          <hr
+            :class="text"
+            class="w-full"
+          >
+          <hr
+            :class="text"
+            class="w-full"
+          >
+          <hr
+            :class="text"
+            class="w-full"
+          >
+          <hr
+            :class="text"
+            class="mr-[10%]"
+          >
+          <hr
+            :class="text"
+            class="mr-[80%]"
+          >
+          <hr
+            :class="[text, 'bg-[#a8afca]']"
+            class="ml-[80%]"
+          >
+        </div>
       </div>
-    </div></div>
-    <div><hr :class="nick" class="ml-[55%]">
-    <div :class="messageOut">
-      <div class="m-2">
-        <hr :class="text" class="mr-[10%]">
-        <hr :class="text" class="mr-[45%]">
-        <hr :class="[text, 'bg-[#a8afca]']" class="ml-[80%]">
+    </div>
+    <div>
+      <hr
+        :class="nick"
+        class="ml-[55%]"
+      >
+      <div :class="messageOut">
+        <div class="m-2">
+          <hr
+            :class="text"
+            class="mr-[10%]"
+          >
+          <hr
+            :class="text"
+            class="mr-[45%]"
+          >
+          <hr
+            :class="[text, 'bg-[#a8afca]']"
+            class="ml-[80%]"
+          >
+        </div>
       </div>
-    </div></div>
+    </div>
   </div>
 </template>
 

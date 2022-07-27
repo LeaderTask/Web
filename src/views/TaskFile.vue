@@ -1,5 +1,5 @@
 <script>
-import { GETFILES } from '@/store/actions/taskfiles'
+import { GET_FILE } from '@/store/actions/taskfiles'
 export default {
   data () {
     return {
@@ -17,7 +17,7 @@ export default {
     const type = this.$router.currentRoute.value.query.type
     const format = this.$router.currentRoute.value.query.format
 
-    this.$store.dispatch(GETFILES, this.$router.currentRoute.value.params.id).then((resp) => {
+    this.$store.dispatch(GET_FILE, this.$router.currentRoute.value.params.id).then((resp) => {
       const fileBlob = new Blob([resp.data], { type: type + '/' + format })
       const urlCreator = window.URL || window.webkitURL
       const fileURL = urlCreator.createObjectURL(fileBlob)

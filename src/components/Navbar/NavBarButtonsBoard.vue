@@ -59,6 +59,11 @@
         >
           Удалить доску
         </PopMenuItem>
+        <PopMenuItem
+          @click="favoriteToggle"
+        >
+          {{ !isFavorite ? 'Добавить в избранное' : 'Удалить из избранного' }}
+        </PopMenuItem>
       </template>
     </PopMenu>
   </div>
@@ -109,6 +114,9 @@ export default {
     },
     showOnlyMyCreatedCards () {
       return this.$store.state.boards.showOnlyMyCreatedCards
+    },
+    isFavorite () {
+      return this.board?.favorite
     }
   },
   methods: {
@@ -148,6 +156,19 @@ export default {
     },
     clickBoardFilterClear () {
       this.$store.commit(BOARD.BOARD_CLEAR_FILTER)
+    },
+    favoriteToggle () {
+      if (!this.isFavorite) {
+        this.$store.dispatch(BOARD.ADD_BOARD_TO_FAVORITE, this.board)
+          .then(res => {
+            this.board.favorite = res.data.favorite
+          })
+      } else {
+        this.$store.dispatch(BOARD.REMOVE_BOARD_FROM_FAVORITE, this.board)
+          .then(res => {
+            this.board.favorite = res.data.favorite
+          })
+      }
     }
   }
 }

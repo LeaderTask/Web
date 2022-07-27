@@ -1,4 +1,3 @@
-import { notify } from 'notiwind'
 import {
   CREATE_FILES_REQUEST,
   CREATE_FILE_REQUEST,
@@ -7,7 +6,7 @@ import {
   FILES_REQUEST,
   FILES_SUCCESS,
   FILE_SUCCESS,
-  GETFILES,
+  GET_FILE,
   MERGE_FILES_WITH_MESSAGES,
   MYFILES,
   REFRESH_FILES,
@@ -22,6 +21,8 @@ import {
   MESSAGES_ERROR,
   MESSAGES_REQUEST,
   MESSAGES_SUCCESS,
+  REFRESH_CHAT_MESSAGES,
+  REFRESH_INSPECTOR_MESSAGES,
   REFRESH_MESSAGES,
   REMOVE_MESSAGE_LOCALLY
 } from '../actions/taskmessages'
@@ -31,6 +32,7 @@ import axios from 'axios'
 const state = {
   /* messages */
   messages: [],
+  chatMessages: [],
   inspectorMessages: [],
   status: '',
   hasLoadedOnce: false,
@@ -57,19 +59,16 @@ const actions = {
         taskUid
       axios({ url: url, method: 'GET', signal: fileAbortController.signal })
         .then((resp) => {
-          commit(REFRESH_FILES)
           commit(FILES_SUCCESS, resp)
           resolve(resp)
         })
         .catch((err) => {
-          commit(REFRESH_FILES)
           commit(FILES_ERROR)
           reject(err)
         })
     })
   },
-  //  GetFiles
-  [GETFILES]: ({ commit, dispatch }, uid) => {
+  [GET_FILE]: ({ commit, dispatch }, uid) => {
     return new Promise((resolve, reject) => {
       const url =
         process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasksfiles/file?uid=' + uid
@@ -91,7 +90,6 @@ const actions = {
         'api/v1/tasksfiles/several?uid_task=' +
         data.uid_task
       commit(TOGGLE_UPLOAD_STATUS)
-      console.log(data)
       axios({
         url: url,
         method: 'POST',
@@ -148,15 +146,6 @@ const actions = {
         })
         .catch((err) => {
           commit(MESSAGES_ERROR, err)
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: MESSAGES_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -173,15 +162,6 @@ const actions = {
         })
         .catch((err) => {
           commit(MESSAGES_ERROR, err)
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: MESSAGES_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -195,39 +175,19 @@ const actions = {
           commit(CREATE_MESSAGE_REQUEST, data)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: CREATE_MESSAGE_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
   },
   [DELETE_MESSAGE_REQUEST]: ({ commit, dispatch }, data) => {
     return new Promise((resolve, reject) => {
-      commit(MESSAGES_REQUEST)
       const url =
         process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasksmsgs?uid=' + data.uid
       axios({ url: url, method: 'DELETE' })
         .then((resp) => {
           resolve(resp)
-          commit(DELETE_MESSAGE_REQUEST, data)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: DELETE_MESSAGE_REQUEST,
-              text: err.response?.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -242,15 +202,6 @@ const actions = {
           commit(DELETE_FILE_REQUEST, data)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: DELETE_FILE_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -274,11 +225,10 @@ const mutations = {
   },
   [MESSAGES_SUCCESS]: (state, resp) => {
     state.status = 'success'
-    state.messages = resp.data.msgs
+    state.chatMessages = resp.data.msgs
     state.hasLoadedOnce = true
   },
   [INSPECTOR_MESSAGES_SUCCESS]: (state, resp) => {
-    console.log('inspectors resp ', resp.data)
     state.status = 'success'
     state.inspectorMessages = resp.data
     state.hasLoadedOnce = true
@@ -287,19 +237,12 @@ const mutations = {
     state.status = 'error'
     state.hasLoadedOnce = true
   },
-  [REFRESH_MESSAGES]: (state) => {
-    state.messages = []
-  },
   [CREATE_MESSAGE_REQUEST]: (state, data) => {
     // check if inspector message is already in chat messages
     if (data.id && state.messages.find((message) => message.id === data.id)) {
       return
     }
     state.messages.push(data)
-  },
-  [DELETE_MESSAGE_REQUEST]: (state, data) => {
-    //  state.messages.splice(state.messages.indexOf(data), 1)
-    //  state.messages = data
   },
   [DELETE_FILE_REQUEST]: (state, data) => {
     state.messages.splice(state.messages.indexOf(data), 1)
@@ -309,7 +252,7 @@ const mutations = {
   },
   [FILES_SUCCESS]: (state, resp) => {
     state.status = 'success'
-    state.files = resp.data.files
+    state.files = resp?.data?.files || []
     state.hasLoadedOnce = true
   },
   [FILE_SUCCESS]: (state, resp) => {
@@ -322,7 +265,6 @@ const mutations = {
     state.hasLoadedOnce = true
   },
   [CHANGE_MESSAGE]: (state, data) => {
-    console.log('changing state in task messages')
     for (let i = 0; i < state.messages.length; i++) {
       if (state.messages[i].uid === data.uid) {
         state.messages[i][data.key] = data.value
@@ -362,6 +304,15 @@ const mutations = {
     state.status = 'error'
     state.hasLoadedOnce = true
   },
+  [REFRESH_CHAT_MESSAGES]: (state) => {
+    state.chatMessages = []
+  },
+  [REFRESH_INSPECTOR_MESSAGES]: (state) => {
+    state.inspectorMessages = []
+  },
+  [REFRESH_MESSAGES]: (state) => {
+    state.messages = []
+  },
   [REFRESH_FILES]: (state) => {
     state.files = []
   },
@@ -375,16 +326,17 @@ const mutations = {
       item.msg = item.file_name
     })
 
-    state.messages = state.messages.concat(state.files)
-    state.files = []
-    state.messages = state.messages.concat(state.inspectorMessages)
+    state.messages = [
+      ...state.chatMessages,
+      ...state.files,
+      ...state.inspectorMessages
+    ]
+    state.messages.forEach((item) => {
+      if (!item.date_create.includes('Z')) {
+        item.date_create += 'Z'
+      }
+    })
     state.messages.sort((a, b) => {
-      if (!a.file_name && !a.date_create.includes('Z')) {
-        a.date_create += 'Z'
-      }
-      if (!b.file_name && !b.date_create.includes('Z')) {
-        b.date_create += 'Z'
-      }
       return new Date(a.date_create) - new Date(b.date_create)
     })
   },

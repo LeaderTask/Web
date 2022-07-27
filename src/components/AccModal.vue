@@ -11,14 +11,17 @@ export default {
     ModalBox,
     BoardModalBoxRename
   },
-  emits: ['AccLogout'],
+  emits: ['AccLogout', 'currentSettingsTab'],
   data () {
     return {
-      showEditname: false,
       oldPassword: '',
       newPassword: '',
       confirmNewPassword: '',
-      showError: false,
+      invalidOldPassword: '',
+      showEditname: false,
+      newPassError: false,
+      emptyOldPass: false,
+      emptyNewPasses: false,
       showEditphone: false,
       showEditpassword: false
     }
@@ -40,8 +43,8 @@ export default {
     }
   },
   methods: {
-    tarif () {
-      this.$store.commit('basic', { key: 'navig', value: 1 })
+    changeCurrentTab (tabName) {
+      this.$emit('currentSettingsTab', tabName)
     },
     logout () {
       this.$emit('AccLogout')
@@ -57,20 +60,44 @@ export default {
       }
       this.$store.dispatch(USER_CHANGE_PHOTO, data)
     },
+    showPasswordModalBox () {
+      this.emptyNewPasses = false
+      this.emptyOldPass = false
+      this.invalidOldPassword = false
+      this.newPassError = false
+
+      this.showEditpassword = true
+    },
     changeUserPassword () {
       const oldPassword = this.oldPassword
       const newPassword = this.newPassword
+      const isFieldNotEmptyAndRight = oldPassword && this.newPassword && this.confirmNewPassword && this.newPassword === this.confirmNewPassword
       const data = {
         old_password: oldPassword,
         new_password: newPassword
       }
-      if (oldPassword && this.newPassword === this.confirmNewPassword) {
-        this.$store.dispatch(AUTH_CHANGE_PASSWORD, data)
-        this.showEditpassword = false
-        this.showError = false
-      } else {
-        this.showError = true
+      if (isFieldNotEmptyAndRight) {
+        this.$store.dispatch(AUTH_CHANGE_PASSWORD, data).then(() => {
+          this.showEditpassword = false
+          this.oldPassword = ''
+          this.newPassword = ''
+          this.confirmNewPassword = ''
+        })
+
+        this.$store.dispatch(AUTH_CHANGE_PASSWORD, data).catch(err => {
+          this.invalidOldPassword = err.error
+          this.oldPassword = ''
+          this.confirmNewPassword = ''
+          this.showEditpassword = true
+          this.emptyOldPass = false
+        })
+      } else if (this.newPassword !== this.confirmNewPassword) {
+        this.newPassError = true
       }
+      // проверяем пустое поле старого пароля
+      oldPassword ? this.emptyOldPass = false : this.emptyOldPass = true
+      // проверяем пустые поля нового пароля
+      this.newPassword && this.confirmNewPassword ? this.emptyNewPasses = false : this.emptyNewPasses = true
     },
 
     changeUserPhone (phone) {
@@ -148,6 +175,18 @@ export default {
           class="bg-[#f4f5f7]/50 rounded-[6px] border border-[#4c4c4d] focus:border-[#ff9123] w-full px-[14px] py-[11px] text-[14px] leading-[16px] text-[#4c4c4d] font-roboto"
         >
       </div>
+      <p
+        v-if="invalidOldPassword === 'old_password invalid'"
+        class="text-red-500 text-xs mt-1 ml-1"
+      >
+        Корректно введите старый пароль
+      </p>
+      <p
+        v-if="emptyOldPass"
+        class="text-red-500 text-xs mt-1 ml-1"
+      >
+        Введите старый пароль
+      </p>
       <div>
         <p class="mb-[10px] mt-[10px]">
           Введите новый пароль
@@ -173,7 +212,13 @@ export default {
         >
       </div>
       <p
-        v-if="showError"
+        v-if="emptyNewPasses"
+        class="text-red-500 text-xs mt-1 ml-1"
+      >
+        Заполните все поля ввода нового пароля
+      </p>
+      <p
+        v-if="newPassError"
         class="text-red-500 text-xs mt-1 ml-1"
       >
         Пароли не совпадают
@@ -228,11 +273,13 @@ export default {
         </p>
         <div class="mt-2">
           <button
-            class="border-gray-400 font-normal border rounded-md p-2.5 text-gray-600 mt-2 text-sm landing-4"
+            class="font-normal text-sm landing-4"
             type="button"
-            @click="tarif()"
+            @click="changeCurrentTab ('tarif')"
           >
-            Управление тарифом
+            <p class="border border-gray-400 rounded-md p-2.5 text-gray-600 mt-2">
+              Управление тарифом
+            </p>
           </button>
         </div>
         <div class="mt-6">
@@ -257,7 +304,7 @@ export default {
             </p>
             <form class="mb-2">
               <div class="text-sm landing-4 font-normal">
-                {{ userPhone(phone) }}
+                {{ userPhone() }}
               </div>
               <button
                 type="button"
@@ -278,7 +325,6 @@ export default {
             >
               {{ $store.state.user.user?.current_user_email }}
             </div>
-            <!-- <button type="button" class="mt-2 text-base text-blue-600" @click="showEditemail = true">Изменить email</button> -->
           </div>
           <div class="mb-2 mt-6">
             <form>
@@ -288,7 +334,7 @@ export default {
               <button
                 type="button"
                 class="mt-2 text-[13px] landing-[13px] text-[#007BE5]"
-                @click="showEditpassword = true"
+                @click="showPasswordModalBox"
               >
                 Изменить пароль
               </button>

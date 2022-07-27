@@ -89,9 +89,8 @@ export default {
     <span class="text-sm text-gray-600">В срок:</span> <span class="text-xl mr-6 text-green-500"> {{ successQuantity }}</span>
     <span class="text-sm text-gray-600">Просроченныx:</span> <span class="text-xl text-red-500">{{ overdueQuantity }}</span>
   </p>
-  <!-- <pre>{{ karmaList }}</pre> -->
   <br>
-  <div class="grid grid-cols-1 gap-4">
+  <div class="grid grid-cols-1 gap-4 p-5">
     <div class="grid grid-cols-1 ">
       <p class="text-center text-2xl font-bold">
         Графики

@@ -53,32 +53,33 @@
           />
         </div>
       </div>
-      <div
+      <draggable
+        :list="value.items"
+        :move="checkMove"
         class="grid gap-2 mt-3 grid-cols-1"
         :class="{
           'md:grid-cols-2 lg:grid-cols-4': isGridView,
           'lg:grid-cols-2': isPropertiesMobileExpanded && isGridView
         }"
       >
-        <template
-          v-for="board in value.items"
-          :key="board.uid"
-        >
+        <template #item="{ element }">
           <BoardBlocItem
-            :board="board"
-            @click.stop="gotoChildren(board)"
+            :key="element.uid"
+            :board="element"
+            @click.stop="gotoChildren(element)"
           />
         </template>
         <ListBlocAdd
           v-if="index == 0"
           @click.stop="clickAddBoard"
         />
-      </div>
+      </draggable>
     </div>
   </div>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 import Icon from '@/components/Icon.vue'
 import { setLocalStorageItem } from '@/store/helpers/functions'
 import BoardModalBoxRename from '@/components/Board/BoardModalBoxRename.vue'
@@ -94,6 +95,7 @@ import listView from '@/icons/list-view.js'
 
 export default {
   components: {
+    draggable,
     Icon,
     BoardModalBoxRename,
     BoardModalBoxBoardsLimit,
@@ -123,6 +125,11 @@ export default {
     }
   },
   methods: {
+    checkMove (e) {
+      window.console.log('Future index: ' + e.draggedContext.futureIndex)
+      window.console.log('Index: ' + e.draggedContext.index)
+      window.console.log('Element: ' + e.draggedContext.element.order)
+    },
     print (val) {
       console.log(val)
     },

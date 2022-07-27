@@ -93,7 +93,6 @@
       class="h-auto mb-5 bg-white"
     />
   </div>
-
   <div
     v-if="(isTesting || isEditing) && !showCompleteMessage"
   >
@@ -105,6 +104,7 @@
         :ref="question.uid"
         :is-editing="isEditing"
         :question="question"
+        :reglament="reglament"
         @deleteQuestion="onDeleteQuestion"
         @deleteAnswer="deleteAnswer"
         @addQuestion="onAddQuestion"
@@ -165,11 +165,9 @@
   />
   <div class="h-[20px]" />
 </template>
-
 <script>
 import { QuillEditor } from '@vueup/vue-quill'
 import * as REGLAMENTS from '@/store/actions/reglaments.js'
-
 import ReglamentWrong from '@/components/Reglaments/ReglamentWrong.vue'
 import ReglamentInfo from '@/components/Reglaments/ReglamentInfo.vue'
 import ReglamentTestLimit from '@/components/Reglaments/ReglamentTestLimit.vue'
@@ -180,9 +178,7 @@ import ReglamentCompleteMessage from './ReglamentCompleteMessage.vue'
 import ReglamentSmallButton from '@/components/Reglaments/ReglamentSmallButton.vue'
 import PopMenu from '@/components/modals/PopMenu.vue'
 import BoardPropsMenuItemUser from '@/components/Board/BoardPropsMenuItemUser.vue'
-
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
-
 export default {
   components: {
     QuillEditor,
@@ -228,11 +224,7 @@ export default {
       return this.reglament?.needStartEdit ?? false
     },
     canEdit () {
-<<<<<<< HEAD
-      return this.reglament?.email_creator === this.user.current_user_email
-=======
       return (this.reglament?.email_creator === this.user.current_user_email) || this.editorsCanEdit()
->>>>>>> LeaderTask-projects-and-emps
     },
     user () {
       return this.$store.state.user.user
@@ -323,8 +315,6 @@ export default {
     } catch (e) {}
   },
   methods: {
-<<<<<<< HEAD
-=======
     editorsCanEdit () {
       for (let i = 0; i < this.currentEditors.length; i++) {
         if (this.currentEditors[i] === this.user.current_user_email) {
@@ -332,7 +322,6 @@ export default {
         }
       }
     },
->>>>>>> LeaderTask-projects-and-emps
     uuidv4 () {
       return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
         (
@@ -382,10 +371,6 @@ export default {
       }
     },
     pushAnswer (data) {
-<<<<<<< HEAD
-      console.log(this.currentEditors)
-=======
->>>>>>> LeaderTask-projects-and-emps
       for (let i = 0; i < this.questions.length; i++) {
         if (this.questions[i].uid === data.uid_question) {
           if (!this.questions[i].answers) {
@@ -478,7 +463,6 @@ export default {
             }
           ]
         }
-
         this.questions.push(questionToPush)
         this.$nextTick(() => {
           this.gotoNode(questionToPush.uid)
@@ -552,16 +536,9 @@ export default {
         }
       }
       this.currentEditors.push(email)
-<<<<<<< HEAD
-      console.log(this.currentEditors)
-    },
-    checkEditor (email) {
-      return this.currentEditors.includes(email)
-=======
     },
     checkEditor (email) {
       return this.currentEditors?.includes(email)
->>>>>>> LeaderTask-projects-and-emps
     },
     startTheReglament () {
       if (this.user.tarif !== 'alpha') {

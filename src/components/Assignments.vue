@@ -42,11 +42,9 @@
         </div>
       </div>
       <div
-        class="grid gap-2 mt-3"
+        class="grid gap-2 mt-3 grid-cols-1"
         :class="{
           'md:grid-cols-2 lg:grid-cols-4': isGridView,
-          'grid-cols-1': !isGridView,
-          'grid-cols-1': isPropertiesMobileExpanded && !isGridView,
           'lg:grid-cols-2': isPropertiesMobileExpanded && isGridView
         }"
       >

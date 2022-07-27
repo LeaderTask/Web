@@ -38,3 +38,8 @@ export const TYPE_OBJECT_CLIENT_MSG = 31
 export const TYPE_OBJECT_CLIENT_EXT_FIELD = 32
 export const TYPE_OBJECT_LOCALIZE = 33
 export const TYPE_OBJECT_OPTIONS = 34
+
+// Inspectors Types
+export const TYPE_OBJECT_REGLAMENT = 101
+export const TYPE_OBJECT_REGLAMENT_QUESTION = 102
+export const TYPE_OBJECT_REGLAMENT_ANSWER = 103

@@ -13,6 +13,9 @@ import cardfilesandmessages from './modules/cardfilesandmessages'
 import employees from './modules/employees'
 import departments from './modules/departments'
 import projects from './modules/projects'
+import reglaments from './modules/reglaments'
+import reglamentAnswers from './modules/reglament_answers'
+import reglamentQuestions from './modules/reglament_questions'
 import boards from './modules/boards'
 import cards from './modules/cards'
 import colors from './modules/colors'
@@ -26,8 +29,6 @@ export default createStore({
     greedPath: null,
     greedSource: null,
     taskListSource: null,
-
-    navig: 0,
     isGridView: true,
 
     /* Properties state: (project, task, color, tag, empmloyee) */
@@ -79,7 +80,7 @@ export default createStore({
   actions: {
     asideMobileToggle ({ commit, state }, payload = null) {
       const isShow = payload !== null ? payload : !state.isAsideMobileExpanded
-      document.getElementById('app').classList[isShow ? 'add' : 'remove']('ml-80', 'lg:ml-0')
+      document.getElementById('app').classList[isShow ? 'add' : 'remove']('ml-80', 'xl:ml-0')
       document.documentElement.classList[isShow ? 'add' : 'remove']('m-clipped')
 
       commit('basic', {
@@ -148,6 +149,9 @@ export default createStore({
     employees,
     departments,
     projects,
+    reglaments,
+    reglamentQuestions,
+    reglamentAnswers,
     boards,
     cards,
     colors,

@@ -63,9 +63,6 @@ export default {
     isPropertiesMobileExpanded () {
       return this.$store.state.isPropertiesMobileExpanded
     },
-    storeTasks () {
-      return this.$store.state.tasks.newtasks
-    },
     navStack () {
       return this.$store.state.navbar.navStack
     }
@@ -194,9 +191,6 @@ export default {
     </template>
   </div>
   <div class="mt-5">
-    <TasksListNew
-      :store-tasks="storeTasks"
-      :new-config="newConfig"
-    />
+    <TasksListNew />
   </div>
 </template>

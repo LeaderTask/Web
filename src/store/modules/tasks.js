@@ -1,14 +1,16 @@
 import { REFRESH_FILES } from '@/store/actions/taskfiles'
 import {
+  REFRESH_CHAT_MESSAGES,
+  REFRESH_INSPECTOR_MESSAGES,
   // MESSAGES_REQUEST,
   // INSPECTOR_MESSAGES_REQUEST,
   REFRESH_MESSAGES
 } from '@/store/actions/taskmessages'
-import axios from 'axios'
-import { notify } from 'notiwind'
-import { PUSH_COLOR } from '../actions/colors'
-import * as TASK from '../actions/tasks'
 import { visitChildren } from '@/store/helpers/functions'
+import axios from 'axios'
+import { PUSH_COLOR } from '../actions/colors'
+import { NAVIGATOR_UPDATE_ASSIGNMENTS } from '../actions/navigator'
+import * as TASK from '../actions/tasks'
 
 function arrayRemove (arr, value) {
   return arr.filter(function (ele) {
@@ -76,7 +78,7 @@ const getters = {
 }
 
 const actions = {
-  [TASK.TASKS_REQUEST]: ({ commit, dispatch }, chosenDate) => {
+  [TASK.TASKS_REQUEST]: ({ commit, dispatch, state }, chosenDate) => {
     commit('abortDoitnowAbortController')
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
@@ -109,18 +111,10 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
@@ -136,21 +130,12 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.DAYS_WITH_TASKS,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.ONE_TASK_REQUEST]: ({ commit, dispatch }, uid) => {
+  [TASK.ONE_TASK_REQUEST]: ({ commit, dispatch, state }, uid) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url =
@@ -165,18 +150,10 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
@@ -184,14 +161,15 @@ const actions = {
   },
   [TASK.GET_TASK_CHILDRENS]: ({ commit, dispatch }, uid) => {
     return new Promise((resolve, reject) => {
-      const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasks/withparent?value=' + uid
+      const url =
+        process.env.VUE_APP_LEADERTASK_API +
+        'api/v1/tasks/withparent?value=' +
+        uid
       axios({ url: url, method: 'GET' })
         .then((resp) => {
-          console.log(resp.data)
           resolve(resp)
         })
         .catch((err) => {
-          console.log(err)
           reject(err)
         })
     })
@@ -217,15 +195,6 @@ const actions = {
             resolve(resp)
           })
           .catch((err) => {
-            notify(
-              {
-                group: 'api',
-                title: 'REST API Error, please make screenshot',
-                action: TASK.SEARCH_TASK,
-                text: err.response.data
-              },
-              15000
-            )
             commit(TASK.TASKS_ERROR, err)
             reject(err)
           })
@@ -249,24 +218,18 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, {
+            uids: state.newtasks[taskUid]?.children
+          })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.SUBTASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.OPENED_TASKS_REQUEST]: ({ commit, dispatch }) => {
+  [TASK.OPENED_TASKS_REQUEST]: ({ commit, dispatch, state }) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasks/opened'
@@ -281,18 +244,10 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.OPENED_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
@@ -313,21 +268,12 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.UNSORTED_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.OVERDUE_TASKS_REQUEST]: ({ commit, dispatch }) => {
+  [TASK.OVERDUE_TASKS_REQUEST]: ({ commit, dispatch, state }) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasks/overdue'
@@ -342,18 +288,10 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.OVERDUE_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
@@ -377,9 +315,21 @@ const actions = {
         'api/v1/tasks/withdate?value=' +
         formattedDate
       Promise.all([
-        axios({ url: urlUnread, method: 'GET', signal: doitnowAbortController.signal }),
-        axios({ url: urlOverdue, method: 'GET', signal: doitnowAbortController.signal }),
-        axios({ url: urlToday, method: 'GET', signal: doitnowAbortController.signal })
+        axios({
+          url: urlUnread,
+          method: 'GET',
+          signal: doitnowAbortController.signal
+        }),
+        axios({
+          url: urlOverdue,
+          method: 'GET',
+          signal: doitnowAbortController.signal
+        }),
+        axios({
+          url: urlToday,
+          method: 'GET',
+          signal: doitnowAbortController.signal
+        })
       ])
         .then((respAll) => {
           const unreadTasks = [...respAll[0].data.tasks]
@@ -413,23 +363,12 @@ const actions = {
           resolve([unreadTasks, overdueTasks, todayTasks])
         })
         .catch((err) => {
-          if (err?.message !== 'canceled' && err?.response?.data) {
-            notify(
-              {
-                group: 'api',
-                title: 'REST API Error, please make screenshot',
-                action: TASK.DOITNOW_TASKS_REQUEST,
-                text: err?.response?.data
-              },
-              15000
-            )
-          }
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.UNREAD_TASKS_REQUEST]: ({ commit, dispatch }) => {
+  [TASK.UNREAD_TASKS_REQUEST]: ({ commit, dispatch, state }) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasks/unread'
@@ -444,24 +383,16 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.UNREAD_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.IN_WORK_TASKS_REQUEST]: ({ commit, dispatch }) => {
+  [TASK.IN_WORK_TASKS_REQUEST]: ({ commit, dispatch, state }) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasks/inwork'
@@ -476,24 +407,16 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.IN_WORK_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.IN_FOCUS_TASKS_REQUEST]: ({ commit, dispatch }) => {
+  [TASK.IN_FOCUS_TASKS_REQUEST]: ({ commit, dispatch, state }) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasks/infocus'
@@ -508,24 +431,16 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.IN_FOCUS_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.READY_FOR_COMPLITION_TASKS_REQUEST]: ({ commit, dispatch }) => {
+  [TASK.READY_FOR_COMPLITION_TASKS_REQUEST]: ({ commit, dispatch, state }) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url = process.env.VUE_APP_LEADERTASK_API + 'api/v1/tasks/ready'
@@ -537,24 +452,16 @@ const actions = {
           if (resp.data.anothers_tags.length) {
             commit(TASK.ADD_TASK_TAGS, resp.data.anothers_tags)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.READY_FOR_COMPLITION_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.DELEGATED_TASKS_REQUEST]: ({ commit, dispatch }, email) => {
+  [TASK.DELEGATED_TASKS_REQUEST]: ({ commit, dispatch, state }, email) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url =
@@ -571,24 +478,19 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.DELEGATED_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.DELEGATED_TO_USER_TASKS_REQUEST]: ({ commit, dispatch }, email) => {
+  [TASK.DELEGATED_TO_USER_TASKS_REQUEST]: (
+    { commit, dispatch, state },
+    email
+  ) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url =
@@ -605,24 +507,16 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.DELEGATED_TO_USER_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.PROJECT_TASKS_REQUEST]: ({ commit, dispatch }, uid) => {
+  [TASK.PROJECT_TASKS_REQUEST]: ({ commit, dispatch, state }, uid) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url =
@@ -637,24 +531,16 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.PROJECT_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.TAG_TASKS_REQUEST]: ({ commit, dispatch }, uid) => {
+  [TASK.TAG_TASKS_REQUEST]: ({ commit, dispatch, state }, uid) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url =
@@ -669,24 +555,16 @@ const actions = {
           if (resp.data.anothers_tags.length) {
             commit(TASK.ADD_TASK_TAGS, resp.data.anothers_tags)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.TAG_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.COLOR_TASKS_REQUEST]: ({ commit, dispatch }, uid) => {
+  [TASK.COLOR_TASKS_REQUEST]: ({ commit, dispatch, state }, uid) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url =
@@ -701,24 +579,16 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.COLOR_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
     })
   },
-  [TASK.EMPLOYEE_TASKS_REQUEST]: ({ commit, dispatch }, uid) => {
+  [TASK.EMPLOYEE_TASKS_REQUEST]: ({ commit, dispatch, state }, uid) => {
     return new Promise((resolve, reject) => {
       commit(TASK.TASKS_REQUEST)
       const url =
@@ -733,18 +603,10 @@ const actions = {
           if (resp.data.anothers_markers.length) {
             commit(PUSH_COLOR, resp.data.anothers_markers)
           }
+          dispatch(TASK.GET_INSPECTABLE_TASKS, { uids: state.newConfig.roots })
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.EMPLOYEE_TASKS_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(TASK.TASKS_ERROR, err)
           reject(err)
         })
@@ -771,20 +633,12 @@ const actions = {
               commit(TASK.ADD_TASK, resp.data)
             }
           }
+          if (resp.data.type === 2) {
+            dispatch(NAVIGATOR_UPDATE_ASSIGNMENTS)
+          }
           resolve(resp)
         })
         .catch((err) => {
-          if (err.response?.data?.error !== 'limit. invalid license.') {
-            notify(
-              {
-                group: 'api',
-                title: 'REST API Error, please make screenshot',
-                action: TASK.CREATE_TASK,
-                text: err.response?.data
-              },
-              15000
-            )
-          }
           reject(err)
         })
     })
@@ -795,6 +649,8 @@ const actions = {
     }
 
     commit(REFRESH_FILES)
+    commit(REFRESH_CHAT_MESSAGES)
+    commit(REFRESH_INSPECTOR_MESSAGES)
     commit(REFRESH_MESSAGES)
     commit(TASK.SELECT_TASK, data)
 
@@ -816,24 +672,12 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_READ,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })
   },
   [TASK.CHANGE_TASK_NAME]: ({ commit, dispatch }, data) => {
     return new Promise((resolve, reject) => {
-      if (data.value === '') {
-        data.value = 'Task name'
-      }
       const url =
         process.env.VUE_APP_LEADERTASK_API + 'api/v1/task/name?uid=' + data.uid
       axios({
@@ -845,15 +689,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_NAME,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -872,18 +707,12 @@ const actions = {
       })
         .then((resp) => {
           commit(TASK.UPDATE_TASK, resp.data.tasks[0])
+          if (resp.data.tasks[0].type === 2) {
+            dispatch(NAVIGATOR_UPDATE_ASSIGNMENTS)
+          }
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_STATUS,
-              text: err.response?.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -897,18 +726,12 @@ const actions = {
       })
         .then((resp) => {
           commit(TASK.REMOVE_TASK, uid)
+          //
+          dispatch(NAVIGATOR_UPDATE_ASSIGNMENTS)
+          //
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.REMOVE_TASK,
-              text: err.response?.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -945,15 +768,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_ACCESS,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -976,15 +790,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_COLOR,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -998,15 +803,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_TAGS,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1024,18 +820,11 @@ const actions = {
         method: 'PATCH'
       })
         .then((resp) => {
+          dispatch(NAVIGATOR_UPDATE_ASSIGNMENTS)
+          //
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_PERFORMER,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1053,18 +842,11 @@ const actions = {
         method: 'PATCH'
       })
         .then((resp) => {
+          dispatch(NAVIGATOR_UPDATE_ASSIGNMENTS)
+          //
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_REDELEGATE,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1086,15 +868,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_FOCUS,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1117,15 +890,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_PROJECT,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1138,15 +902,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_CHECKLIST,
-              text: 'error while uploading checklist'
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1167,15 +922,6 @@ const actions = {
           commit(TASK.CHANGE_TASK_COMMENT, data)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_COMMENT,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1191,15 +937,6 @@ const actions = {
           resolve(dataSend)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_DATE,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1223,15 +960,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CHANGE_TASK_PARENT_AND_ORDER,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1245,15 +973,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.CREATE_TAG_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1267,15 +986,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.UPDATE_TAG_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1288,15 +998,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.REMOVE_TAG_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1313,15 +1014,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.RESET_REPEAT_CHANGE,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1337,15 +1029,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.EVERY_DAY_CHANGE,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1361,15 +1044,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.EVERY_WEEK_CHANGE,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1385,15 +1059,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.EVERY_MONTH_CHANGE,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -1409,15 +1074,19 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: TASK.EVERY_YEAR_CHANGE,
-              text: err.response.data
-            },
-            15000
-          )
+          reject(err)
+        })
+    })
+  },
+  [TASK.GET_INSPECTABLE_TASKS]: ({ commit, dispatch }, data) => {
+    return new Promise((resolve, reject) => {
+      const url = process.env.VUE_APP_INSPECTOR_API + 'tasksFromList'
+      axios({ url: url, method: 'POST', data: data })
+        .then((resp) => {
+          commit(TASK.GET_INSPECTABLE_TASKS, resp.data)
+          resolve(resp)
+        })
+        .catch((err) => {
           reject(err)
         })
     })
@@ -1426,7 +1095,7 @@ const actions = {
 
 const mutations = {
   [TASK.REMOVE_TAG_REQUEST]: (state, uid) => {
-    visitChildren([state.tags[uid]], value => (delete state.tags[value.uid]))
+    visitChildren([state.tags[uid]], (value) => delete state.tags[value.uid])
     delete state.tags[uid]
   },
   [TASK.PUSH_TAG]: (state, resp) => {
@@ -1445,7 +1114,6 @@ const mutations = {
   },
   [TASK.REMOVE_TASK_FROM_LEAVES]: (state, uid) => {
     for (let i = 0; i < state.newConfig.leaves.length; i++) {
-      console.log(state.newConfig.leaves)
       if (uid === state.newConfig.leaves[i]) {
         state.newConfig.leaves.splice(i, 1)
       }
@@ -1532,6 +1200,7 @@ const mutations = {
     state.loadedTasks = {}
   },
   [TASK.SELECT_TASK]: (state, task) => {
+    if (task) console.log('select task', task)
     state.selectedTask = task
   },
   [TASK.ADD_TASK_TAGS]: (state, tags) => {
@@ -1793,6 +1462,12 @@ const mutations = {
   },
   [TASK.RESET_COPY_TASK]: (state) => {
     state.copiedTasks = {}
+  },
+  [TASK.GET_INSPECTABLE_TASKS]: (state, uids) => {
+    for (const uid of uids) {
+      state.newtasks[uid].info.is_inspectable = true
+      state.newtasks[uid].info.has_msgs = true
+    }
   },
   initDoitnowAbortController (state, controller) {
     state.doitnowAbortController = controller

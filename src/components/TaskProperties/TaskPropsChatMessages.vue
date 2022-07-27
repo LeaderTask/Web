@@ -36,8 +36,8 @@
           :creator-name="employees[message.uid_creator]?.name ?? '???'"
           :message="message.msg"
           :time="getMessageTimeString(message.date_create)"
-          @answer="answerMessage(message.uid_msg ? message.uid_msg : message.uid)"
-          @deleted="deleteTaskMsg(message.uid_msg ? message.uid_msg : message.uid)"
+          @answer="answerMessage(message.uid)"
+          @deleted="deleteTaskMsg(message.uid)"
         />
 
         <!-- Сообщение от инспектора -->
@@ -213,7 +213,7 @@ export default {
       return this.$store.state.taskfilesandmessages.uploadStarted
     },
     messages () {
-      const messages = this.taskMessages.map((message) => ({
+      return this.taskMessages.map((message) => ({
         ...message,
         isFile: !!message.uid_file,
         isMessage: !message.uid_file && message.uid_creator !== 'inspector',
@@ -221,10 +221,12 @@ export default {
         isMyMessage: message.uid_creator === this.currentUserUid,
         shouldShowInspectorButtons: message?.performer_answer == null && ![1, 5, 7, 8].includes(this.task.status) && (this.selectedTask.uid_performer === this.currentUserUid)
       }))
-      return messages
     }
   },
   methods: {
+    print (msg, val) {
+      val ? console.log(msg, val) : console.log(msg)
+    },
     readTask () {
       this.$emit('readTask')
     },

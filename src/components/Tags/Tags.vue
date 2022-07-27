@@ -137,6 +137,7 @@ export default {
       }
       this.$store.dispatch(TASK.CREATE_TAG_REQUEST, tag)
         .then(() => {
+          tag.global_property_uid = '00a5b3de-9474-404d-b3ba-83f488ac6d30'
           this.$store.commit(NAVIGATOR.NAVIGATOR_PUSH_TAG, [tag])
         })
     }

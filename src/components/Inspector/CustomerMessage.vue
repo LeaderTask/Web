@@ -27,10 +27,10 @@ const getMessageTimeString = (dateCreate) => {
   <Transition>
     <div class="flex items-start justify-end mb-4 space-x-[8px]">
       <div
-        class="bg-[#EAF2FC] max-w-sm py-[12px] px-[15px]"
+        class="bg-[#EAF2FC] max-w-[334px] py-[12px] px-[15px]"
         style="border-radius: 11px 0px 11px 11px;"
       >
-        <p class="text-[#4C4C4D] font-[500] text-[14px] leading-[19px] max-w-full break-all">
+        <p class="text-[#4C4C4D] font-[500] text-[14px] leading-[19px] max-w-full break-words">
           {{ props.message }}
         </p>
         <span

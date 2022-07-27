@@ -29,6 +29,11 @@
         >
           Удалить проект
         </PopMenuItem>
+        <PopMenuItem
+          @click="favoriteToggle"
+        >
+          {{ !isFavorite ? 'Добавить в избранное' : 'Удалить из избранного' }}
+        </PopMenuItem>
       </template>
     </PopMenu>
   </div>
@@ -41,7 +46,12 @@ import PopMenuItem from '@/components/modals/PopMenuItem.vue'
 import PopMenuDivider from '@/components/modals/PopMenuDivider.vue'
 import BoardModalBoxDelete from '@/components/Board/BoardModalBoxDelete.vue'
 
-import { SELECT_PROJECT, REMOVE_PROJECT_REQUEST } from '@/store/actions/projects'
+import {
+  ADD_PROJECT_TO_FAVORITE,
+  REMOVE_PROJECT_FROM_FAVORITE,
+  REMOVE_PROJECT_REQUEST,
+  SELECT_PROJECT
+} from '@/store/actions/projects'
 import { NAVIGATOR_REMOVE_PROJECT } from '@/store/actions/navigator'
 
 export default {
@@ -74,6 +84,9 @@ export default {
     },
     canDelete () {
       return this.project?.email_creator === this.$store.state.user?.user?.current_user_email
+    },
+    isFavorite () {
+      return this.project?.favorite
     }
   },
   methods: {
@@ -104,6 +117,19 @@ export default {
     },
     clickCompletedTasks () {
       this.$emit('toggleCompletedTasks')
+    },
+    favoriteToggle () {
+      if (!this.isFavorite) {
+        this.$store.dispatch(ADD_PROJECT_TO_FAVORITE, this.project)
+          .then(res => {
+            this.project.favorite = res.data.favorite
+          })
+      } else {
+        this.$store.dispatch(REMOVE_PROJECT_FROM_FAVORITE, this.project)
+          .then(res => {
+            this.project.favorite = res.data.favorite
+          })
+      }
     }
   }
 }

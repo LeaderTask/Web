@@ -1157,14 +1157,19 @@ const mutations = {
       dragAndDrop: true,
       keyboardNavigation: true
     })
-
     const nodes = {}
+    const map = new Map() // order_new => uid
+    const rmap = new Map() // uid => order_new
+    const order = []
     for (const node of resp.data.tasks) {
       if (node.has_children && !state.newConfig.listHasChildren) {
         state.newConfig.listHasChildren = true
       }
 
-      state.newConfig.roots.push(node.uid)
+      map.set(node.order_new, node.uid)
+      rmap.set(node.uid, node.order_new)
+      order.push(node.order_new)
+      // state.newConfig.roots.push(node.uid)
       if (!node.has_children) {
         state.newConfig.leaves.push(node.uid)
       }
@@ -1178,6 +1183,16 @@ const mutations = {
         }
       }
     }
+
+    for (const orderNew of order.sort((a, b) => (a - b))) {
+      state.newConfig.roots.push(map.get(orderNew))
+    }
+
+    for (const node in nodes) {
+      const item = nodes[node]
+      item.children.sort((a, b) => rmap.get(a) - rmap.get(b))
+    }
+
     state.newtasks = nodes
   },
   [TASK.SUBTASKS_SUCCESS]: (state, resp) => {

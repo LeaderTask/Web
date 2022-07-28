@@ -95,15 +95,6 @@ export default {
       }
     },
     sendTaskMsg: function (msg) {
-      // this.showAllMessages = true
-      // const date = new Date()
-      // const month = this.pad2(date.getUTCMonth() + 1)
-      // const day = this.pad2(date.getUTCDate())
-      // const year = this.pad2(date.getUTCFullYear())
-      // const hours = this.pad2(date.getUTCHours())
-      // const minutes = this.pad2(date.getUTCMinutes())
-      // const seconds = this.pad2(date.getUTCSeconds())
-      // const dateCreate = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes + ':' + seconds
       let msgtask = msg || this.taskMsg
       console.log('msgtask', msgtask, msg, this.taskMsg)
       msgtask = this.taskMsg.trim()

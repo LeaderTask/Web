@@ -164,7 +164,6 @@ export default {
         key: 'cardSource',
         value: { uid: board.global_property_uid, param: board.uid }
       })
-      // store.commit(TASK.CLEAN_UP_LOADED_TASKS)
 
       const navElem = {
         name: board.name,

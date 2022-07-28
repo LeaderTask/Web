@@ -21,15 +21,6 @@ const state = {
 }
 
 const getters = {}
-// const getDefaultState = () => {
-//   return {
-//     boards: false,
-//     status: '',
-//     computedNavigator: false,
-//     hasLoadedOnce: false,
-//     selectedBoard: undefined
-//   }
-// }
 
 const actions = {
   [BOARD.CREATE_BOARD_REQUEST]: ({ commit, dispatch }, data) => {

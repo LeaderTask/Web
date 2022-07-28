@@ -28,7 +28,7 @@ const componentClass = computed(() => {
 
   return bgs[bgKey] ?? ''
 })
-// const secondBgImage = 'bg-no-repeat bg-right-top md:bg-[url("@/assets/images/tasks.png")]'
+
 </script>
 
 <template>

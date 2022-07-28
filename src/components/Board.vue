@@ -208,10 +208,12 @@
               ghost-class="ghost-card"
               item-key="uid"
               group="cards"
+              :delay="80"
+              :touch-start-threshold="10"
               :animation="100"
               :disabled="!board || board.type_access === 0"
               :move="checkMoveDragCard"
-              :scroll-sensitivity="250"
+              :scroll-sensitivity="100"
               :force-fallback="true"
               @start="startDragCard"
               @end="endDragCard"
@@ -440,7 +442,8 @@ export default {
       // скрываем архив
       if (column.Archive) return false
       // скрываем пустое неразобранное
-      if (column.Unsorted && column.cards.length === 0) return false
+      const isDragCardFromUnsortedNow = this.dragCardParam?.move?.column?.Unsorted ?? false
+      if (column.Unsorted && column.cards.length === 0 && !isDragCardFromUnsortedNow) return false
       return true
     },
     totalItem (cards) {
@@ -677,7 +680,7 @@ export default {
           willInsertAfter: true
         }
       }
-      //
+
       const fromColumnId = start.from.dataset.columnId
       const fromColumn = this.storeCards.find(
         (column) => column.UID === fromColumnId

@@ -106,7 +106,7 @@
                 :src="employees[task.uid_customer] ? employees[task.uid_customer]?.fotolink : ''"
                 class="rounded-lg ml-1 h-[20px] w-[20px]"
               >
-              <span class="ml-1 text-black">{{ employees[task.uid_customer]?.name }}</span>
+              <span class="ml-1 text-black">{{ getByNameOrEmail(employees) }}</span>
             </div>
           </div>
           <!-- performer -->
@@ -627,12 +627,14 @@ export default {
       this.$store.dispatch(TASK.CHANGE_TASK_COMMENT, data)
       this.$emit('changeValue', { comment: text })
     },
+    getByNameOrEmail (employees) {
+      return employees[this.task.uid_customer]?.name || employees[this.task.uid_customer]?.email
+    },
     _linkify (text) {
       return text.replace(/(lt?:\/\/[^\s]+)/g, '<a href="$1">$1</a>')
     },
     copyUrl (task) {
       copyText(`${window.location.origin}/task/${task.uid}`, undefined, (error, event) => {
-        // copyText('lt://planning?{' + selectedTask.value.uid.toUpperCase() + '}', undefined, (error, event) => {
         if (error) {
           console.log(error)
         } else {

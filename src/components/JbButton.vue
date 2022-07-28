@@ -116,6 +116,7 @@ const componentClass = computed(() => {
     <icon
       v-if="icon"
       :path="icon"
+      :box="'0 0 24 24'"
     />
   </component>
 </template>

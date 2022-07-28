@@ -1424,15 +1424,6 @@ const mutations = {
     state.open = resp.data
     state.open.title = 'Открытые задачи'
     state.open.link = '017a3e8c-79ac-452c-abb7-6652deecbd1c'
-    // for (const elem in state.open.tasks) {
-    //   if (state.open.tasks[elem].customer_date_end !== state.open.tasks[elem].customer_date_begin) {
-    //     if (new Date(state.open.tasks[elem].customer_date_end) > new Date()) {
-    //       state.today.tasks.push(state.open.tasks[elem])
-    //     } else {
-    //       state.overdue.tasks.push(state.open.tasks[elem])
-    //     }
-    //   }
-    // }
   },
   [TASK.SELECT_TAG]: (state, tag) => {
     state.selectedTag = tag

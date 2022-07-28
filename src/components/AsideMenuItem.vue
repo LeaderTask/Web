@@ -63,7 +63,7 @@ const styleInactive = 'font-medium text-[#606061]'
           :box="item.iconBox"
           :width="item.width"
           :height="item.height"
-          :class="[isActive ? styleActive : styleInactive]"
+          :class="[isActive ? styleActive : styleInactive, item.iconBackgroundClass]"
         />
       </div>
       <span

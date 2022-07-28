@@ -1,120 +1,14 @@
-<script setup>
-import { ref, nextTick, defineEmits } from 'vue'
-import { useStore } from 'vuex'
-import { GETFILES } from '@/store/actions/taskfiles'
-import ChatLoader from '@/components/CardProperties/ChatLoader.vue'
-import { writeCache } from '@/store/helpers/functions'
-// use the component
-const store = useStore()
-const props = defineProps({
-  file: {
-    type: Object,
-    default: () => ({})
-  }
-})
-const emit = defineEmits(['setLink'])
-
-const pics = ['jpg', 'png', 'jpeg', 'git', 'bmp', 'gif', 'PNG', 'JPG', 'JPEG', 'BMP', 'GIF']
-const movies = ['mov', 'mp4', 'wmv', 'avi', 'avchd', 'mkv', 'webm', 'mpeg-2']
-const docs = ['doc', 'xls', 'xlsx', 'txt', 'pdf']
-const audio = ['mp3', 'wav', 'm4a']
-const isImageLoaded = ref(false)
-
-const b64toBlob = (base64) => fetch(base64).then(res => res.blob())
-
-const getImgUrl = (uid, extension, filename) => {
-  // computed value triggered after template change
-  if (isImageLoaded.value) return
-  const cachedImageBase64 = localStorage.getItem(uid)
-  if (cachedImageBase64) {
-    // we nee to wait until hidden messages will be drawn
-    nextTick(() => {
-      b64toBlob(cachedImageBase64).then(blobImage => {
-        const fileURL = window.URL.createObjectURL(blobImage)
-        const myImage = new Image()
-        myImage.src = cachedImageBase64
-        document.getElementById('img_' + uid).appendChild(myImage)
-        document.getElementById('img_' + uid).setAttribute('href', fileURL)
-        document.getElementById('img_' + uid).style.maxHeight = '100px'
-        isImageLoaded.value = true
-      })
-    })
-  } else {
-    store.dispatch(GETFILES, uid).then(resp => {
-      writeCache(uid, new Blob([resp.data], { type: 'image/' + extension }))
-      const fileURL = window.URL.createObjectURL(new Blob([resp.data], { type: 'image/' + extension }))
-      const myImage = new Image()
-      myImage.src = fileURL
-      document.getElementById('img_' + uid).appendChild(myImage)
-      isImageLoaded.value = true
-      document.getElementById('img_' + uid).setAttribute('href', fileURL)
-      document.getElementById('img_' + uid).style.maxHeight = '100px'
-      return myImage
-    }).catch(
-      setTimeout(() => { // bug fix: https://beta.leadertask.ru/task/0fe60f4b-496c-4587-a6a4-6de2f66951d3
-        getImgUrl(uid, extension, filename)
-      }, 500)
-    )
-  }
-}
-
-const getMovUrl = (uid, extension, filename) => {
-  const fileURL = window.location.href + 'taskfile/' + uid + '?type=video&format=' + extension
-  nextTick(() => {
-    document.getElementById('video_' + uid).setAttribute('href', fileURL)
-  })
-}
-
-const getDocUrl = (uid, extension, filename) => {
-  console.log('GETMOVEURL')
-  store.dispatch(GETFILES, uid).then(resp => {
-    const fileURL = window.URL.createObjectURL(new Blob([resp.data], { type: 'text/plain' }))
-    emit('setLink', [fileURL, false])
-    document.getElementById('doc_' + uid).setAttribute('href', fileURL)
-    document.getElementById('doc_' + uid).setAttribute('download', filename)
-    return fileURL
-  })
-}
-
-const getAudioUrl = (uid, extension, filename) => {
-  store.dispatch(GETFILES, uid).then(resp => {
-    const fileURL = window.URL.createObjectURL(new Blob([resp.data], { type: 'audio/' + extension }))
-    emit('setLink', [fileURL, true])
-    const myAudio = new Audio()
-    myAudio.src = fileURL
-    document.getElementById('audio_' + uid).appendChild(myAudio)
-    document.getElementById('audio_' + uid).setAttribute('src', fileURL)
-    document.getElementById('audio_' + uid).setAttribute('download', filename)
-    return myAudio
-  })
-}
-
-const getAnyUrl = (uid, extension, filename) => {
-  console.log('GETANYURL')
-  store.dispatch(GETFILES, uid).then(resp => {
-    const fileURL = window.URL.createObjectURL(new Blob([resp.data]))
-    emit('setLink', [fileURL, false])
-    document.getElementById('any_' + uid).setAttribute('href', fileURL)
-    document.getElementById('any_' + uid).setAttribute('download', filename)
-    // получаем arrayBuffer из Blob
-    return fileURL
-  })
-}
-
-</script>
-
 <template>
   <!-- Pic -->
   <span
-    v-if="pics.includes(props.file.file_name.split('.').pop())"
+    v-if="pics.includes(file.file_name.split('.').pop())"
     class="inline-block w-full"
   >
     <a
-      :id="'img_' + props.file.uid"
-      :href="'https://web.leadertask.com/User/Files/GetFile?uid=' + props.file.uid"
+      :id="'img_' + file.uid"
+      :href="'https://web.leadertask.com/User/Files/GetFile?uid=' + file.uid"
       target="_blank"
     >
-      {{ getImgUrl(props.file.uid, props.file.file_name.split('.').pop(), props.file.file_name) }}
       <ChatLoader
         v-if="!isImageLoaded"
         width="250px"
@@ -125,13 +19,13 @@ const getAnyUrl = (uid, extension, filename) => {
   </span>
 
   <!-- Movie -->
-  <span
-    v-if="movies.includes(props.file.file_name.split('.').pop())"
-  >
-    {{ getMovUrl(props.file.uid, props.file.file_name.split('.').pop(), props.file.file_name) }}
+  <span v-if="movies.includes(file.file_name.split('.').pop())">
+    {{ getMovUrl(file.uid, file.file_name.split('.').pop(), file.file_name) }}
     <a
-      :id="'video_' + props.file.uid"
-      :href="'https://web.leadertask.com/User/Files/GetFile?uid=' + props.file.uid"
+      :id="'video_' + file.uid"
+      :href="
+        'https://web.leadertask.com/User/Files/GetFile?uid=' + file.uid
+      "
       target="_blank"
     >
       <svg
@@ -153,17 +47,17 @@ const getAnyUrl = (uid, extension, filename) => {
 
   <!-- Docs -->
   <span
-    v-if="docs.includes(props.file.file_name.split('.').pop())"
+    v-if="docs.includes(file.file_name.split('.').pop())"
     class="flex mr-1"
   >
     <a
-      :id="'doc_' + props.file.uid"
+      :id="'doc_' + file.uid"
       target="_blank"
       download
-      @click="getDocUrl(props.file.uid, props.file.file_name.split('.').pop(), props.file.file_name)"
+      @click="getDocUrl(file.uid, file.file_name.split('.').pop(), file.file_name)"
     >
       <svg
-        v-if="props.file.file_name.split('.').pop() === 'pdf'"
+        v-if="file.file_name.split('.').pop() === 'pdf'"
         width="22"
         height="27"
         viewBox="0 0 74 89"
@@ -196,14 +90,12 @@ const getAnyUrl = (uid, extension, filename) => {
   </span>
 
   <!-- Audio -->
-  <span
-    v-if="audio.includes(props.file.file_name.split('.').pop())"
-  >
-    {{ getAudioUrl(props.file.uid, props.file.file_name.split('.').pop(), props.file.file_name) }}
+  <span v-if="audio.includes(file.file_name.split('.').pop())">
+    {{ getAudioUrl(file.uid, file.file_name.split('.').pop(), file.file_name) }}
     <audio
-      :id="'audio_' + props.file.uid"
+      :id="'audio_' + file.uid"
       ref="audioPlayer"
-      :src="'https://web.leadertask.com/User/Files/GetFile?uid=' + props.uid"
+      :src="'https://web.leadertask.com/User/Files/GetFile?uid=' + uid"
       controls
     >
       Your browser does not support the
@@ -217,13 +109,18 @@ const getAnyUrl = (uid, extension, filename) => {
     class="flex mr-1"
   >
     <a
-      :id="'any_' + props.file.uid"
+      :id="'any_' + file.uid"
       target="_blank"
       download
-      @click="getAnyUrl(props.file.uid, props.file.file_name.split('.').pop(), props.file.file_name)"
+      @click="getAnyUrl( file.uid, file.file_name.split('.').pop(), file.file_name)"
     >
       <svg
-        v-if="!docs.includes(props.file.file_name.split('.').pop()) && !audio.includes(props.file.file_name.split('.').pop()) && !movies.includes(props.file.file_name.split('.').pop()) && !pics.includes(props.file.file_name.split('.').pop())"
+        v-if="
+          !docs.includes(file.file_name.split('.').pop()) &&
+            !audio.includes(file.file_name.split('.').pop()) &&
+            !movies.includes(file.file_name.split('.').pop()) &&
+            !pics.includes(file.file_name.split('.').pop())
+        "
         width="22"
         height="27"
         viewBox="0 0 74 89"
@@ -240,3 +137,150 @@ const getAnyUrl = (uid, extension, filename) => {
     </a>
   </span>
 </template>
+
+<script>
+import { GET_FILE } from '@/store/actions/taskfiles'
+import { writeCache } from '@/store/helpers/functions'
+
+export default {
+  props: {
+    file: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  emits: ['setLink'],
+  data () {
+    return {
+      pics: [
+        'jpg',
+        'png',
+        'jpeg',
+        'git',
+        'bmp',
+        'gif',
+        'PNG',
+        'JPG',
+        'JPEG',
+        'BMP',
+        'GIF'
+      ],
+      movies: ['mov', 'mp4', 'wmv', 'avi', 'avchd', 'mkv', 'webm', 'mpeg-2'],
+      docs: ['doc', 'docx', 'xls', 'xlsx', 'txt', 'pdf'],
+      audio: ['mp3', 'wav', 'm4a'],
+      isImageLoaded: false
+    }
+  },
+  mounted () {
+    if (this.pics.includes(this.file.file_name.split('.').pop())) {
+      this.getImgUrl(
+        this.file.uid,
+        this.file.file_name.split('.').pop(),
+        this.file.file_name,
+        0
+      )
+    }
+    if (this.docs.includes(this.file.file_name.split('.').pop())) {
+      this.getDocUrl(
+        this.file.uid,
+        this.file.file_name.split('.').pop(),
+        this.file.file_name
+      )
+    }
+  },
+  methods: {
+    b64toBlob: (base64) => fetch(base64).then((res) => res.blob()),
+    getImgUrl (uid, extension, filename, counter) {
+      // computed value triggered after template change
+      if (this.isImageLoaded) return
+      const cachedImageBase64 = localStorage.getItem(uid)
+      if (cachedImageBase64) {
+        // we nee to wait until hidden messages will be drawn
+        this.$nextTick(() => {
+          this.b64toBlob(cachedImageBase64).then((blobImage) => {
+            // убираем дублирование при обновлении текущей задачи
+            // если процесс в фоне (получается что запускается одновременно два и более)
+            if (document.getElementById('img_' + uid)?.getElementsByTagName('img')?.length) {
+              this.isImageLoaded = true
+              return
+            }
+            const fileURL = window.URL.createObjectURL(blobImage)
+            const myImage = new Image()
+            myImage.src = cachedImageBase64
+            document.getElementById('img_' + uid).appendChild(myImage)
+            document.getElementById('img_' + uid).setAttribute('href', fileURL)
+            document.getElementById('img_' + uid).style.maxHeight = '100px'
+            this.isImageLoaded = true
+          })
+        })
+      } else {
+        this.$store
+          .dispatch(GET_FILE, uid)
+          .then((resp) => {
+            if (document.getElementById('img_' + uid)?.getElementsByTagName('img')?.length) {
+              this.isImageLoaded = true
+              return
+            }
+            writeCache(uid, new Blob([resp.data], { type: 'image/' + extension }))
+            const fileURL = window.URL.createObjectURL(
+              new Blob([resp.data], { type: 'image/' + extension })
+            )
+            const myImage = new Image()
+            myImage.src = fileURL
+            document.getElementById('img_' + uid).appendChild(myImage)
+            document.getElementById('img_' + uid).setAttribute('href', fileURL)
+            document.getElementById('img_' + uid).style.maxHeight = '100px'
+            this.isImageLoaded = true
+          })
+          .catch((e) => {
+            if (e?.message === 'Request failed with status code 404' && counter < 10) {
+              setTimeout(() => {
+                this.getImgUrl(uid, extension, filename, counter + 1)
+              }, 500)
+            }
+          })
+      }
+    },
+    getMovUrl (uid, extension, filename) {
+      const fileURL = window.location.href + 'taskfile/' + uid + '?type=video&format=' + extension
+      this.$nextTick(() => {
+        document.getElementById('video_' + uid).setAttribute('href', fileURL)
+      })
+    },
+    getAnyUrl (uid, extension, filename) {
+      this.$store.dispatch(GET_FILE, uid).then((resp) => {
+        const fileURL = window.URL.createObjectURL(new Blob([resp.data]))
+        this.$emit('setLink', [fileURL, false])
+        document.getElementById('any_' + uid).setAttribute('href', fileURL)
+        document.getElementById('any_' + uid).setAttribute('download', filename)
+        return fileURL
+      })
+    },
+    getAudioUrl (uid, extension, filename) {
+      this.$store.dispatch(GET_FILE, uid).then((resp) => {
+        const fileURL = window.URL.createObjectURL(
+          new Blob([resp.data], { type: 'audio/' + extension })
+        )
+        this.$emit('setLink', [fileURL, true])
+        const myAudio = new Audio()
+        myAudio.src = fileURL
+        document.getElementById('audio_' + uid).appendChild(myAudio)
+        document.getElementById('audio_' + uid).setAttribute('src', fileURL)
+        document.getElementById('audio_' + uid).setAttribute('download', filename)
+        return myAudio
+      })
+    },
+    getDocUrl (uid, extension, filename) {
+      this.$store.dispatch(GET_FILE, uid).then((resp) => {
+        const fileURL = window.URL.createObjectURL(
+          new Blob([resp.data], { type: 'text/plain' })
+        )
+        this.$emit('setLink', [fileURL, false])
+        document.getElementById('doc_' + uid).setAttribute('href', fileURL)
+        document.getElementById('doc_' + uid).setAttribute('download', filename)
+        return fileURL
+      })
+    }
+  }
+}
+</script>

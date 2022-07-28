@@ -23,12 +23,6 @@
       >
         Поручить
       </button>
-      <!-- <div
-        v-if="header"
-        class="font-Roboto flex ml-2 text-base"
-      >
-        {{ header }}
-      </div> -->
     </div>
     <button
       class="border border-slate-600 py-3 px-4 rounded-lg mr-5 hover:bg-gray-300 text-sm bg-opacity-70 font-medium flex w-[181px] items-center justify-center"
@@ -53,7 +47,7 @@
       :colors="colors"
       :tags="tags"
       :user="user"
-      :task-messages="taskMessages"
+      :task-messages="taskMessages.slice().reverse()"
       :employees="employees"
       :projects="projects"
       @clickTask="onClickTask"
@@ -117,8 +111,7 @@ export default {
         this.unreadTasks.length +
         this.overdueTasks.length +
         this.readyTasks.length +
-        this.todayTasks.length +
-        this.openedTasks.length
+        this.todayTasks.length
       )
     },
     firstTask () {
@@ -133,9 +126,6 @@ export default {
       }
       if (this.todayTasks.length) {
         return this.todayTasks[0]
-      }
-      if (this.openedTasks.length) {
-        return this.openedTasks[0]
       }
       return null
     },

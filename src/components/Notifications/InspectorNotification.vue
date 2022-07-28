@@ -1,11 +1,16 @@
-<script setup>
-import { useStore } from 'vuex'
-import { computed } from 'vue'
-
-const store = useStore()
-const currentLocation = window.location.href
-const employees = computed(() => store.state.employees.employees)
-
+<script>
+export default {
+  data () {
+    return {
+      currentLocation: window.location.href
+    }
+  },
+  computed: {
+    employees () {
+      return this.$store.state.employees.employees
+    }
+  }
+}
 </script>
 <template>
   <NotificationGroup group="inspector">

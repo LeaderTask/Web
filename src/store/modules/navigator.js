@@ -1,6 +1,5 @@
 // icons for navigator
 import axios from 'axios'
-import { notify } from 'notiwind'
 import { PUSH_BOARD } from '../actions/boards'
 import { PUSH_COLOR, PUSH_MYCOLOR } from '../actions/colors'
 import { PUSH_DEPARTMENT } from '../actions/departments'
@@ -13,16 +12,21 @@ import {
   NAVIGATOR_PUSH_DEPARTAMENT,
   NAVIGATOR_PUSH_EMPLOYEE,
   NAVIGATOR_PUSH_PROJECT,
+  NAVIGATOR_PUSH_REGLAMENT,
   NAVIGATOR_PUSH_TAG,
   NAVIGATOR_REMOVE_BOARD,
   NAVIGATOR_REMOVE_COLOR,
   NAVIGATOR_REMOVE_DEPARTAMENT,
   NAVIGATOR_REMOVE_EMPLOYEE,
-  NAVIGATOR_UPDATE_EMPLOYEE,
   NAVIGATOR_REMOVE_PROJECT,
+  NAVIGATOR_REMOVE_REGLAMENT,
   NAVIGATOR_REMOVE_TAG,
   NAVIGATOR_REQUEST,
   NAVIGATOR_SUCCESS,
+  NAVIGATOR_UPDATE_ASSIGNMENTS,
+  NAVIGATOR_UPDATE_DEPARTMENT,
+  NAVIGATOR_UPDATE_EMPLOYEE,
+  NAVIGATOR_UPDATE_REGLAMENT,
   PATCH_SETTINGS,
   PATCH_SETTINGS_SUCCESS,
   RESET_STATE_NAVIGATOR
@@ -43,7 +47,7 @@ const getDefaultState = () => {
 
 function getAllMembersByDepartmentUID (emps, departmentUID) {
   const employeesStuck = []
-  for (const employee of emps.items) {
+  for (const employee of emps) {
     if (employee.uid_dep === departmentUID) {
       employeesStuck.push(employee)
     }
@@ -73,14 +77,6 @@ const actions = {
         .then((resp) => {
           resp.rootState = rootState
 
-          commit(NAVIGATOR_SUCCESS, resp)
-          if (resp.data.emps.items) {
-            for (const employee of resp.data.emps.items) {
-              employee.parentID = resp.data.emps.uid
-              commit(PUSH_EMPLOYEE, employee)
-              commit(PUSH_EMPLOYEE_BY_EMAIL, employee)
-            }
-          }
           if (resp.data.delegate_iam) {
             for (const dm of resp.data.delegate_iam.items) {
               dm.parentID = resp.data.delegate_iam.uid
@@ -91,6 +87,14 @@ const actions = {
               dt.parentID = resp.data.delegate_to_me.uid
             }
           }
+          if (resp.data.emps.items) {
+            for (const employee of resp.data.emps.items) {
+              employee.parentID = resp.data.emps.uid
+              commit(PUSH_EMPLOYEE, employee)
+              commit(PUSH_EMPLOYEE_BY_EMAIL, employee)
+            }
+          }
+          commit(NAVIGATOR_SUCCESS, resp)
           // TODO: we are doing the same thing 3 times, DRY
           // process colors in shared vuex storage
           if (resp.data.colors.items) {
@@ -156,15 +160,6 @@ const actions = {
         })
         .catch((err) => {
           commit(NAVIGATOR_ERROR, err)
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: NAVIGATOR_REQUEST,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -178,15 +173,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: PATCH_SETTINGS,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -195,6 +181,30 @@ const actions = {
     commit(NAVIGATOR_UPDATE_EMPLOYEE, employee)
     commit(PUSH_EMPLOYEE, employee)
     commit(PUSH_EMPLOYEE_BY_EMAIL, employee)
+  },
+  [NAVIGATOR_UPDATE_ASSIGNMENTS]: ({ commit }) => {
+    return new Promise((resolve, reject) => {
+      const url =
+        process.env.VUE_APP_LEADERTASK_API + 'api/v1/navigator/assignments'
+      axios({ url: url, method: 'GET' })
+        .then((resp) => {
+          if (resp.data.delegate_iam) {
+            for (const dm of resp.data.delegate_iam.items) {
+              dm.parentID = resp.data.delegate_iam.uid
+            }
+          }
+          if (resp.data.delegate_to_me) {
+            for (const dt of resp.data.delegate_to_me.items) {
+              dt.parentID = resp.data.delegate_to_me.uid
+            }
+          }
+          commit(NAVIGATOR_UPDATE_ASSIGNMENTS, resp)
+          resolve(resp)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
   }
 }
 
@@ -208,22 +218,7 @@ const mutations = {
 
     console.log('navigator ', resp)
 
-    // Push statickly tasks to menu array from state
-    state.memu = []
-    // state.menu.push('separator')
-    // state.menu.push([
-    //   {
-    //     label: 'Рабочий стол',
-    //     uid: '2bad1413-a373-4926-8a3c-58677a680714',
-    //     bold: 0,
-    //     icon: desktop.path,
-    //     width: desktop.width,
-    //     height: desktop.height,
-    //     iconBox: desktop.viewBox,
-    //     type: 'uid',
-    //     iconBackgroundClass: 'bg-white-500'
-    //   }
-    // ])
+    state.menu = []
     state.menu.push([
       {
         label: 'Очередь',
@@ -234,7 +229,7 @@ const mutations = {
         height: 30,
         iconBox: '0 0 30 30',
         type: 'uid',
-        iconBackgroundClass: 'bg-white-500'
+        iconBackgroundClass: ''
       }
     ])
     state.menu.push([
@@ -247,7 +242,7 @@ const mutations = {
         height: 30,
         iconBox: '0 0 30 30',
         type: 'uid',
-        iconBackgroundClass: 'bg-blue-400'
+        iconBackgroundClass: ''
       }
     ])
     // state.menu.push('separator')
@@ -262,7 +257,7 @@ const mutations = {
         height: 30,
         type: 'greed',
         path: 'new_delegate',
-        iconBackgroundClass: 'bg-indigo-400'
+        iconBackgroundClass: ''
       }
     ])
     // state.menu.push('separator')
@@ -277,7 +272,21 @@ const mutations = {
         height: 30,
         type: 'greed',
         path: 'new_private_projects',
-        iconBackgroundClass: 'bg-amber-500'
+        iconBackgroundClass: ''
+      }
+    ])
+    state.menu.push([
+      {
+        label: 'Регламенты',
+        uid: '92413f6c-2ef3-476e-9429-e76d7818685d', // reglaments uuid
+        bold: false,
+        icon: 'M 22.082031 6.183594 L 16.820312 0.921875 C 16.664062 0.765625 16.433594 0.664062 16.199219 0.664062 C 15.96875 0.664062 15.738281 0.765625 15.582031 0.921875 L 12.871094 3.628906 C 12.535156 3.964844 12.535156 4.535156 12.871094 4.867188 L 12.898438 4.894531 L 6.113281 8.273438 C 5.933594 8.378906 5.777344 8.53125 5.699219 8.738281 L 0.746094 21.125 C 0.746094 21.148438 0.71875 21.175781 0.71875 21.203125 C 0.695312 21.253906 0.667969 21.304688 0.667969 21.355469 C 0.640625 21.589844 0.71875 21.820312 0.875 22 C 1.03125 22.234375 1.289062 22.335938 1.546875 22.335938 C 1.597656 22.335938 1.648438 22.335938 1.699219 22.3125 C 1.726562 22.3125 1.753906 22.3125 1.777344 22.285156 C 1.804688 22.285156 1.828125 22.257812 1.855469 22.257812 L 14.238281 17.304688 C 14.445312 17.226562 14.601562 17.074219 14.703125 16.890625 L 18.085938 10.105469 L 18.109375 10.132812 C 18.265625 10.289062 18.496094 10.390625 18.730469 10.390625 C 18.960938 10.390625 19.195312 10.289062 19.347656 10.132812 L 22.082031 7.421875 C 22.417969 7.089844 22.417969 6.519531 22.082031 6.183594 Z M 9.855469 12.789062 C 9.855469 12.582031 10.007812 12.429688 10.214844 12.429688 C 10.421875 12.429688 10.574219 12.582031 10.574219 12.789062 C 10.574219 12.996094 10.421875 13.152344 10.214844 13.152344 C 10.007812 13.152344 9.855469 12.96875 9.855469 12.789062 Z M 5.183594 19.058594 L 9.464844 14.777344 C 9.699219 14.855469 9.957031 14.90625 10.214844 14.90625 C 11.375 14.90625 12.332031 13.949219 12.332031 12.789062 C 12.332031 11.628906 11.375 10.675781 10.214844 10.675781 C 9.054688 10.675781 8.097656 11.628906 8.097656 12.789062 C 8.097656 13.046875 8.152344 13.304688 8.226562 13.539062 L 3.945312 17.820312 L 7.195312 9.695312 L 14.1875 6.183594 L 16.792969 8.789062 L 13.3125 15.808594 Z M 14.730469 4.25 L 16.199219 2.777344 L 20.226562 6.804688 L 18.753906 8.273438 Z M 14.730469 4.25',
+        iconBox: '0 0 23 23',
+        width: 20,
+        height: 20,
+        type: 'greed',
+        path: 'reglaments',
+        iconBackgroundClass: 'm-[5px]'
       }
     ])
     state.menu.push([
@@ -291,7 +300,7 @@ const mutations = {
         height: 30,
         type: 'greed',
         path: 'new_private_boards',
-        iconBackgroundClass: 'bg-amber-500'
+        iconBackgroundClass: ''
       }
     ])
     // state.menu.push('separator')
@@ -306,7 +315,7 @@ const mutations = {
         width: 30,
         height: 30,
         iconBox: '0 0 30 30',
-        iconBackgroundClass: 'bg-cyan-500'
+        iconBackgroundClass: ''
       }
     ])
     state.menu.push([
@@ -338,22 +347,24 @@ const mutations = {
     resp.data.new_delegate = newAssignments
 
     // Merge emps to deps like new private projects
+    const dataEmps = [...resp.data.emps?.items]
     const newEmps = []
     newEmps.push({
       dep: { uid: '', name: 'Вне отдела' },
       items: getAllMembersByDepartmentUID(
-        resp.data.emps,
+        dataEmps,
         '00000000-0000-0000-0000-000000000000'
       )
     })
     for (const department of resp.data.deps.items) {
       const dep = {
         dep: department,
-        items: getAllMembersByDepartmentUID(resp.data.emps, department.uid)
+        items: getAllMembersByDepartmentUID(dataEmps, department.uid)
       }
       newEmps.push(dep)
     }
     resp.data.new_emps = newEmps
+
     // Merge common projects and private projects into my own data structure
     // Array of objects where object is { dep: 'Dependency name', items: items }
     const itemsInProjectView = []
@@ -382,6 +393,20 @@ const mutations = {
 
     state.navigator = resp.data
   },
+  [NAVIGATOR_UPDATE_ASSIGNMENTS]: (state, resp) => {
+    const newAssignments = []
+    newAssignments.push({
+      dep: 'Поручено мной',
+      items: resp.data.delegate_iam.items
+    })
+    newAssignments.push({
+      dep: 'Поручено мне',
+      items: resp.data.delegate_to_me.items
+    })
+    state.navigator.delegate_iam = resp.data.delegate_iam
+    state.navigator.delegate_to_me = resp.data.delegate_to_me
+    state.navigator.new_delegate = newAssignments
+  },
   [NAVIGATOR_PUSH_DEPARTAMENT]: (state, departaments) => {
     for (const departament of departaments) {
       if (
@@ -402,10 +427,21 @@ const mutations = {
       state.navigator.new_emps.push({
         dep: departament,
         items: getAllMembersByDepartmentUID(
-          state.navigator.emps,
+          state.navigator.emps.items,
           departament.uid
         )
       })
+    }
+  },
+  [NAVIGATOR_PUSH_REGLAMENT]: (state, reglament) => {
+    state.navigator.reglaments.items.push(reglament)
+  },
+  [NAVIGATOR_REMOVE_REGLAMENT]: (state, reglament) => {
+    for (let i = 0; i < state.navigator.reglaments.items.length; i++) {
+      if (state.navigator.reglaments.items[i].uid === reglament) {
+        state.navigator.reglaments.items.splice(i, 1)
+        return
+      }
     }
   },
   [NAVIGATOR_REMOVE_DEPARTAMENT]: (state, uidDepartment) => {
@@ -429,6 +465,19 @@ const mutations = {
     )
     if (indexDeps !== -1) state.navigator.deps.items.splice(indexDeps, 1)
   },
+  [NAVIGATOR_UPDATE_DEPARTMENT]: (state, department) => {
+    const indexEmps = state.navigator.new_emps.findIndex(
+      (emps) => emps.dep.uid === department.uid
+    )
+    if (indexEmps !== -1) {
+      state.navigator.new_emps[indexEmps].dep = department
+    }
+
+    const indexDeps = state.navigator.deps.items.findIndex(
+      (dep) => dep.uid === department.uid
+    )
+    if (indexDeps !== -1) state.navigator.deps.items[indexDeps] = department
+  },
   [NAVIGATOR_CHANGE_EMPLOYEE_DEPARTMENT]: (state, data) => {
     const uidDepOld =
       data.uidDepartmentOld === '00000000-0000-0000-0000-000000000000'
@@ -446,7 +495,6 @@ const mutations = {
     )
     const empsOld = state.navigator.new_emps[indexEmpsOld]
     const empsNew = state.navigator.new_emps[indexEmpsNew]
-    console.log('NAVIGATOR_CHANGE_EMPLOYEE_DEPARTMENT', empsOld, empsNew)
     if (empsOld && empsNew && empsOld.dep.uid !== empsNew.dep.uid) {
       // отдел поменялся - перемещаем сотрудника
       const indexEmp = empsOld.items.findIndex((emp) => emp.uid === data.uidEmp)
@@ -506,7 +554,6 @@ const mutations = {
         // adding projects recursively to subarrays
         visitChildren(state.navigator.tags.items, (value) => {
           if (value.uid === tag.uid_parent) {
-            console.log(value)
             value.children.push(tag)
           }
         })
@@ -524,6 +571,14 @@ const mutations = {
         Object.assign(value, colors)
       }
     })
+  },
+  [NAVIGATOR_UPDATE_REGLAMENT]: (state, reglament) => {
+    for (let i = 0; i < state.navigator.reglaments.items.length; i++) {
+      if (state.navigator.reglaments.items[i].uid === reglament.uid) {
+        Object.assign(state.navigator.reglaments.items[i], reglament)
+        return
+      }
+    }
   },
   NAVIGATOR_UPDATE_TAG: (state, tag) => {
     visitChildren(state.navigator.tags.items, (value) => {

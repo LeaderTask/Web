@@ -5,7 +5,7 @@
   />
   <div class="flex gap-[10px] items-center px-3">
     <div
-      v-if="!showSearchBar"
+      v-if="!showSearchBar && lastGreedPath !== 'reglament_content' && lastGreedPath !== 'reglaments'"
       class="flex-none flex gap-[5px] p-[8px] cursor-pointer text-[#7e7e80] hover:text-[#7e7e80]/75"
       @click="onShowSearchBar"
     >
@@ -56,13 +56,33 @@
         @keyup.enter="sendSearchRequest"
         @blur="onBlurSearchInput"
       >
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" data-v-1ded894d="" @click="erase">
-        <path d="M14.8486 2.84858C15.3172 2.37995 15.3172 1.62015 14.8486 1.15152C14.3799 0.682892 13.6202 0.682892 13.1515 1.15152L8.00005 6.30299L2.84858 1.15152C2.37995 0.682892 1.62015 0.682892 1.15152 1.15152C0.682891 1.62015 0.682891 2.37995 1.15152 2.84858L6.30299 8.00005L1.15152 13.1515C0.682891 13.6202 0.682891 14.3799 1.15152 14.8486C1.62015 15.3172 2.37995 15.3172 2.84858 14.8486L8.00005 9.69711L13.1515 14.8486C13.6202 15.3172 14.3799 15.3172 14.8486 14.8486C15.3172 14.3799 15.3172 13.6202 14.8486 13.1515L9.69711 8.00005L14.8486 2.84858Z" fill="black" fill-opacity="0.5" data-v-1ded894d=""></path>
+      <svg
+        v-if="searchText"
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        class="cursor-pointer"
+        xmlns="http://www.w3.org/2000/svg"
+        data-v-1ded894d=""
+        @click="erase"
+      >
+        <path
+          d="M14.8486 2.84858C15.3172 2.37995 15.3172 1.62015 14.8486 1.15152C14.3799 0.682892 13.6202 0.682892 13.1515 1.15152L8.00005 6.30299L2.84858 1.15152C2.37995 0.682892 1.62015 0.682892 1.15152 1.15152C0.682891 1.62015 0.682891 2.37995 1.15152 2.84858L6.30299 8.00005L1.15152 13.1515C0.682891 13.6202 0.682891 14.3799 1.15152 14.8486C1.62015 15.3172 2.37995 15.3172 2.84858 14.8486L8.00005 9.69711L13.1515 14.8486C13.6202 15.3172 14.3799 15.3172 14.8486 14.8486C15.3172 14.3799 15.3172 13.6202 14.8486 13.1515L9.69711 8.00005L14.8486 2.84858Z"
+          fill="black"
+          fill-opacity="0.5"
+          data-v-1ded894d=""
+        />
       </svg>
     </div>
     <NavBarButtonsBoard
       v-if="lastGreedPath === 'boards_children'"
       :board-uid="lastNavStackUid"
+      @popNavBar="popNavBar"
+    />
+    <NavBarButtonsReglament
+      v-if="lastGreedPath === 'reglament_content'"
+      :reglament-uid="lastNavStackUid"
       @popNavBar="popNavBar"
     />
     <NavBarButtonsProject
@@ -103,6 +123,7 @@ import { notify } from 'notiwind'
 
 import NavBarButtonsBoard from '@/components/Navbar/NavBarButtonsBoard.vue'
 import NavBarButtonsProject from '@/components/Navbar/NavBarButtonsProject.vue'
+import NavBarButtonsReglament from '@/components/Navbar/NavBarButtonsReglament.vue'
 import NavBarButtonsColor from '@/components/Navbar/NavBarButtonsColor.vue'
 import NavbarSearchLimit from '@/components/Navbar/NavbarSearchLimit'
 import NavBarButtonsTag from '@/components/Navbar/NavBarButtonsTag.vue'
@@ -112,6 +133,7 @@ export default {
   components: {
     NavBarButtonsBoard,
     NavBarButtonsProject,
+    NavBarButtonsReglament,
     NavBarButtonsColor,
     NavBarButtonsTag,
     NavbarSearchLimit,
@@ -163,7 +185,7 @@ export default {
       return this.lastNavStackType === 'color'
     },
     isTagTaskList () {
-      return this.navStack[this.navStack.length - 1].greedPath === 'tags_children'
+      return this.lastGreedPath === 'tags_children'
     }
   },
   watch: {
@@ -324,7 +346,7 @@ export default {
           this.$store.commit('basic', { key: 'mainSectionState', value: 'tasks' })
           this.$store.commit('basic', { key: 'taskListSource', value: navElem.value })
           this.$store.dispatch(TASK.SEARCH_TASK, this.searchText).then((resp) => {
-            console.log('Search Taks', resp)
+            console.log('Search Tasks', resp)
           })
         } else {
           notify(

@@ -1,7 +1,6 @@
-import axios from 'axios'
-import { notify } from 'notiwind'
-import * as BOARD from '../actions/boards'
 import { visitChildren } from '@/store/helpers/functions'
+import axios from 'axios'
+import * as BOARD from '../actions/boards'
 
 function uuidv4 () {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
@@ -41,15 +40,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: BOARD.CREATE_BOARD_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -62,15 +52,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: BOARD.UPDATE_BOARD_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -84,15 +65,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: BOARD.REMOVE_BOARD_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -110,15 +82,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: BOARD.REMOVE_BOARD_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -233,7 +196,7 @@ const actions = {
         .then((resp) => {
           // В resp.data сервер возвращает всю доску
           // по уму нужно мутировать доску, а не самим пересчитывать
-          // console.log('DELETE_STAGE_BOARD_REQUEST', resp)
+          //
           // удаляем
           board.stages.splice(index, 1)
           // пересчитываем порядок
@@ -244,15 +207,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: BOARD.DELETE_STAGE_BOARD_REQUEST,
-              text: err.response?.data ?? err.response
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -313,12 +267,37 @@ const actions = {
           reject(err)
         })
     })
+  },
+  [BOARD.ADD_BOARD_TO_FAVORITE]: ({ commit, dispatch }, data) => {
+    return new Promise((resolve, reject) => {
+      dispatch(BOARD.UPDATE_BOARD_REQUEST, { ...data, favorite: 1 })
+        .then((resp) => {
+          resolve(resp)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
+  },
+  [BOARD.REMOVE_BOARD_FROM_FAVORITE]: ({ commit, dispatch }, data) => {
+    return new Promise((resolve, reject) => {
+      dispatch(BOARD.UPDATE_BOARD_REQUEST, { ...data, favorite: 0 })
+        .then((resp) => {
+          resolve(resp)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
   }
 }
 
 const mutations = {
   [BOARD.REMOVE_BOARD_REQUEST]: (state, uid) => {
-    visitChildren([state.boards[uid]], value => (delete state.boards[value.uid]))
+    visitChildren(
+      [state.boards[uid]],
+      (value) => delete state.boards[value.uid]
+    )
     delete state.boards[uid]
   },
   [BOARD.PUSH_BOARD]: (state, boards) => {
@@ -332,7 +311,10 @@ const mutations = {
   [BOARD.SHOW_BOARD_ARCHIVE]: (state, showArchive) => {
     state.showArchive = showArchive
   },
-  [BOARD.SHOW_BOARD_MY_CARDS_WHERE_IAM_RESPONSIBLE]: (state, showCardsWhereIAmResponsible) => {
+  [BOARD.SHOW_BOARD_MY_CARDS_WHERE_IAM_RESPONSIBLE]: (
+    state,
+    showCardsWhereIAmResponsible
+  ) => {
     state.showOnlyCardsWhereIAmResponsible = showCardsWhereIAmResponsible
   },
   [BOARD.SHOW_BOARD_MY_CREATED_CARDS]: (state, showMyCreatedCards) => {

@@ -1,6 +1,7 @@
 import { showNotify } from '@/store/helpers/functions'
 import store from '@/store/index.js'
 import { createCard } from '@/websync/card.js'
+import { createReglament } from '@/websync/reglaments.js'
 import { createCardMessage } from '@/websync/card_message.js'
 import { createColor } from '@/websync/colors_dop.js'
 import { createEmployee } from '@/websync/employee.js'
@@ -9,6 +10,7 @@ import { createTag } from '@/websync/tag.js'
 import { createTask } from '@/websync/task.js'
 import { createTaskMessage } from '@/websync/task_message.js'
 import * as TYPES from '@/websync/types.js'
+import { createDepartment } from '@/websync/departments'
 
 function currentUserUid () {
   return store?.state?.user?.user?.current_user_uid
@@ -24,6 +26,9 @@ function currentUserEmail () {
 
 export default function processCreate (obj) {
   switch (obj.type) {
+    case TYPES.TYPE_OBJECT_REGLAMENT:
+      createReglament(obj)
+      break
     case TYPES.TYPE_OBJECT_TAG:
       createTag(obj)
       break
@@ -101,6 +106,7 @@ export default function processCreate (obj) {
     case TYPES.TYPE_OBJECT_CONTACT_FOTO:
       break
     case TYPES.TYPE_OBJECT_USER_GROUP:
+      createDepartment(obj)
       break
     case TYPES.TYPE_OBJECT_INVITE:
       break

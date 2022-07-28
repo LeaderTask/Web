@@ -41,7 +41,9 @@ const computedChecklist = computed(() => {
     return _renderedChecklist
   }
 
-  for (const check of props.checklist.split('\r\n\r\n')) {
+  // нормализуем перенос строки (разные на windows и на mac)
+  const chlist = props.checklist.replaceAll('\r\n', '\n').replaceAll('\r', '\n').replaceAll('\n', '\r\n')
+  for (const check of chlist.split('\r\n\r\n')) {
     _renderedChecklist.push({ checked: !!+check.split('\r\n')[0], text: check.split('\r\n')[1] })
   }
   return _renderedChecklist

@@ -4,7 +4,6 @@ import {
   NAVIGATOR_PUSH_EMPLOYEE
 } from '@/store/actions/navigator'
 import axios from 'axios'
-import { notify } from 'notiwind'
 import * as EMPLOYEE from '../actions/employees'
 
 const state = {
@@ -29,17 +28,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          if (err.response?.data?.error !== "in user's org present employees" && err.response?.data?.error !== 'the employee is the director of the organization' && err.response?.data?.error !== 'the employee is already present in this organization') {
-            notify(
-              {
-                group: 'api',
-                title: 'REST API Error, please make screenshot',
-                action: EMPLOYEE.CREATE_EMPLOYEE_REQUEST,
-                text: err.response?.data ?? err
-              },
-              15000
-            )
-          }
           reject(err)
         })
     })
@@ -80,15 +68,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: EMPLOYEE.CHANGE_EMPLOYEE_NAME,
-              text: err.response?.data || err
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -105,15 +84,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: EMPLOYEE.REMOVE_EMPLOYEE_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           reject(err)
         })
     })

@@ -30,7 +30,6 @@ const updateSettings = () => {
     cal_work_week: settings.value.cal_work_week === true ? 1 : 0,
     compact_mode: settings.value.compact_mode === true ? 1 : 0
   }
-  console.log(data)
   store.dispatch(PATCH_SETTINGS, data).then(resp => {
   })
 }
@@ -53,48 +52,8 @@ const updateSettings = () => {
             for="opt_1"
           >Добавлять задачи в начало списка</label>
         </div>
-        <!--   <a class="ml-2" v-if="settings.add_task_to_begin === true">Вкл.</a>
-                <a class="ml-2" v-if="settings.add_task_to_begin === false">Выкл.</a> -->
       </div>
     </div>
-    <!-- <div class="my-2 mt-[15px]">
-      <div class="flex mt-2">
-        <div class="checkbox">
-          <input
-            id="opt_2"
-            v-model="settings.cal_number_of_first_week"
-            type="checkbox"
-            class="custom-checkbox-orange outline-none"
-            @change="updateSettings()"
-          >
-          <label
-            class="text-sm text-[#606061]"
-            for="opt_2"
-          >Первая неделя с 1 января</label>
-        </div>
-         <a class="ml-2" v-if="settings.cal_number_of_first_week === true">Вкл.</a>
-                <a class="ml-2" v-if="settings.cal_number_of_first_week === false">Выкл.</a>
-      </div>
-    </div> -->
-    <!-- <div class="my-2 mt-[15px]">
-      <div class="flex mt-2">
-        <div class="checkbox">
-          <input
-            id="opt_3"
-            v-model="settings.cal_show_week_number"
-            type="checkbox"
-            class="custom-checkbox-orange outline-none"
-            @change="updateSettings()"
-          >
-          <label
-            class="text-sm text-[#606061]"
-            for="opt_3"
-          >Показывать номера недель в календаре</label>
-        </div>
-        <    <a class="ml-2" v-if="settings.cal_show_week_number === true">Вкл.</a>
-                <a class="ml-2" v-if="settings.cal_show_week_number === false">Выкл.</a>
-      </div>
-    </div> -->
     <div class="my-2 mt-[15px]">
       <div class="flex mt-2">
         <div class="checkbox">
@@ -110,27 +69,6 @@ const updateSettings = () => {
             for="opt_4"
           >Показывать раздел Просрочено</label>
         </div>
-        <!--    <a class="ml-2" v-if="settings.nav_show_overdue === true">Вкл.</a>
-                <a class="ml-2" v-if="settings.nav_show_overdue === false">Выкл.</a> -->
-      </div>
-    </div>
-    <div class="my-2 mt-[15px]">
-      <div class="flex mt-2">
-        <div class="checkbox">
-          <input
-            id="opt_5"
-            v-model="settings.nav_show_summary"
-            type="checkbox"
-            class="custom-checkbox-orange outline-none"
-            @change="updateSettings()"
-          >
-          <label
-            class="text-sm text-[#606061]"
-            for="opt_5"
-          >Показывать количество задач</label>
-        </div>
-        <!--   <a class="ml-2" v-if="settings.nav_show_summary === 1">Вкл.</a>
-                <a class="ml-2" v-if="settings.nav_show_summary === 0">Выкл.</a> -->
       </div>
     </div>
     <div class="my-2 mt-[15px]">
@@ -148,8 +86,6 @@ const updateSettings = () => {
             for="sound"
           >Сопровождать уведомления звуковым сообщением</label>
         </div>
-        <!--   <a class="ml-2" v-if="settings.nav_show_summary === 1">Вкл.</a>
-                <a class="ml-2" v-if="settings.nav_show_summary === 0">Выкл.</a> -->
       </div>
     </div>
     <div class="my-2 mt-[50px]">

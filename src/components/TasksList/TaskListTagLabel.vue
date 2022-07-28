@@ -35,7 +35,7 @@ export default {
       default: 'text-white'
     },
     colorBgClass: {
-      type: String,
+      type: [String, Object],
       default: ''
     },
     colorBgStyle: {
@@ -55,12 +55,12 @@ export default {
       default: '0 0 13 12'
     },
     iconWidth: {
-      type: String,
-      default: '13'
+      type: Number,
+      default: 13
     },
     iconHeight: {
-      type: String,
-      default: '12'
+      type: Number,
+      default: 12
     },
     image: {
       type: String,

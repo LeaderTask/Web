@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { notify } from 'notiwind'
 import {
   USER_CHANGE_PHONE,
   USER_CHANGE_PHOTO,
@@ -27,15 +26,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: USER_REQUEST,
-              text: err.response.data
-            },
-            15000
-          )
           commit(USER_ERROR, err)
           reject(err)
         })
@@ -50,22 +40,12 @@ const actions = {
         method: 'PATCH'
       })
         .then((resp) => {
-          console.log(resp)
           dispatch(USER_REQUEST).then((resp) => {
             commit(USER_CHANGE_PHOTO)
             resolve(resp)
           })
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: USER_CHANGE_PHOTO,
-              text: '123'
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -83,15 +63,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: USER_CHANGE_PHONE,
-              text: '123'
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -101,7 +72,6 @@ const actions = {
 const mutations = {
   [USER_CHANGE_PHOTO]: (state, data) => {
     state.user.foto_link = state.user.foto_link + '&Z=' + Date.now()
-    console.log(state.user.foto_link)
   },
   [USER_REQUEST]: (state) => {
     state.status = 'loading'

@@ -183,7 +183,6 @@
         class="mt-3"
         :comment="task.comment"
         :can-edit="task.uid_customer === user.current_user_uid"
-        @endChangeComment="endChangeComment"
         @changeComment="onChangeComment"
       />
       <Checklist
@@ -198,14 +197,11 @@
         class="flex flex-col max-w-1/2 border-t mt-2 pt-2"
         :class="task.uid_marker !== '00000000-0000-0000-0000-000000000000' ? 'bg-white p-1 mt-1 rounded-lg' : ''"
       >
-        <!-- <p
-        v-if="taskMessages.length > 2 && !showAllMessages"
-        class="text-gray-500 dark:text-gray-100 text-sm text-center cursor-pointer"
-        style="border-bottom: 1px dashed; padding-bottom: 0; width: 125px; margin: 0 auto;"
-        @click="scrollDown"
-      >
-        ПОКАЗАТЬ ВСЕ
-      </p> -->
+        <!-- input -->
+        <TaskPropsInputForm
+          :task="task"
+          @readTask="readTask"
+        />
         <!-- chat -->
         <TaskPropsChatMessages
           v-if="taskMessages?.length"
@@ -221,11 +217,6 @@
           @onPasteEvent="onPasteEvent"
           @deleteFiles="deleteFiles"
           @deleteTaskMsg="deleteTaskMsg"
-          @readTask="readTask"
-        />
-        <!-- input -->
-        <TaskPropsInputForm
-          :task="task"
           @readTask="readTask"
         />
       </div>
@@ -330,8 +321,6 @@
 </template>
 
 <script>
-// import TaskListIconLabel from '@/components/TasksList/TaskListIconLabel.vue'
-// import TaskListTagLabel from '@/components/TasksList/TaskListTagLabel.vue'
 import { copyText } from 'vue3-clipboard'
 import contenteditable from 'vue-contenteditable'
 import linkify from 'vue-linkify'
@@ -341,7 +330,7 @@ import Popper from 'vue3-popper'
 import SetDate from '@/components/Doitnow/SetDate.vue'
 import Checklist from '@/components/Doitnow/Checklist.vue'
 import TaskPropsChatMessages from '@/components/TaskProperties/TaskPropsChatMessages.vue'
-import TaskPropsInputForm from '@/components/TaskProperties/TaskPropsInputForm'
+import TaskPropsInputForm from '@/components/TaskProperties/TaskPropsInputForm.vue'
 import TaskStatus from '@/components/TasksList/TaskStatus.vue'
 import Icon from '@/components/Icon.vue'
 
@@ -380,8 +369,6 @@ import repeat from '@/icons/repeat.js'
 
 export default {
   components: {
-    // TaskListIconLabel,
-    // TaskListTagLabel,
     Icon,
     SetDate,
     TaskPropsChatMessages,
@@ -632,15 +619,13 @@ export default {
     pad2 (n) {
       return (n < 10 ? '0' : '') + n
     },
-    endChangeComment (text) {
-      this.$emit('changeValue', { comment: text })
-    },
     onChangeComment (text) {
       const data = {
         uid: this.task.uid,
         value: text
       }
       this.$store.dispatch(TASK.CHANGE_TASK_COMMENT, data)
+      this.$emit('changeValue', { comment: text })
     },
     _linkify (text) {
       return text.replace(/(lt?:\/\/[^\s]+)/g, '<a href="$1">$1</a>')
@@ -743,7 +728,7 @@ export default {
       this.$store.dispatch(MSG.DELETE_MESSAGE_REQUEST, { uid: uid })
         .then((resp) => {
           this.$store.state.tasks.selectedTask.has_msgs = true
-          this.$store.state.taskfilesandmessages.messages.find(message => message.uid_msg) ? this.$store.state.taskfilesandmessages.messages.find(message => message.uid_msg === uid).deleted = 1 : this.$store.state.taskfilesandmessages.messages.find(message => message.uid === uid).deleted = 1
+          this.$store.state.taskfilesandmessages.messages.find(message => message.uid === uid).deleted = 1
         })
     },
     editTaskName (task) {
@@ -797,7 +782,9 @@ export default {
         done: 0,
         undone: 0
       }
-      for (const line of checklist.split('\r\n\r\n')) {
+      // нормализуем перенос строки (разные на windows и на mac)
+      const chlist = checklist.replaceAll('\r\n', '\n').replaceAll('\r', '\n').replaceAll('\n', '\r\n')
+      for (const line of chlist.split('\r\n\r\n')) {
         data.undone++
         if (+line.split('\r\n')[0] === 1) {
           data.done++
@@ -943,7 +930,6 @@ export default {
       this.$store.dispatch(TASK.CHANGE_TASK_REDELEGATE, data)
         .then(
           resp => {
-            console.log(resp.data)
             this.$store.commit(TASK.SUBTASKS_REQUEST, resp.data)
           }
         )
@@ -989,11 +975,13 @@ export default {
       const seconds = this.pad2(date.getUTCSeconds())
       const dateCreate = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes + ':' + seconds
       const msgtask = this._linkify(msg)
+      const uid = this.uuidv4()
 
       const data = {
         uid_task: this.task.uid,
         uid_creator: this.user.current_user_uid,
-        uid_msg: this.uuidv4(),
+        uid: uid,
+        uid_msg: uid,
         date_create: dateCreate,
         deleted: 0,
         text: msg,

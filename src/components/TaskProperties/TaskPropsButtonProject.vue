@@ -16,6 +16,7 @@
       class="bottom"
     >
       <div
+        v-if="myProjects.length || sharedProjects.length"
         class="popper"
         @click="close"
       >
@@ -46,6 +47,12 @@
             </div>
           </div>
         </div>
+      </div>
+      <div
+        v-else
+        class="text-sm text-center max-w-[176px]"
+      >
+        На данный момент у Вас нет проектов. Их можно добавить на вкладке "Проекты"
       </div>
     </template>
     <div

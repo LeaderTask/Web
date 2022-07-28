@@ -6,6 +6,17 @@
     @cancel="showConfirm = false"
     @yes="deleteTask(selectedTask)"
   />
+  <ModalBox
+    v-if="showNoneInspectable"
+    title="Не все параметры установлены"
+    ok="Хорошо"
+    @ok="showNoneInspectable = false"
+    @cancel="showNoneInspectable = false"
+  >
+    <div class="text-[#7e7e80] text-[13px] leading-[18px] font-roboto whitespace-pre-line">
+      {{ inspectorMissedField }}
+    </div>
+  </ModalBox>
   <ChatLimit
     v-if="showFreeModalChat"
     @cancel="showFreeModalChat = false"
@@ -123,475 +134,11 @@
           @changeDates="onChangeDates"
         />
         <!-- Повтор -->
-        <Popper
+        <TaskRepeat
           v-if="selectedTask.uid_customer === user.current_user_uid"
-          class="popper-repeat"
-          arrow
-          trigger="hover"
           :class="isDark ? 'dark' : 'light'"
-          placement="bottom"
-          :disabled="selectedTask.type !== 1 && selectedTask.type !== 2"
           @click="showFreeModalRepeat = (user.tarif === 'free')"
-        >
-          <template
-            #content="{ close }"
-            class="bottom"
-          >
-            <div class="popper">
-              <div class="text-white body-popover-custom body-repeat-custom rounded-b-lg">
-                <select
-                  ref="SeriesType"
-                  v-model="selectedTask.SeriesType"
-                  class="form-control select-repeat-control"
-                  @change="tabChanged($event)"
-                >
-                  <option value="0">
-                    Не повторять
-                  </option>
-                  <option value="1">
-                    Ежедневно
-                  </option>
-                  <option value="2">
-                    Еженедельно
-                  </option>
-                  <option value="3">
-                    Ежемесячно
-                  </option>
-                  <option value="4">
-                    Ежегодно
-                  </option>
-                </select>
-                <div
-                  v-if="noRepeat = selectedTask.SeriesType === 0 ? true : noRepeat"
-                  class="top-panel-repeat"
-                />
-                <div
-                  v-if="everyDayRepeat = selectedTask.SeriesType === 1 ? true : everyDayRepeat"
-                  class="tab-content-repeat"
-                >
-                  <div class="top-panel-repeat">
-                    <label>Каждый </label>
-                    <div class="every-content">
-                      <div class="form-group">
-                        <input
-                          ref="SeriesAfterCount"
-                          v-model="SeriesAfterCount"
-                          type="number"
-                          class="form-control form-control-select-repeat"
-                          name="repeateveryday"
-                        >
-                      </div>
-                      <div
-                        class="form-group"
-                        style="margin-left: 5px"
-                      >
-                        <select
-                          ref="SeriesAfterType"
-                          v-model="SeriesAfterType"
-                          class="form-control form-control-select-repeat"
-                        >
-                          <option value="1">
-                            День
-                          </option>
-                          <option value="2">
-                            Неделю
-                          </option>
-                          <option value="3">
-                            Месяц
-                          </option>
-                          <option value="4">
-                            Год
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  v-if="everyWeekRepeat = selectedTask.SeriesType === 2 ? true : everyWeekRepeat"
-                  class="tab-content-repeat"
-                >
-                  <div class="top-panel-repeat">
-                    <div class="repeat-seleclist">
-                      <div>
-                        <label>Каждую </label>
-                        <select
-                          ref="SeriesWeekCount"
-                          v-model="SeriesWeekCount"
-                          class="form-control form-control-width-100"
-                          name=""
-                        >
-                          <option
-                            v-for="item in 365"
-                            :key="item"
-                            :value="item"
-                          >
-                            {{ item }} неделю
-                          </option>
-                        </select>
-                      </div>
-                      <div
-                        class="form-group"
-                        style="margin-left: 5px"
-                      >
-                        <div
-                          v-for="opt in myOptions"
-                          :key="opt"
-                          :value="opt.id"
-                          class="form_checkbox_btn-custom"
-                        >
-                          <input
-                            :id="'opt_' + opt.id"
-                            ref="SeriesWeek"
-                            v-model="SeriesWeek"
-                            type="checkbox"
-                            name="checkbox"
-                            :value="opt.id"
-                          >
-                          <label :for="'opt_' +opt.id">{{ opt.text }}</label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  v-if="everyMonthRepeat = selectedTask.SeriesType === 3 ? true : everyMonthRepeat"
-                  class="tab-content-repeat"
-                >
-                  <div class="top-panel-repeat">
-                    <div class="flex repeat-seleclist">
-                      <div class="form-group">
-                        <select
-                          ref="SeriesMonthType"
-                          v-model="SeriesMonthType"
-                          class="form-control form-control-select-repeat"
-                          style="margin-right: 5px"
-                          name=""
-                          @change="changeEveryMonthType(SeriesMonthType)"
-                        >
-                          <option value="1">
-                            Каждый
-                          </option>
-                          <option value="2">
-                            Первый
-                          </option>
-                          <option value="3">
-                            Второй
-                          </option>
-                          <option value="4">
-                            Третий
-                          </option>
-                          <option value="5">
-                            Четвертый
-                          </option>
-                          <option value="6">
-                            Последний
-                          </option>
-                        </select>
-                      </div>
-                      <div
-                        class="form-group everymonthtype"
-                        :class="{showselect:ActiveSelect==1}"
-                      >
-                        <select
-                          ref="SeriesMonthCount"
-                          v-model="SeriesMonthCount"
-                          class="form-control form-control-select-repeat"
-                          name=""
-                        >
-                          <option
-                            v-for="item in 12"
-                            :key="item"
-                            :value="item"
-                          >
-                            {{ item }} месяц
-                          </option>
-                        </select>
-                      </div>
-                      <div
-                        class="everymonthtype"
-                        :class="{showselect:ActiveSelect>1}"
-                      >
-                        <div class="form-group">
-                          <select
-                            ref="SeriesMonthDayOfWeek"
-                            v-model="SeriesMonthDayOfWeek"
-                            class="form-control form-control-select-repeat"
-                          >
-                            <option
-                              v-for="(item, value) in days.filter(v=>v !== '')"
-                              :key="value>0"
-                              :value="value+1"
-                            >
-                              {{ item }}
-                            </option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      class="form-group everymonthtype"
-                      :class="{showselect:ActiveSelect>1}"
-                    >
-                      <select
-                        ref="SeriesMonthCount"
-                        v-model="SeriesMonthCount"
-                        class="form-control select-repeat-control"
-                        name=""
-                      >
-                        <option
-                          v-for="item in 12"
-                          :key="item"
-                          :value="item"
-                        >
-                          Каждый {{ item }} месяц
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="everymonth-content">
-                    <div
-                      class="everymonthtype"
-                      :class="{showselect:ActiveSelect==1}"
-                    >
-                      <div class="form-group">
-                        <div class="form-everymonth-container">
-                          <div
-                            v-for="day in 28"
-                            :key="day"
-                            class="form_radio_btn-custom"
-                          >
-                            <input
-                              :id="'m1_' + day"
-                              ref="SeriesMonthDay"
-                              v-model="SeriesMonthDay"
-                              type="radio"
-                              name="radio"
-                              :value="day"
-                              :checked="selectedTask.SeriesMonthDay === day"
-                            >
-                            <label :for="'m1_' + day">{{ day }}</label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  v-if="everyYearRepeat = selectedTask.SeriesType === 4 ? true : everyYearRepeat"
-                  class="tab-content-repeat"
-                >
-                  <div class="top-panel-repeat">
-                    <div class="flex repeat-seleclist">
-                      <div
-                        class="form-group"
-                        style="margin-right: 5px;"
-                        aria-valuemax="SeriesYearType"
-                      >
-                        <select
-                          ref="SeriesYearType"
-                          v-model="SeriesYearType"
-                          class="form-control form-control-select-repeat"
-                          name="SeriesYearType"
-                          @change="changeEveryYearType(SeriesYearType)"
-                        >
-                          <option value="1">
-                            Каждый
-                          </option>
-                          <option value="2">
-                            Первый
-                          </option>
-                          <option value="3">
-                            Второй
-                          </option>
-                          <option value="4">
-                            Третий
-                          </option>
-                          <option value="5">
-                            Четвертый
-                          </option>
-                          <option value="6">
-                            Последний
-                          </option>
-                        </select>
-                      </div>
-                      <div
-                        class="everyyeartype"
-                        :class="{showselect:ActiveYartype == 1}"
-                      >
-                        <div class="form-group">
-                          <select
-                            ref="SeriesYearMonth"
-                            v-model="SeriesYearMonth"
-                            class="form-control form-control-select-repeat"
-                            name=""
-                          >
-                            <option
-                              v-for="(item, value) in months"
-                              :key="value"
-                              :value="value+1"
-                            >
-                              {{ item }}
-                            </option>
-                          </select>
-                        </div>
-                      </div>
-                      <div
-                        class="everyyeartype"
-                        :class="{showselect:ActiveYartype>1}"
-                      >
-                        <div class="form-group">
-                          <select
-                            ref="SeriesYearDayOfWeek"
-                            v-model="SeriesYearDayOfWeek"
-                            class="form-control form-control-select-repeat"
-                          >
-                            <option
-                              v-for="(item, value) in days.filter(v=>v!=='')"
-                              :key="value"
-                              :value="value+1"
-                            >
-                              {{ item }}
-                            </option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="everyyear-content">
-                    <div
-                      class="everyyeartype"
-                      :class="{showselect:ActiveYartype == 1}"
-                    >
-                      <div class="form-group">
-                        <div class="form-everyyear-container">
-                          <div
-                            v-for="day in 28"
-                            :key="day"
-                            class="form_radio_btn-custom"
-                          >
-                            <input
-                              :id="'y1_' + day"
-                              ref="SeriesYearMonthDay"
-                              v-model="SeriesYearMonthDay"
-                              type="radio"
-                              name="radio"
-                              :value="day"
-                              :checked="selectedTask.SeriesYearMonthDay===day"
-                            >
-                            <label :for="'y1_' + day">{{ day }}</label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    class="everyyearbuttontype"
-                    :class="{showselect:ActiveYartype>1}"
-                  >
-                    <div class="form-group">
-                      <select
-                        ref="SeriesYearMonth"
-                        v-model="SeriesYearMonth"
-                        class="form-control select-repeat-control"
-                      >
-                        <option
-                          v-for="(month,value) in months"
-                          :key="value"
-                          :value="value+1"
-                          class="btn-month-year"
-                        >
-                          {{ month.substr(0,3) }}
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="ready-button">
-                  <div class="form-group">
-                    <button
-                      class="btn-save-repeat"
-                      @click.stop="close"
-                      @click="SaveRepeat"
-                    >
-                      Готово
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
-          <div>
-            <div
-              v-if="selectedTask.SeriesEnd!==''"
-              class="mt-3 tags-custom dark:bg-gray-800 dark:text-gray-100 project-hover-close"
-              :style="{ 'cursor': selectedTask.type !== 1 && selectedTask.type !== 2 ? 'default' : 'pointer' }"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 92 80"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                :style="{ 'cursor': selectedTask.type !== 1 && selectedTask.type !== 2 ? 'default' : 'pointer' }"
-              >
-                <path
-                  d="M15.595 71.68H76.4048V66.5015C76.4048 64.3145 78.1735 62.5415 80.3554 62.5415C82.5373 62.5415 84.306 64.3145 84.306 66.5015V71.68C84.306 76.0541 80.7685 79.6 76.4048 79.6H15.595C11.2313 79.6 7.69378 76.0541 7.69378 71.68L7.69378 40H2.83583C0.728566 40 -0.380779 37.4961 1.03222 35.929L9.84079 26.1602C10.8061 25.0897 12.4827 25.0897 13.448 26.1602L22.2566 35.929C23.6696 37.4961 22.5602 40 20.453 40H15.595L15.595 71.68Z"
-                  fill="#5D94F7"
-                  fill-opacity="1"
-                />
-                <path
-                  d="M76.4048 8.32H15.595V13.4985C15.595 15.6855 13.8263 17.4585 11.6444 17.4585C9.46253 17.4585 7.69378 15.6855 7.69378 13.4985V8.32C7.69378 3.94591 11.2313 0.400002 15.595 0.400002H76.4048C80.7685 0.400002 84.306 3.9459 84.306 8.32V40H89.164C91.2712 40 92.3806 42.5039 90.9676 44.071L82.159 53.8398C81.1937 54.9103 79.5171 54.9103 78.5518 53.8398L69.7432 44.071C68.3302 42.5039 69.4396 40 71.5469 40H76.4048V8.32Z"
-                  fill="#5D94F7"
-                  fill-opacity="1"
-                />
-              </svg>
-              <span v-if="selectedTask.SeriesType===0">Не повторять</span>
-              <span v-if="selectedTask.SeriesType===1"><span v-if="selectedTask.SeriesAfterType===1"><span v-if="selectedTask.SeriesAfterCount===1">Ежедневно: Каждый 1 день.</span><span v-else>Ежедневно: Каждый {{ selectedTask.SeriesAfterCount }} день.</span></span><span v-else-if="selectedTask.SeriesAfterType===2"><span v-if="selectedTask.SeriesAfterCount===1">Ежедневно:  </span><span v-else>Каждый {{ selectedTask.SeriesAfterCount }} неделю.</span></span><span v-else-if="selectedTask.SeriesAfterType===3"><span v-if="selectedTask.SeriesAfterCount===1">Ежедневно:  </span><span v-else>Ежедневно:  Каждый {{ selectedTask.SeriesAfterCount }} месяц.</span></span><span v-else-if="selectedTask.SeriesAfterType===4"><span v-if="selectedTask.SeriesAfterCount===1">Ежедневно:  </span><span v-else>Каждый {{ selectedTask.SeriesAfterCount }} год.</span></span> </span>
-              <span v-if="selectedTask.SeriesType===2">Еженедельно: Каждую {{ selectedTask.SeriesWeekCount }} неделю, по:
-                <span v-if="selectedTask.SeriesWeekMon===1">Пн. </span>
-                <span v-if="selectedTask.SeriesWeekTue===1">Вт. </span>
-                <span v-if="selectedTask.SeriesWeekWed===1">Ср. </span>
-                <span v-if="selectedTask.SeriesWeekThu===1">Чт. </span>
-                <span v-if="selectedTask.SeriesWeekFri===1">Пт. </span>
-                <span v-if="selectedTask.SeriesWeekSat===1">Сб. </span>
-                <span v-if="selectedTask.SeriesWeekSun===1">Вс. </span>
-              </span>
-              <span v-if="selectedTask.SeriesType===3">
-                <span v-if="selectedTask.SeriesMonthType===1">Ежемесячно: Каждый {{ selectedTask.SeriesMonthCount }} месяц {{ selectedTask.SeriesMonthDay }} числа</span>
-                <span v-else>Ежемесячно: {{ firstcount[selectedTask.SeriesMonthWeekType] }}
-                  <span>{{ day[selectedTask.SeriesMonthDayOfWeek] }} каждый {{ selectedTask.SeriesMonthCount }} месяц</span>
-                </span>
-              </span>
-              <span v-if="selectedTask.SeriesType===4">
-                <span v-if="selectedTask.SeriesYearType===1">Ежегодно: Каждый год {{ selectedTask.SeriesYearMonthDay }}  {{ months[selectedTask.SeriesYearMonth-1] }}</span>
-                <span v-else>Ежегодно:
-                  Каждый {{ months[selectedTask.SeriesYearMonth-1] }} {{ firstcount[selectedTask.SeriesYearWeekType] }}
-                  {{ day[selectedTask.SeriesYearDayOfWeek] }}
-                </span>
-              </span>
-              <button
-                v-if="selectedTask.SeriesType > 0 && (selectedTask.type === 1 || selectedTask.type === 2)"
-                class="btn-close-popover"
-                @click="resetRepeat"
-              >
-                <svg
-                  width="5"
-                  height="5"
-                  viewBox="0 0 16 15"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M14.8483 2.34833C15.317 1.8797 15.317 1.11991 14.8483 0.651277C14.3797 0.182647 13.6199 0.182647 13.1513 0.651277L7.99981 5.80275L2.84833 0.651277C2.3797 0.182647 1.61991 0.182647 1.15128 0.651277C0.682647 1.11991 0.682647 1.8797 1.15128 2.34833L6.30275 7.4998L1.15128 12.6513C0.682647 13.1199 0.682647 13.8797 1.15128 14.3483C1.61991 14.817 2.3797 14.817 2.84833 14.3483L7.99981 9.19686L13.1513 14.3483C13.6199 14.817 14.3797 14.817 14.8483 14.3483C15.317 13.8797 15.317 13.1199 14.8483 12.6513L9.69686 7.4998L14.8483 2.34833Z"
-                    fill="black"
-                    fill-opacity="0.5"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </Popper>
+        />
         <!-- Кнопка Проект -->
         <TaskPropsButtonProject
           v-if="(selectedTask.type === 1 || selectedTask.type === 2 || (selectedTask.uid_project !== '00000000-0000-0000-0000-000000000000')) && ((selectedTask.uid_customer === user?.current_user_uid) && (selectedTask.status !== 1))"
@@ -641,6 +188,11 @@
           :focus="isInFocus"
           @toggle-focus="changeFocus(selectedTask.uid, isInFocus ? 0 : 1)"
         />
+        <!-- Передать инспектору -->
+        <TaskPropsButtonInspector
+          v-if="(selectedTask.type === 1 || selectedTask.type === 2) && !isInspectable"
+          @click="addInspector"
+        />
         <!-- Три точки -->
         <TaskPropsButtonDots
           :show-delete="selectedTask.type === 1 || selectedTask.type === 2"
@@ -664,10 +216,9 @@
       />
       <!-- Comment -->
       <TaskPropsCommentEditor
-        class="mt-3 h-32"
         :comment="selectedTask.comment ?? ''"
         :can-edit="canEditComment"
-        @endChangeComment="endChangeComment"
+        @scrollToEnd="scrollToEnd"
         @changeComment="onChangeComment"
       />
       <!-- Show all -->
@@ -686,7 +237,6 @@
       <TaskPropsChatMessages
         v-if="taskMessages?.length && status=='success'"
         id="content"
-        class="mt-3 h-3/6"
         :task-messages="taskMessages"
         :current-user-uid="user?.current_user_uid"
         :show-all-messages="showAllMessages"
@@ -699,19 +249,20 @@
       />
     </div>
   </div>
-  <div class="w-full">
+  <div class="w-full relative">
     <img
       v-if="isloading"
+      class="mt-[8px] h-[40px]"
       src="/ajaxloader.gif"
     >
     <div
       v-if="currentAnswerMessageUid"
-      class="quote-request border-l-2 border-[#7E7E80] mt-2 h-9"
+      class="quote-request border-l-2 border-[#7E7E80] mt-[8px] h-[40px]"
     >
       <div class="flex flex-row items-center">
-        <div class="grow width100without20">
+        <div class="grow w-[calc(100%-20px)]">
           <div
-            class="mx-1"
+            class="mx-[4px]"
           >
             <p class="text-[11px] leading-[16px] overflow-hidden text-black text-ellipsis whitespace-nowrap">
               {{ messageQuoteUser }}
@@ -722,10 +273,11 @@
           </div>
         </div>
         <div
-          class="flex-none p-0.5 relative bottom-2"
+          class="flex-none"
           @click="onAnswerMessage('')"
         >
           <svg
+            class="m-[2px]"
             width="18"
             height="18"
             viewBox="0 0 18 18"
@@ -742,114 +294,20 @@
         </div>
       </div>
     </div>
-    <div
-      id="drop-area"
-      class="input-group bg-gray-100 rounded-[10px] mt-2"
-    >
-      <span class="input-group-addon input-group-attach dark:bg-gray-800 dark:text-gray-100">
-        <div class="example-1">
-          <label
-            v-if="user.tarif !== 'free'"
-            class="label"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1.94475 17.443C3.17452 18.6611 4.78671 19.2627 6.3989 19.2627C8.0111 19.2627 9.62329 18.6537 10.8531 17.4356L18.5841 9.77812C20.3388 8.04015 20.3388 5.21038 18.5841 3.47241C17.7368 2.63313 16.6045 2.16522 15.4047 2.16522C14.2049 2.16522 13.0726 2.6257 12.2253 3.47241L5.12415 10.506C4.07435 11.5458 4.07435 13.2466 5.12415 14.2865C6.17395 15.3263 7.89112 15.3263 8.94092 14.2865L13.6125 9.65929C13.965 9.31021 13.965 8.74574 13.6125 8.39666C13.2601 8.04758 12.6902 8.04758 12.3378 8.39666L7.67366 13.0313C7.32123 13.3803 6.75134 13.3803 6.3989 13.0313C6.04647 12.6822 6.04647 12.1177 6.3989 11.7686L13.4926 4.74246C14.0025 4.23741 14.6773 3.96261 15.4047 3.96261C16.1246 3.96261 16.8069 4.23741 17.3168 4.74246C18.3666 5.78228 18.3666 7.48311 17.3168 8.52292L9.5783 16.1804C7.82364 17.9184 4.96668 17.9184 3.21201 16.1804C2.36467 15.3411 1.89976 14.2196 1.89976 13.0313C1.89976 11.8429 2.36467 10.7214 3.21951 9.88211L10.943 2.22463C11.2955 1.87555 11.2955 1.31108 10.943 0.962005C10.5906 0.612925 10.0207 0.612925 9.66829 0.962005L1.94475 8.61948C0.752474 9.79298 0.100098 11.3601 0.100098 13.0313C0.100098 14.695 0.752474 16.2621 1.94475 17.443Z"
-                fill="black"
-                fill-opacity="0.5"
-              />
-            </svg>
-            <input
-              id="file_attach"
-              ref="file_attach"
-              type="file"
-              multiple="multiple"
-              name="file_attach"
-              @change="createTaskFile($event)"
-            >
-          </label>
-          <svg
-            v-if="user.tarif === 'free'"
-            class="mx-3.5 cursor-pointer"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            @click="showFreeModalChat = true"
-          >
-            <path
-              d="M1.94475 17.443C3.17452 18.6611 4.78671 19.2627 6.3989 19.2627C8.0111 19.2627 9.62329 18.6537 10.8531 17.4356L18.5841 9.77812C20.3388 8.04015 20.3388 5.21038 18.5841 3.47241C17.7368 2.63313 16.6045 2.16522 15.4047 2.16522C14.2049 2.16522 13.0726 2.6257 12.2253 3.47241L5.12415 10.506C4.07435 11.5458 4.07435 13.2466 5.12415 14.2865C6.17395 15.3263 7.89112 15.3263 8.94092 14.2865L13.6125 9.65929C13.965 9.31021 13.965 8.74574 13.6125 8.39666C13.2601 8.04758 12.6902 8.04758 12.3378 8.39666L7.67366 13.0313C7.32123 13.3803 6.75134 13.3803 6.3989 13.0313C6.04647 12.6822 6.04647 12.1177 6.3989 11.7686L13.4926 4.74246C14.0025 4.23741 14.6773 3.96261 15.4047 3.96261C16.1246 3.96261 16.8069 4.23741 17.3168 4.74246C18.3666 5.78228 18.3666 7.48311 17.3168 8.52292L9.5783 16.1804C7.82364 17.9184 4.96668 17.9184 3.21201 16.1804C2.36467 15.3411 1.89976 14.2196 1.89976 13.0313C1.89976 11.8429 2.36467 10.7214 3.21951 9.88211L10.943 2.22463C11.2955 1.87555 11.2955 1.31108 10.943 0.962005C10.5906 0.612925 10.0207 0.612925 9.66829 0.962005L1.94475 8.61948C0.752474 9.79298 0.100098 11.3601 0.100098 13.0313C0.100098 14.695 0.752474 16.2621 1.94475 17.443Z"
-              fill="black"
-              fill-opacity="0.5"
-            />
-          </svg>
-        </div>
-      </span>
-      <textarea
-        v-if="user.tarif !== 'free'"
-        ref="taskMsgEdit"
-        v-model="taskMsg"
-        class="form-control mt-[6px] mb-[8px] text-group-design task-msg overflow-auto scroll-style dark:bg-gray-800 dark:text-gray-100 focus:ring-0"
-        placeholder="Напишите сообщение..."
-        rows="58"
-        @input="onInputTaskMsg"
-        @keydown.enter.exact.prevent="sendTaskMsg()"
-        @keydown.enter.shift.exact.prevent="addNewLineTaskMsg"
-      />
-      <div
-        v-if="user.tarif === 'free'"
-        @click="showFreeModalChat = true"
-      >
-        <textarea
-          ref="taskMsgEdit"
-          v-model="taskMsg"
-          class="form-control mt-[6px] mb-[8px] text-group-design task-msg overflow-auto scroll-style dark:bg-gray-800 dark:text-gray-100 focus:ring-0"
-          placeholder="Напишите сообщение..."
-          rows="58"
-          disabled
-        />
-      </div>
-      <span class="input-group-addon input-group-btn-send dark:bg-gray-800 dark:text-gray-100">
-        <button
-          type="button"
-          name="btn-send"
-          class="btn-send-custom"
-          @click="sendTaskMsg()"
-        >
-          <svg
-            width="32"
-            class="mr-2"
-            height="32"
-            viewBox="0 0 32 32"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <rect
-              width="32"
-              height="32"
-              rx="8"
-              fill="#E0E1E3"
-            />
-            <path
-              d="M16 8L9 15L9.987 15.987L15.3 10.681V24.8H16.7V10.681L22.013 15.987L23 15L16 8Z"
-              fill="#4C4C4D"
-            />
-          </svg>
-        </button>
-      </span>
-    </div>
+    <CardMessageInput
+      v-model="taskMsg"
+      class="mt-[16px]"
+      :can-add-files="user.tarif !== 'free'"
+      @cantWriteMessages="showFreeModalChat = true"
+      @createCardMessage="sendTaskMsg"
+      @createCardFile="createTaskFile"
+      @onPaste="onPasteEvent"
+      @changeHeight="onChangeChatInputHeight"
+    />
   </div>
 </template>
 
 <script>
-import Popper from 'vue3-popper'
 import close from '@/icons/close.js'
 import { CREATE_MESSAGE_REQUEST, DELETE_MESSAGE_REQUEST } from '@/store/actions/taskmessages'
 import { CREATE_FILES_REQUEST, DELETE_FILE_REQUEST } from '@/store/actions/taskfiles'
@@ -862,7 +320,9 @@ import { maska } from 'maska'
 
 import { shouldAddTaskIntoList } from '@/websync/utils'
 import ModalBoxDelete from '@/components/Common/ModalBoxDelete.vue'
+import ModalBox from '@/components/modals/ModalBox.vue'
 import TaskPropsButtonDots from '@/components/TaskProperties/TaskPropsButtonDots.vue'
+import TaskPropsButtonInspector from '@/components/TaskProperties/TaskPropsButtonInspector.vue'
 import TaskPropsButtonFocus from '@/components/TaskProperties/TaskPropsButtonFocus.vue'
 import TaskPropsChatMessages from '@/components/TaskProperties/TaskPropsChatMessages.vue'
 import TaskPropsCommentEditor from '@/components/TaskProperties/TaskPropsCommentEditor.vue'
@@ -878,10 +338,15 @@ import RepeatLimit from '@/components/properties/RepeatLimit'
 import ChecklistLimit from '@/components/properties/ChecklistLimit'
 import ChatLimit from '@/components/properties/ChatLimit'
 import PerformerLimit from '@/components/TaskProperties/PerformerLimit'
+import CardMessageInput from '@/components/CardProperties/CardMessageInput'
+import TaskRepeat from '@/components/TaskProperties/TaskRepeat'
+import { computed } from 'vue'
 
 export default {
   components: {
+    CardMessageInput,
     TaskPropsButtonDots,
+    TaskPropsButtonInspector,
     TaskPropsButtonFocus,
     TaskPropsChatMessages,
     PerformerLimit,
@@ -895,10 +360,11 @@ export default {
     TaskPropsButtonPerform,
     TaskPropsButtonProject,
     TaskPropsButtonColor,
-    Popper,
     ModalBoxDelete,
+    ModalBox,
     TaskPropsCommentEditor,
-    TaskPropsChecklist
+    TaskPropsChecklist,
+    TaskRepeat
   },
   directives: {
     linkify,
@@ -908,6 +374,7 @@ export default {
     return {
       shouldAddTaskIntoList,
       close,
+      isloading: false,
       showAllMessages: false,
       showFreeModalCheck: false,
       showFreeModalRepeat: false,
@@ -916,33 +383,18 @@ export default {
       timeStartActive: false,
       checklistshow: false,
       checklistSavedNow: false,
-      noRepeat: false,
-      everyDayRepeat: false,
-      everyWeekRepeat: false,
-      everyMonthRepeat: false,
-      everyYearRepeat: false,
       isEditable: false,
       isEditableTaskName: false,
       showOnlyFiles: false,
       showConfirm: false,
+      showNoneInspectable: false,
+      inspectorMissedField: '',
 
       currentAnswerMessageUid: '',
       taskMsg: '',
       files: [], // replace this with const in function createTaskFiles
 
-      months: ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'],
-      days: ['', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'],
       day: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
-      firstcount: ['последний', 'первый', 'второй', 'третий', 'четвертый', 'последний'],
-      myOptions: [
-        { id: 'mon', text: 'Пн' },
-        { id: 'tue', text: 'Вт' },
-        { id: 'wed', text: 'Ср' },
-        { id: 'thu', text: 'Чт' },
-        { id: 'fri', text: 'Пт' },
-        { id: 'sat', text: 'Сб' },
-        { id: 'sun', text: 'Вс' }
-      ],
 
       range: {
         start: this.selectedTask?.term_customer === '' ? new Date() : new Date(this.selectedTask?.customer_date_begin),
@@ -950,46 +402,16 @@ export default {
       },
       timeStart: this.selectedTask?.term_customer === '' ? '' : new Date(this.selectedTask?.customer_date_begin).toLocaleTimeString(),
       timeEnd: this.selectedTask?.term_customer === '' ? '' : new Date(this.selectedTask?.customer_date_end).toLocaleTimeString(),
-      SeriesType: this.selectedTask?.SeriesType,
-      SeriesAfterCount: this.selectedTask?.SeriesAfterCount,
-      SeriesAfterType: this.selectedTask?.SeriesAfterType,
-      SeriesWeekCount: this.selectedTask?.SeriesWeekCount,
-      SeriesMonthType: this.selectedTask?.SeriesMonthType === 1 ? this.selectedTask?.SeriesMonthType : this.selectedTask?.SeriesMonthWeekType,
-      SeriesMonthCount: this.selectedTask?.SeriesMonthCount ?? 1,
-      SeriesMonthDay: this.selectedTask?.SeriesMonthDay,
-      SeriesMonthWeekType: this.selectedTask?.SeriesMonthWeekType,
-      SeriesMonthDayOfWeek: this.selectedTask?.SeriesMonthDayOfWeek,
-      SeriesYearType: this.selectedTask?.SeriesYearType === 1 ? this.selectedTask?.SeriesYearType : this.selectedTask?.SeriesYearWeekType,
-      SeriesYearMonth: this.selectedTask?.SeriesYearMonth === 0 ? '1' : this.selectedTask?.SeriesYearMonth,
-      SeriesYearMonthDay: this.selectedTask?.SeriesYearMonthDay,
-      SeriesYearWeekType: this.selectedTask?.SeriesYearWeekType,
-      SeriesYearDayOfWeek: this.selectedTask?.SeriesYearDayOfWeek,
-      ActiveSelect: this.selectedTask?.SeriesMonthType,
-      ActiveYartype: this.selectedTask?.SeriesYearType,
-      SeriesWeekMon: this.selectedTask?.SeriesWeekMon === 1 ? 'mon' : ' ',
-      SeriesWeekTue: this.selectedTask?.SeriesWeekTue === 1 ? 'tue' : ' ',
-      SeriesWeekWed: this.selectedTask?.SeriesWeekWed === 1 ? 'wed' : ' ',
-      SeriesWeekThu: this.selectedTask?.SeriesWeekThu === 1 ? 'thu' : ' ',
-      SeriesWeekFri: this.selectedTask?.SeriesWeekFri === 1 ? 'fri' : ' ',
-      SeriesWeekSat: this.selectedTask?.SeriesWeekSat === 1 ? 'sat' : ' ',
-      SeriesWeekSun: this.selectedTask?.SeriesWeekSun === 1 ? 'sun' : ' ',
-      SeriesWeek: [
-        this.selectedTask?.SeriesWeekMon === 1 ? 'mon' : ' ',
-        this.selectedTask?.SeriesWeekTue === 1 ? 'tue' : ' ',
-        this.selectedTask?.SeriesWeekWed === 1 ? 'wed' : ' ',
-        this.selectedTask?.SeriesWeekThu === 1 ? 'thu' : ' ',
-        this.selectedTask?.SeriesWeekFri === 1 ? 'fri' : ' ',
-        this.selectedTask?.SeriesWeekSat === 1 ? 'sat' : ' ',
-        this.selectedTask?.SeriesWeekSun === 1 ? 'sun' : ' '
-      ]
+      sendChatEditHeight: 44
     }
   },
   computed: {
+    employees () { return this.$store.state.employees.employees },
     taskMessages () { return this.$store.state.taskfilesandmessages.messages },
     uploadStarted () { return this.$store.state.taskfilesandmessages.uploadStarted },
     selectedTask () { return this.$store.state.tasks.selectedTask },
+    selectedTaskUid () { return this.$store.state.tasks.selectedTask?.uid || '' },
     isPropertiesMobileExpanded () { return this.$store.state.isPropertiesMobileExpanded },
-    taskMessagesAndFiles () { return this.$store.state.taskfilesandmessages.messages },
     user () { return this.$store.state.user.user },
     status () { return this.$store.state.taskfilesandmessages.status },
     tasks () { return this.$store.state.tasks.newtasks },
@@ -998,6 +420,9 @@ export default {
     daysWithTasks () { return this.$store.state.tasks.daysWithTasks },
     navStack () { return this.$store.state.navbar.navStack },
     isInFocus () { return this.selectedTask?.focus === 1 },
+    isInspectable () {
+      return this.selectedTask?.is_inspectable ?? false
+    },
     isAccessVisible () {
       if (this.selectedTask.emails) return true
       if (this.selectedTask.type === 1 || this.selectedTask.type === 2) return true
@@ -1005,35 +430,49 @@ export default {
     },
     modalBoxDeleteText () {
       let text = 'Вы действительно хотите удалить задачу?'
-      if (this.tasks[this.selectedTask.uid]?.children?.length > 0) {
-        text = 'Вы действительно хотите удалить задачу с подзадачами в количестве: ' + this.tasks[this.selectedTask.uid]?.children?.length + '?'
+      if (this.tasks[this.selectedTaskUid]?.children?.length > 0) {
+        text = 'Вы действительно хотите удалить задачу с подзадачами в количестве: ' + this.tasks[this.selectedTaskUid]?.children?.length + '?'
       }
       return text
     },
     canEditChecklist () { return (this.selectedTask.type === 1 || this.selectedTask.type === 2) && this.user.tarif !== 'free' },
     canCheckChecklist () { return (this.canEditChecklist || this.selectedTask.type === 3) && this.user.tarif !== 'free' },
-    canEditComment () { return (this.selectedTask.type === 1 || this.selectedTask.type === 2) }
+    canEditComment () { return (this.selectedTask.type === 1 || this.selectedTask.type === 2) },
+    messageQuoteUser () {
+      if (!this.currentAnswerMessageUid) return ''
+      const quotedMessage = this.taskMessages.find(message => message.uid === this.currentAnswerMessageUid)
+      if (!quotedMessage) return ''
+      return this.employees[quotedMessage.uid_creator]?.name ?? '???'
+    },
+    messageQuoteString () {
+      if (!this.currentAnswerMessageUid) return ''
+      const quotedMessage = this.taskMessages.find(message => message.uid === this.currentAnswerMessageUid)
+      if (!quotedMessage) return ''
+      let msg = quotedMessage.msg.trim()
+      msg = msg.replaceAll('&amp;', '&')
+      msg = msg.replaceAll('&lt;', '<')
+      msg = msg.replaceAll('&gt;', '>')
+      return msg
+    }
   },
   watch: {
-    selectedTask (newval, oldval) {
+    selectedTaskUid (newval, oldval) {
       this.showOnlyFiles = false
       this.showAllMessages = false
       this.currentAnswerMessageUid = ''
+      this.taskMsg = ''
+      // пересчитываем высоту плашки отправки сообщения
       this.$nextTick(function () {
         this.onInputTaskMsg()
       })
     }
   },
-  mounted: function () {
-    this.$nextTick(function () {
-      // Код, который будет запущен только после
-      // отображения всех представлений
-      this.$refs.taskMsgEdit.addEventListener('paste', this.onPasteEvent, { once: true })
-    })
-  },
   methods: {
     closeProperties () {
       this.$store.dispatch('asidePropertiesToggle', false)
+    },
+    scrollToEnd () {
+      document.getElementById('aside-right').scrollTo(0, document.getElementById('taskPropsCommentEditor').scrollHeight)
     },
     pad2 (n) {
       return (n < 10 ? '0' : '') + n
@@ -1049,15 +488,45 @@ export default {
           this.selectedTask.focus = value
         })
     },
+    addInspector () {
+      let message = ''
+      if (this.selectedTask.type !== 2) message += 'Исполнителя\n'
+      if (this.selectedTask.term_user === '') message += 'Срок\n'
+      if (message) {
+        this.inspectorMissedField = 'Пожалуйста, установите:\n' + message
+        this.showNoneInspectable = true
+        return
+      }
+      this.$store.dispatch('CREATE_INSPECTOR_TASK', {
+        uid: this.selectedTask.uid,
+        uid_customer: this.selectedTask.uid_customer,
+        is_inspectable: 1,
+        taskJson: JSON.stringify(this.selectedTask)
+      }).then((resp) => {
+        this.selectedTask.is_inspectable = true
+        // update both, performer and customer in inspector service
+        const performer = this.employees[this.selectedTask.uid_performer]
+        const customer = this.employees[this.selectedTask.uid_customer]
+        this.$store.dispatch('CREATE_OR_UPDATE_INSPECTOR_USER', {
+          uid: performer.uid,
+          userJson: JSON.stringify(performer)
+        })
+        this.$store.dispatch('CREATE_OR_UPDATE_INSPECTOR_USER', {
+          uid: customer.uid,
+          userJson: JSON.stringify(customer)
+        })
+      })
+      console.log('addInspector')
+    },
     createTaskFile (event) {
-      this.files = event.target.files
+      this.files = event.target.files ? event.target.files : event.dataTransfer.files
       const formData = new FormData()
       for (let i = 0; i < this.files.length; i++) {
         const file = this.files[i]
         formData.append('files[' + i + ']', file)
       }
       const data = {
-        uid_task: this.selectedTask.uid,
+        uid_task: this.selectedTaskUid,
         name: formData
       }
 
@@ -1098,7 +567,7 @@ export default {
         this.$store.dispatch('asidePropertiesToggle', false)
       }
       const data = {
-        uid: this.selectedTask.uid
+        uid: this.selectedTaskUid
       }
       this.$store.dispatch(TASK.REMOVE_TASK, data.uid)
         .then(() => {
@@ -1117,8 +586,8 @@ export default {
     deleteTaskMsg (uid) {
       this.$store.dispatch(DELETE_MESSAGE_REQUEST, { uid: uid }).then(
         resp => {
-          this.selectedTask.has_msgs = true
-          this.taskMessages.find(message => message.uid_msg) ? this.taskMessages.find(message => message.uid_msg === uid).deleted = 1 : this.taskMessages.find(message => message.uid === uid).deleted = 1
+          const message = this.taskMessages.find(message => message.uid === uid)
+          if (message) message.deleted = 1
         })
     },
     deleteFiles (uid) {
@@ -1126,8 +595,11 @@ export default {
     },
     changeName (event) {
       const data = {
-        uid: this.selectedTask.uid,
-        value: event.target.innerText
+        uid: this.selectedTaskUid,
+        value: event.target.innerText.trim()
+      }
+      if (data.value.length <= 0) {
+        data.value = 'Задача без названия'
       }
       this.$store.dispatch(TASK.CHANGE_TASK_NAME, data)
     },
@@ -1137,7 +609,7 @@ export default {
       const starttime = new Date(this.range.start).getFullYear() + '-' + (this.pad2(new Date(this.range.start).getMonth() + 1)) + '-' + this.pad2(new Date(this.range.start).getDate()) + timestart
       const startend = new Date(this.range.end).getFullYear() + '-' + (this.pad2(new Date(this.range.start).getMonth() + 1)) + '-' + this.pad2(new Date(this.range.end).getDate()) + timeend
       const data = {
-        uid_task: this.selectedTask.uid,
+        uid_task: this.selectedTaskUid,
         str_date_begin: starttime,
         str_date_end: startend,
         reset: 0
@@ -1151,53 +623,10 @@ export default {
           this.timeStartActive = true
         })
     },
-    resetRepeat () {
-      const data = {
-        uid: this.selectedTask.uid
-      }
-      this.$store.dispatch(TASK.RESET_REPEAT_CHANGE, data).then(
-        resp => {
-          this.selectedTask.SeriesType = 0
-          this.selectedTask.SeriesAfterType = 0
-          this.selectedTask.SeriesAfterCount = 0
-          this.selectedTask.SeriesWeekCount = 0
-          this.selectedTask.SeriesWeekMon = 0
-          this.selectedTask.SeriesWeekTue = 0
-          this.selectedTask.SeriesWeekWed = 0
-          this.selectedTask.SeriesWeekThu = 0
-          this.selectedTask.SeriesWeekFri = 0
-          this.selectedTask.SeriesWeekSat = 0
-          this.selectedTask.SeriesWeekSun = 0
-          this.selectedTask.SeriesMonthType = 0
-          this.selectedTask.SeriesMonthCount = 0
-          this.selectedTask.SeriesMonthDay = 0
-          this.selectedTask.SeriesMonthWeekType = 0
-          this.selectedTask.SeriesMonthDayOfWeek = 0
-          this.selectedTask.SeriesYearType = 0
-          this.selectedTask.SeriesYearMonth = 0
-          this.selectedTask.SeriesYearMonthDay = 0
-          this.selectedTask.SeriesYearWeekType = 0
-          this.selectedTask.SeriesYearDayOfWeek = 0
-          this.noRepeat = true
-          this.everyDayRepeat = false
-          this.everyWeekRepeat = false
-          this.everyMonthRepeat = false
-          this.everyYearRepeat = false
-        })
-    },
     copyurl (e) {
-      copyText(`${window.location.origin}/task/${this.selectedTask.uid}`, undefined, (error, event) => {
+      copyText(`${window.location.origin}/task/${this.selectedTaskUid}`, undefined, (error, event) => {
         console.log(error, event)
       })
-    },
-    changeEveryMonthType (value) {
-      this.ActiveSelect = value
-      this.SeriesMonthDay = 0
-    },
-    changeEveryYearType (value) {
-      this.ActiveYartype = value
-      this.SeriesYearMonth = 0
-      this.SeriesYearMonthDay = 0
     },
     setCursorPosition (oInput, oStart, oEnd) {
       if (oInput.setSelectionRange) {
@@ -1215,7 +644,7 @@ export default {
       const message = event.target.innerText.trim()
       this.setCursorPosition(event.target.id, 0, 100)
       const data = {
-        uid: this.selectedTask.uid,
+        uid: this.selectedTaskUid,
         value: message
       }
       this.$store.dispatch(TASK.CHANGE_TASK_COMMENT, data)
@@ -1240,197 +669,36 @@ export default {
       }
       this.checklistshow = true
     },
-    SaveRepeat () {
-      if (this.$refs.SeriesType.value === '0') {
-        const data = {
-          uid: this.selectedTask.uid
-        }
-        this.$store.dispatch(TASK.RESET_REPEAT_CHANGE, data).then(
-          resp => {
-            this.selectedTask.SeriesType = 0
-            this.selectedTask.SeriesType = 0
-            this.selectedTask.SeriesAfterType = 0
-            this.selectedTask.SeriesAfterCount = 0
-            this.selectedTask.SeriesWeekCount = 0
-            this.selectedTask.SeriesWeekMon = 0
-            this.selectedTask.SeriesWeekTue = 0
-            this.selectedTask.SeriesWeekWed = 0
-            this.selectedTask.SeriesWeekThu = 0
-            this.selectedTask.SeriesWeekFri = 0
-            this.selectedTask.SeriesWeekSat = 0
-            this.selectedTask.SeriesWeekSun = 0
-            this.selectedTask.SeriesMonthType = 0
-            this.selectedTask.SeriesMonthCount = 0
-            this.selectedTask.SeriesMonthDay = 0
-            this.selectedTask.SeriesMonthWeekType = 0
-            this.selectedTask.SeriesMonthDayOfWeek = 0
-            this.selectedTask.SeriesYearType = 0
-            this.selectedTask.SeriesYearMonth = 0
-            this.selectedTask.SeriesYearMonthDay = 0
-            this.selectedTask.SeriesYearWeekType = 0
-            this.selectedTask.SeriesYearDayOfWeek = 0
-          })
-      }
-      if (this.$refs.SeriesType.value === '1') {
-        const data = {
-          uid: this.selectedTask.uid,
-          type: this.$refs.SeriesAfterType.value,
-          every_value: this.$refs.SeriesAfterCount.value
-        }
-        this.$store.dispatch(TASK.EVERY_DAY_CHANGE, data).then(
-          resp => {
-            this.selectedTask.SeriesType = 1
-            this.selectedTask.SeriesAfterType = resp.data.SeriesAfterType
-            this.selectedTask.SeriesAfterCount = resp.data.SeriesAfterCount
-          })
-      }
-      if (this.$refs.SeriesType.value === '2') {
-        const data = {
-          uid: this.selectedTask.uid,
-          days: this.SeriesWeek,
-          every_value: this.$refs.SeriesWeekCount.value
-        }
-        this.$store.dispatch(TASK.EVERY_WEEK_CHANGE, data).then(
-          resp => {
-            this.selectedTask.SeriesType = 2
-            this.selectedTask.SeriesWeekFri = resp.data.SeriesWeekFri
-            this.selectedTask.SeriesWeekMon = resp.data.SeriesWeekMon
-            this.selectedTask.SeriesWeekSat = resp.data.SeriesWeekSat
-            this.selectedTask.SeriesWeekSun = resp.data.SeriesWeekSun
-            this.selectedTask.SeriesWeekThu = resp.data.SeriesWeekThu
-            this.selectedTask.SeriesWeekTue = resp.data.SeriesWeekTue
-            this.selectedTask.SeriesWeekWed = resp.data.SeriesWeekWed
-            this.selectedTask.SeriesWeekCount = resp.data.SeriesWeekCount
-          })
-      }
-      if (this.$refs.SeriesType.value === '3') {
-        if (this.SeriesMonthDay > 0) {
-          const data = {
-            uid: this.selectedTask.uid,
-            num_day: this.SeriesMonthDay,
-            every_value: this.SeriesMonthCount
-          }
-
-          this.$store.dispatch(TASK.EVERY_MONTH_CHANGE, data).then(
-            resp => {
-              this.selectedTask.SeriesType = 3
-              this.selectedTask.SeriesMonthCount = resp.data.SeriesMonthCount
-              this.selectedTask.SeriesMonthDay = resp.data.SeriesMonthDay
-              this.selectedTask.SeriesMonthDayOfWeek = resp.data.SeriesMonthDayOfWeek
-              this.selectedTask.SeriesMonthType = resp.data.SeriesMonthType
-              this.selectedTask.SeriesMonthDay = resp.data.SeriesMonthDay
-              this.selectedTask.SeriesMonthWeekType = resp.data.SeriesMonthWeekType
-            })
-        }
-        if (this.SeriesMonthDay === 0) {
-          const data = {
-            uid: this.selectedTask.uid,
-            every_value: this.SeriesMonthCount,
-            num_day: this.SeriesMonthDay,
-            mwt: this.SeriesMonthType - 1,
-            mdw: this.SeriesMonthDayOfWeek
-          }
-          this.$store.dispatch(TASK.EVERY_MONTH_CHANGE, data).then(
-            resp => {
-              this.selectedTask.SeriesType = 3
-              this.selectedTask.SeriesMonthCount = resp.data.SeriesMonthCount
-              this.selectedTask.SeriesMonthDay = resp.data.SeriesMonthDay
-              this.selectedTask.SeriesMonthDayOfWeek = resp.data.SeriesMonthDayOfWeek
-              this.selectedTask.SeriesMonthType = resp.data.SeriesMonthType
-              this.selectedTask.SeriesMonthDay = resp.data.SeriesMonthDay
-              this.selectedTask.SeriesMonthWeekType = resp.data.SeriesMonthWeekType
-            })
-        }
-      }
-      if (this.$refs.SeriesType.value === '4') {
-        if (this.SeriesYearMonthDay > 0) {
-          const data = {
-            uid: this.selectedTask.uid,
-            num_day: this.SeriesYearMonthDay,
-            every_value: this.SeriesYearMonth
-          }
-          this.$store.dispatch(TASK.EVERY_YEAR_CHANGE, data).then(
-            resp => {
-              this.selectedTask.SeriesType = 4
-              this.selectedTask.SeriesYearDayOfWeek = resp.data.SeriesYearDayOfWeek
-              this.selectedTask.SeriesYearMonth = resp.data.SeriesYearMonth
-              this.selectedTask.SeriesYearType = resp.data.SeriesYearType
-              this.selectedTask.SeriesYearMonthDay = resp.data.SeriesYearMonthDay
-              this.selectedTask.SeriesMonthWeekType = resp.data.SeriesYearWeekType
-              this.selectedTask.SeriesMonthDayOfWeek = resp.data.SeriesYearDayOfWeek
-            })
-        }
-        if (this.SeriesYearMonthDay === 0) {
-          const data = {
-            uid: this.selectedTask.uid,
-            every_value: this.SeriesYearMonth,
-            num_day: this.SeriesYearMonthDay,
-            mwt: this.SeriesYearType - 1,
-            mdw: this.SeriesYearDayOfWeek
-          }
-          this.$store.dispatch(TASK.EVERY_YEAR_CHANGE, data).then(
-            resp => {
-              this.selectedTask.SeriesType = 4
-              this.selectedTask.SeriesYearDayOfWeek = resp.data.SeriesYearDayOfWeek
-              this.selectedTask.SeriesYearMonth = resp.data.SeriesYearMonth
-              this.selectedTask.SeriesYearMonthDay = resp.data.SeriesYearMonthDay
-              this.selectedTask.SeriesYearWeekType = resp.data.SeriesYearWeekType
-              this.selectedTask.SeriesMonthDayOfWeek = resp.data.SeriesYearDayOfWeek
-            })
-        }
-      }
-    },
-    tabChanged (event) {
-      if (event.target.value === '0') {
-        this.noRepeat = true
-        this.everyDayRepeat = false
-        this.everyWeekRepeat = false
-        this.everyMonthRepeat = false
-        this.everyYearRepeat = false
-        this.selectedTask.SeriesType = 0
-      }
-      if (event.target.value === '1') {
-        this.noRepeat = false
-        this.everyDayRepeat = true
-        this.everyWeekRepeat = false
-        this.everyMonthRepeat = false
-        this.everyYearRepeat = false
-        this.selectedTask.SeriesType = 1
-      }
-      if (event.target.value === '2') {
-        this.noRepeat = false
-        this.everyDayRepeat = false
-        this.everyWeekRepeat = true
-        this.everyMonthRepeat = false
-        this.everyYearRepeat = false
-        this.selectedTask.SeriesType = 2
-        this.selectedTask.SeriesWeekMon = 0
-        this.selectedTask.SeriesWeekCount = 1
-      }
-      if (event.target.value === '3') {
-        this.noRepeat = false
-        this.everyDayRepeat = false
-        this.everyWeekRepeat = false
-        this.everyMonthRepeat = true
-        this.everyYearRepeat = false
-        this.selectedTask.SeriesType = 3
-      }
-      if (event.target.value === '4') {
-        this.noRepeat = false
-        this.everyDayRepeat = false
-        this.everyWeekRepeat = false
-        this.everyMonthRepeat = false
-        this.everyYearRepeat = true
-        this.selectedTask.SeriesType = 4
-      }
-    },
     getFixedCommentName () {
       return this.selectedTask.name.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('\n', '<br/>')
     },
     print (value) {
       console.log(value)
     },
-    sendTaskMsg: function (msg) {
+    onChangeChatInputHeight (height) {
+      if (this.sendChatEditHeight !== height) {
+        this.sendChatEditHeight = height
+        // пересчитываем высоту плашки отправки сообщения
+        this.$nextTick(function () {
+          this.onInputTaskMsg()
+        })
+      }
+    },
+    onInputTaskMsg () {
+      // по идее чтобы не зашивать магические числа
+      // можно получать соотвествующие элементы из DOM
+      // и брать высоту из низ
+      const defAnswerHeight = this.currentAnswerMessageUid ? 40 + 8 : 0
+      const defFileLoadingHeight = this.isloading ? 40 + 8 : 0
+      const defHexParentHeight = 96
+      //
+      const sendHeightAddConst = defHexParentHeight - 44
+      //
+      const sendHeight = sendHeightAddConst + this.sendChatEditHeight + defFileLoadingHeight + defAnswerHeight
+      //
+      document.documentElement.style.setProperty('--hex-parent-height', sendHeight + 'px')
+    },
+    sendTaskMsg (msg) {
       let msgtask = msg || this.taskMsg
       msgtask = msgtask.trim()
       msgtask = msgtask.replaceAll('&', '&amp;')
@@ -1438,10 +706,10 @@ export default {
       msgtask = msgtask.replaceAll('>', '&gt;')
       const uid = this.uuidv4()
       const data = {
-        uid_task: this.selectedTask.uid,
+        uid_task: this.selectedTaskUid,
         uid: uid,
-        uid_creator: this.user?.current_user_uid,
         uid_msg: uid,
+        uid_creator: this.user?.current_user_uid,
         date_create: new Date().toISOString(),
         deleted: 0,
         uid_quote: this.currentAnswerMessageUid,
@@ -1452,7 +720,7 @@ export default {
         this.$store.dispatch(CREATE_MESSAGE_REQUEST, data).then(
           resp => {
           // Answer last inspector message
-            const lastInspectorMessage = this.taskMessagesAndFiles.slice().reverse().find(message => message.uid_creator === 'inspector')
+            const lastInspectorMessage = [...this.taskMessages].reverse().find(message => message.uid_creator === 'inspector')
             if (lastInspectorMessage && this.selectedTask.uid_performer === this.user?.current_user_uid) {
               this.$store.dispatch(INSPECTOR.ANSWER_INSPECTOR_TASK, { id: lastInspectorMessage.id, answer: 1 }).then(() => {
                 lastInspectorMessage.performer_answer = 1
@@ -1473,35 +741,13 @@ export default {
       }
       this.currentAnswerMessageUid = ''
       this.taskMsg = ''
+      // пересчитываем высоту плашки отправки сообщения
       this.$nextTick(function () {
         this.onInputTaskMsg()
       })
     },
-    onInputTaskMsg: function () {
-      // после этого рассчитает новый scrollHeight
-      this.$refs.taskMsgEdit.style.height = '40px'
-      //
-      const defAnswerHeight = this.currentAnswerMessageUid ? 36 + 8 : 0
-      const defSendHeight = 96
-      const defEditHeight = 40
-      const defEditHeightMax = 100
-      const scrollHeight = this.$refs.taskMsgEdit.scrollHeight
-      const scrollHeightFix = scrollHeight < defEditHeight ? defEditHeight : scrollHeight > defEditHeightMax ? defEditHeightMax : scrollHeight
-      const sendHeight = defSendHeight + scrollHeightFix + defAnswerHeight - defEditHeight
-      //
-      this.$refs.taskMsgEdit.style.height = scrollHeight + 'px'
-      document.documentElement.style.setProperty('--hex-parent-height', sendHeight + 'px')
-    },
-    addNewLineTaskMsg: function () {
-      this.taskMsg += '\n'
-      this.$nextTick(function () {
-        this.onInputTaskMsg()
-        this.$refs.taskMsgEdit.scrollTo(0, this.$refs.taskMsgEdit.scrollHeight)
-      })
-    },
-    onPasteEvent: function (e) {
+    onPasteEvent (e) {
       const items = (e.clipboardData || e.originalEvent.clipboardData).items
-      let loadFile = false
       for (const index in items) {
         const item = items[index]
         if (item.kind === 'file') {
@@ -1509,14 +755,12 @@ export default {
           const formData = new FormData()
           formData.append('files', blob)
           const data = {
-            uid_task: this.selectedTask.uid,
+            uid_task: this.selectedTaskUid,
             name: formData
           }
-          loadFile = true
-          this.isloading = true
+          this.setFileLoading(true)
           this.$store.dispatch(CREATE_FILES_REQUEST, data).then(
             resp => {
-              this.isloading = false
               // ставим статус "на доработку" когда прикладываем файл
               if (this.selectedTask.type === 2 || this.selectedTask.type === 3) {
                 if ([1, 5, 7, 8].includes(this.selectedTask.status)) {
@@ -1525,23 +769,20 @@ export default {
                   }
                 }
               }
-              // загрузка завершена - подписываемся опять
-              this.$refs.taskMsgEdit.addEventListener('paste', this.onPasteEvent, { once: true })
-            })
-          setTimeout(() => {
-            const elmnt = document.getElementById('content').lastElementChild
-            elmnt.scrollIntoView({ behavior: 'smooth' })
-          }, 100)
+              // прокручиваем до файла
+              setTimeout(() => {
+                const elmnt = document.getElementById('content')?.lastElementChild
+                elmnt?.scrollIntoView({ behavior: 'smooth' })
+              }, 100)
+            }).finally(() => {
+            this.setFileLoading(false)
+          })
         }
-      }
-      if (!loadFile) {
-        // не вставка файла - подписываемся опять
-        this.$refs.taskMsgEdit.addEventListener('paste', this.onPasteEvent, { once: true })
       }
     },
     onReAssignToUser: function (userEmail) {
       const data = {
-        uid: this.selectedTask.uid,
+        uid: this.selectedTaskUid,
         value: userEmail
       }
       this.$store.dispatch(TASK.CHANGE_TASK_REDELEGATE, data).then(
@@ -1556,9 +797,9 @@ export default {
       }
     },
     onChangePerformer: function (userEmail) {
-      const taskUid = this.selectedTask.uid
+      const taskUid = this.selectedTaskUid
       const data = {
-        uid: this.selectedTask.uid,
+        uid: taskUid,
         value: userEmail
       }
       this.$store.dispatch(TASK.CHANGE_TASK_PERFORMER, data).then(
@@ -1579,9 +820,9 @@ export default {
       }
     },
     onChangeDates: function (begin, end) {
-      const taskUid = this.selectedTask.uid
+      const taskUid = this.selectedTaskUid
       const data = {
-        uid_task: this.selectedTask.uid,
+        uid_task: taskUid,
         str_date_begin: begin,
         str_date_end: end,
         reset: 0
@@ -1593,7 +834,20 @@ export default {
         this.selectedTask.date_end = end
 
         if (!shouldAddTaskIntoList(this.selectedTask)) {
-          this.$store.commit(TASK.REMOVE_TASK, taskUid)
+          this.$store.dispatch(TASK.REMOVE_TASK, taskUid)
+            .then(() => {
+              this.$store.dispatch(TASK.DAYS_WITH_TASKS)
+                .then(() => {
+                  const calendarDates = computed(() => this.$store.state.calendar[1].dates)
+                  const daysWithTasks = computed(() => this.$store.state.tasks.daysWithTasks)
+                  for (let i = 0; i < calendarDates.value.length; i++) {
+                    const date = calendarDates.value[i].getDate() + '-' + (calendarDates.value[i].getMonth() + 1) + '-' + calendarDates.value[i].getFullYear()
+                    if (!daysWithTasks.value.includes(date)) {
+                      this.$store.state.calendar[1].dates.splice(this.$store.state.calendar[1].dates.indexOf(calendarDates.value[i]), 1)
+                    }
+                  }
+                })
+            })
           this.$store.dispatch('asidePropertiesToggle', false)
         }
       })
@@ -1601,15 +855,18 @@ export default {
     onChangeAccess: function (checkEmails) {
       const emails = checkEmails.join('..')
       const data = {
-        uid: this.selectedTask.uid,
+        uid: this.selectedTaskUid,
         value: emails
+      }
+      if (!emails.includes(this.user.current_user_email) && this.selectedTask.uid_parent) {
+        this.selectedTask.uid_parent = ''
       }
       this.$store.dispatch(TASK.CHANGE_TASK_ACCESS, data).then(
         resp => {
           this.selectedTask.emails = emails
           if (!this.shouldAddTaskIntoList(this.selectedTask)) {
             // (!checkEmails.includes(this.user.current_user_email))
-            this.$store.commit(TASK.REMOVE_TASK, this.selectedTask.uid)
+            this.$store.commit(TASK.REMOVE_TASK, this.selectedTaskUid)
             this.closeProperties()
           }
         }
@@ -1617,7 +874,7 @@ export default {
     },
     onChangeProject: function (projectUid) {
       const data = {
-        uid: this.selectedTask.uid,
+        uid: this.selectedTaskUid,
         value: projectUid
       }
       this.$store.dispatch(TASK.CHANGE_TASK_PROJECT, data).then(
@@ -1628,7 +885,7 @@ export default {
     },
     onChangeTags: function (tags) {
       const data = {
-        uid: this.selectedTask.uid,
+        uid: this.selectedTaskUid,
         tags: tags
       }
       this.$store.dispatch(TASK.CHANGE_TASK_TAGS, data).then(
@@ -1639,7 +896,7 @@ export default {
     },
     onChangeColor: function (colorUid) {
       const data = {
-        uid: this.selectedTask.uid,
+        uid: this.selectedTaskUid,
         value: colorUid
       }
       this.$store.dispatch(TASK.CHANGE_TASK_COLOR, data).then(
@@ -1650,15 +907,10 @@ export default {
     },
     onChangeComment: function (text) {
       const data = {
-        uid: this.selectedTask.uid,
+        uid: this.selectedTaskUid,
         value: text
       }
       this.$store.dispatch(TASK.CHANGE_TASK_COMMENT, data)
-    },
-    endChangeComment: function (text) {
-      // чтобы у нас в интерфейсе поменялось
-      // потому что на changeComment он только
-      // на сервер отправляет и всё
       this.selectedTask.comment = text
     },
     gotoParentNode (uid) {
@@ -1666,13 +918,21 @@ export default {
     },
     onAnswerMessage (uid) {
       this.currentAnswerMessageUid = uid
+      // пересчитываем высоту плашки отправки сообщения
+      this.$nextTick(function () {
+        this.onInputTaskMsg()
+      })
+    },
+    setFileLoading (loading) {
+      this.isloading = loading
+      // пересчитываем высоту плашки отправки сообщения
       this.$nextTick(function () {
         this.onInputTaskMsg()
       })
     },
     onChangeChecklist (checklist) {
       const data = {
-        uid_task: this.selectedTask.uid,
+        uid_task: this.selectedTaskUid,
         checklist: checklist
       }
       this.checklistSavedNow = true
@@ -2042,9 +1302,6 @@ export default {
   opacity: 0;
   height: 0;
   padding: 0;
-}
-.width100without20 {
-  width: calc(100% - 20px);
 }
 .droptarget {
   float: left;

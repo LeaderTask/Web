@@ -24,269 +24,275 @@
     @cancel="showFreeModal = false"
   />
 
-  <!-- Add task input -->
   <div
-    v-if="taskListSource && !DONT_SHOW_TASK_INPUT_UIDS[taskListSource.uid]"
-    class="fixed-create z-[2] flex bg-[#f4f5f7] px-px pt-px"
+    class="lg:mr-0"
+    :class="{'mr-96': isPropertiesMobileExpanded}"
   >
-    <button
-      class="bg-[#FF912380] px-2 rounded-[8px] text-black text-sm mr-1 hover:bg-[#F5DEB3]"
-      @click="shouldShowInspector"
-    >
-      Поручить
-    </button>
+    <!-- Add task input -->
     <div
-      class="flex items-center bg-[#FAFAFB] border dark:bg-gray-700 rounded-[8px] w-full"
+      v-if="taskListSource && !DONT_SHOW_TASK_INPUT_UIDS[taskListSource.uid]"
+      class="fixed-create z-[2] flex bg-[#f4f5f7] px-px pt-px relative lg:static top-0"
     >
-      <div
-        class="flex items-center pl-3"
-        :class="{ 'bg-white p-3 rounded-l-lg cursor-pointer': Object.keys(copiedTasks).length }"
-        @click="pasteCopiedTasks('00000000-0000-0000-0000-000000000000')"
+      <button
+        class="bg-[#FF912380] px-2 rounded-[8px] text-black text-sm mr-1 hover:bg-[#F5DEB3]"
+        @click="shouldShowInspector"
       >
-        <svg
-          :class="{ 'mr-2': Object.keys(copiedTasks).length }"
-          width="14"
-          height="14"
-          viewBox="0 0 16 16"
-          fill="white"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M8.00011 2.3457V8.4034M8.00011 8.4034V14.4611M8.00011 8.4034H14.4617M8.00011 8.4034H1.53857"
-            stroke="#7E7E80"
-            stroke-width="1"
-            stroke-linecap="round"
-          />
-        </svg>
+        Поручить
+      </button>
+      <div
+        class="flex items-center bg-[#FAFAFB] border dark:bg-gray-700 rounded-[8px] w-full"
+      >
         <div
-          v-if="Object.keys(copiedTasks).length"
-          class="flex items-center justify-center bg-rose-600 rounded-full w-6 h-6"
+          class="flex items-center pl-3"
+          :class="{ 'bg-white p-3 rounded-l-lg cursor-pointer': Object.keys(copiedTasks).length }"
+          @click="pasteCopiedTasks('00000000-0000-0000-0000-000000000000')"
         >
-          <p class="text-white text-sm font-bold">
-            {{ Object.keys(copiedTasks).length }}
-          </p>
-        </div>
-      </div>
-      <TaskListEdit
-        id="task"
-        ref="root"
-        v-model="createTaskText"
-        bg-transperant
-        class="w-full text-black"
-        placeholder="Добавить задачу"
-        @keyup.enter="createTask($event)"
-      />
-    </div>
-  </div>
-
-  <EmptyTasksListPics
-    v-if="!Object.keys(storeTasks).length && status === 'success'"
-  />
-
-  <!-- Skeleton -->
-  <TasksSkeleton
-    v-if="status == 'loading'"
-  />
-  <!-- vue3-treeview -->
-  <div
-    v-if="status == 'success'"
-    class="overflow-y-auto pt-[4px] px-px min-h-[300px] w-full"
-  >
-    <tree
-      :nodes="storeTasks"
-      :config="newConfig"
-      class="w-full h-full"
-      @nodeOpened="nodeExpanding"
-      @nodeFocus="nodeSelected"
-      @nodeDragend="nodeDragEnd"
-    >
-      <template #before-input="props">
-        <div
-          :id="props.node.info.uid"
-          class="border border-gray-300 group shrink-0 w-full pl-[31px] pr-[6px] py-[11px] mb-[4px] min-h-[42px] font-roboto flex flex-col bg-white rounded-[8px] relative"
-          :style="{ backgroundColor: getValidBackColor(colors[props.node.info?.uid_marker]?.back_color) }"
-          :class="{ 'ring-1 ring-orange-400': props.node.id === lastSelectedTaskUid}"
-        >
-          <!-- Name, Status -->
-          <div
-            class="flex gap-[6px] items-center w-full"
+          <svg
+            :class="{ 'mr-2': Object.keys(copiedTasks).length }"
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="white"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <div class="flex-none h-[20px] w-[20px] leading-[20px]">
-              <TaskStatus
-                :task="props.node.info"
-                @changeStatus="onChangeStatus($event, props.node.info)"
+            <path
+              d="M8.00011 2.3457V8.4034M8.00011 8.4034V14.4611M8.00011 8.4034H14.4617M8.00011 8.4034H1.53857"
+              stroke="#7E7E80"
+              stroke-width="1"
+              stroke-linecap="round"
+            />
+          </svg>
+          <div
+            v-if="Object.keys(copiedTasks).length"
+            class="flex items-center justify-center bg-rose-600 rounded-full w-6 h-6"
+          >
+            <p class="text-white text-sm font-bold">
+              {{ Object.keys(copiedTasks).length }}
+            </p>
+          </div>
+        </div>
+        <TaskListEdit
+          id="task"
+          ref="root"
+          v-model="createTaskText"
+          bg-transperant
+          class="w-full text-black"
+          placeholder="Добавить задачу"
+          @keyup.enter="createTask($event)"
+        />
+      </div>
+    </div>
+
+    <!-- Skeleton -->
+    <TasksSkeleton
+      v-if="status == 'loading'"
+    />
+
+    <!-- vue3-treeview -->
+    <div
+      v-if="status == 'success' && Object.keys(storeTasks).length"
+      class="overflow-y-auto pt-[4px] px-px min-h-[300px] w-full"
+    >
+      <tree
+        :nodes="storeTasks"
+        :config="newConfig"
+        class="w-full h-full"
+        @nodeOpened="nodeExpanding"
+        @nodeFocus="nodeSelected"
+        @nodeDragend="nodeDragEnd"
+      >
+        <template #before-input="props">
+          <div
+            :id="props.node.info.uid"
+            class="border border-gray-300 group shrink-0 w-full pl-[31px] pr-[6px] py-[11px] mb-[4px] min-h-[42px] font-roboto flex flex-col bg-white rounded-[8px] relative"
+            :style="{ backgroundColor: getValidBackColor(colors[props.node.info?.uid_marker]?.back_color) }"
+            :class="{ 'ring-1 ring-orange-400': props.node.id === lastSelectedTaskUid}"
+          >
+            <!-- Name, Status -->
+            <div
+              class="flex gap-[6px] items-center w-full"
+            >
+              <div class="flex-none h-[20px] w-[20px] leading-[20px]">
+                <TaskStatus
+                  :task="props.node.info"
+                  @changeStatus="onChangeStatus($event, props.node.info)"
+                />
+              </div>
+
+              <!-- Editable name -->
+              <contenteditable
+                v-model="props.node.info.name"
+                tag="div"
+                class="taskName p-0 ring-0 outline-none w-[calc(100%-26px)] overflow-x-clip break-words cursor-default"
+                :contenteditable="props.node.info._isEditable"
+                placeholder="Введите название задачи"
+                :no-nl="true"
+                :no-html="true"
+                :class="{ 'uppercase': !props.node.info._isEditable && colors[props.node.info.uid_marker] && colors[props.node.info.uid_marker].uppercase, 'text-gray-500': props.node.info.status == 1 || props.node.info.status == 7, 'line-through': props.node.info.status == 1 || props.node.info.status == 7, 'font-extrabold': props.node.info.readed == 0 }"
+                :style="{ color: getValidForeColor(colors[props.node.info.uid_marker]?.fore_color) }"
+                @focusout="clearTaskFocus(props.node.info)"
+                @keydown.enter="updateTask($event, props.node.info); props.node.info._isEditable = false;"
               />
             </div>
 
-            <!-- Editable name -->
-            <contenteditable
-              v-model="props.node.info.name"
-              tag="div"
-              class="taskName p-0 ring-0 outline-none w-[calc(100%-26px)] overflow-x-clip break-words cursor-default"
-              :contenteditable="props.node.info._isEditable"
-              placeholder="Введите название задачи"
-              :no-nl="true"
-              :no-html="true"
-              :class="{ 'uppercase': !props.node.info._isEditable && colors[props.node.info.uid_marker] && colors[props.node.info.uid_marker].uppercase, 'text-gray-500': props.node.info.status == 1 || props.node.info.status == 7, 'line-through': props.node.info.status == 1 || props.node.info.status == 7, 'font-extrabold': props.node.info.readed == 0 }"
-              :style="{ color: getValidForeColor(colors[props.node.info.uid_marker]?.fore_color) }"
-              @focusout="clearTaskFocus(props.node.info)"
-              @dblclick.stop="editTaskName(props.node.id)"
-              @keydown.enter="updateTask($event, props.node.info); props.node.info._isEditable = false;"
-            />
-          </div>
-
-          <!-- Tags, Overdue, Customer, Performer -->
-          <div
-            v-if="props.node.info.uid_customer == '00000000-0000-0000-0000-000000000000' || props.node.info.email_performer || props.node.info.is_overdue || props.node.info.tags || props.node.info.uid_project == '00000000-0000-0000-0000-000000000000' || props.node.info.term_customer || props.node.info.checklist || props.node.info.has_files || props.node.info.has_msgs || props.node.info.comment || props.node.info.focus"
-            class="flex flex-wrap gap-[4px] items-center mt-[6px]"
-          >
-            <!-- Focus -->
-            <TaskListIconLabel
-              v-if="props.node.info.focus"
-              :icon-path="taskfocus.path"
-              :icon-box="taskfocus.viewBox"
-              icon-class="text-red-600"
-              icon-height="15"
-              class="h-[22px]"
-            />
-            <!-- Data -->
-            <TaskListIconLabel
-              v-if="props.node.info.term_user"
-              :icon-path="clock.path"
-              :icon-box="clock.viewBox"
-              :text="props.node.info.term_user"
-              icon-width="16"
-              class="h-[22px]"
-              icon-height="16"
-            />
-            <TaskListIconLabel
-              v-if="props.node.info.type !== 1 && props.node.info.type !== 2 && props.node.info.term_customer"
-              :icon-path="clock.path"
-              :icon-box="clock.viewBox"
-              :text="props.node.info.term_customer"
-              icon-class="text-red-600"
-              class="h-[22px]"
-              icon-height="15"
-            />
-            <!-- Customer -->
-            <TaskListTagLabel
-              v-if="props.node.info.uid_customer != '00000000-0000-0000-0000-000000000000' && employees[props.node.info.uid_customer] && props.node.info.uid_customer != currentUserUid"
-              :text="employees[props.node.info.uid_customer].name"
-              :color-bg-class="{ 'border-red-500': currentUserEmail == props.node.info.email_performer, 'bg-gray-400': currentUserEmail != props.node.info.email_performer, 'bg-opacity-50': props.node.info.status == 1 || props.node.info.status == 7, 'bg-red-500': currentUserEmail == props.node.info.email_performer }"
-              icon-height="15"
-              :image="employees[props.node.info.uid_customer] ? employees[props.node.info.uid_customer].fotolink : ''"
-              class="h-[22px]"
-            />
-            <!-- Performer -->
-            <TaskListTagLabel
-              v-if="props.node.info.email_performer && employeesByEmail[props.node.info.email_performer] && currentUserEmail != props.node.info.email_performer && employees[props.node.info.uid_customer] && employees[props.node.info.uid_customer].email != props.node.info.email_performer"
-              :text="employeesByEmail[props.node.info.email_performer].name"
-              :icon-width="props.node.info.performerreaded ? performerRead.width : performerNotRead.width"
-              :icon-height="props.node.info.performerreaded ? performerRead.height : performerNotRead.height"
-              :icon-box="props.node.info.performerreaded ? performerRead.viewBox : performerNotRead.viewBox"
-              :icon-path="props.node.info.performerreaded ? performerRead.path : performerNotRead.path"
-              :image="employeesByEmail[props.node.info.email_performer] ? employeesByEmail[props.node.info.email_performer].fotolink : ''"
-              :color-bg-class="{ 'bg-gray-400': currentUserEmail != props.node.info.email_performer, 'bg-green-500': currentUserUid == props.node.info.uid_customer, 'bg-opacity-50': props.node.info.status == 1 || props.node.info.status == 7 }"
-              class="h-[22px]"
-            />
-            <!-- Overdue -->
-            <TaskListTagLabel
-              v-if="props.node.info.is_overdue"
-              text="Просрочено"
-              color-text-class="text-red-600"
-              color-bg-class="bg-red-300 opacity-70"
-              icon-height="15"
-              class="h-[22px]"
-            />
-            <!-- Tags -->
-            <template
-              v-for="(tag, index) in props.node.info.tags"
-              :key="index"
+            <!-- Tags, Overdue, Customer, Performer -->
+            <div
+              v-if="props.node.info.uid_customer == '00000000-0000-0000-0000-000000000000' || props.node.info.email_performer || props.node.info.is_overdue || props.node.info.tags || props.node.info.uid_project == '00000000-0000-0000-0000-000000000000' || props.node.info.term_customer || props.node.info.checklist || props.node.info.has_files || props.node.info.has_msgs || props.node.info.comment || props.node.info.focus"
+              class="flex flex-wrap gap-[4px] items-center mt-[6px]"
             >
-              <TaskListTagLabel
-                v-if="tags[tag]"
-                :icon-path="tagIcon.path"
-                :icon-box="tagIcon.viewBox"
-                :text="tags[tag].name"
-                :color-bg-style="{ backgroundColor: tags[tag] ? tags[tag].back_color : '' }"
+              <!-- Focus -->
+              <TaskListIconLabel
+                v-if="props.node.info.focus"
+                :icon-path="taskfocus.path"
+                :icon-box="taskfocus.viewBox"
+                icon-class="text-red-600"
+                icon-height="15"
                 class="h-[22px]"
               />
-            </template>
-            <!-- Project -->
-            <TaskListTagLabel
-              v-if="taskListSource && props.node.info.uid_project != '00000000-0000-0000-0000-000000000000' && projects[props.node.info.uid_project] && props.node.info.uid_project !== taskListSource.param"
-              :icon-path="project.path"
-              :icon-box="project.viewBox"
-              :text="projects[props.node.info.uid_project].name"
-              :color-bg-class="{ 'bg-yellow-400': true, 'bg-opacity-50': props.node.info.status == 1 || props.node.info.status == 7 }"
-              class="h-[22px]"
-            />
-            <!-- Files -->
-            <TaskListIconLabel
-              v-if="props.node.info.has_files"
-              :icon-path="file.path"
-              :icon-box="file.viewBox"
-              icon-width="11"
-              icon-height="15"
-              class="h-[22px]"
-            />
-            <!-- Checklist -->
-            <TaskListIconLabel
-              v-if="props.node.info.checklist"
-              :icon-path="checklist.path"
-              :icon-box="checklist.viewBox"
-              :text="`${countChecklist(props.node.info.checklist).done} / ${countChecklist(props.node.info.checklist).undone}`"
-              icon-height="15"
-              icon-width="14"
-              class="h-[22px]"
-            />
-            <!-- Access -->
-            <TaskListIconLabel
-              v-if="props.node.info.emails"
-              :icon-path="inaccess.path"
-              :icon-box="inaccess.viewBox"
-              icon-width="15"
-              icon-height="15"
-              class="h-[22px]"
-            />
-            <!-- Messages -->
-            <TaskListIconLabel
-              v-if="props.node.info.has_msgs"
-              :icon-path="msgs.path"
-              :icon-box="msgs.viewBox"
-              icon-height="15"
-              class="h-[22px]"
-            />
-            <!-- Comment -->
-            <TaskListIconLabel
-              v-if="props.node.info.comment.replace(/\r?\n|\r/g, '')"
-              :icon-path="taskcomment.path"
-              :icon-box="taskcomment.viewBox"
-              icon-height="14"
-              class="h-[22px]"
+              <!-- Data -->
+              <TaskListIconLabel
+                v-if="props.node.info.term_user"
+                :icon-path="clock.path"
+                :icon-box="clock.viewBox"
+                :text="props.node.info.term_user"
+                icon-width="16"
+                class="h-[22px]"
+                icon-height="16"
+              />
+              <TaskListIconLabel
+                v-if="props.node.info.type !== 1 && props.node.info.type !== 2 && props.node.info.term_customer"
+                :icon-path="clock.path"
+                :icon-box="clock.viewBox"
+                :text="props.node.info.term_customer"
+                icon-class="text-red-600"
+                class="h-[22px]"
+                icon-height="15"
+              />
+              <!-- Customer -->
+              <TaskListTagLabel
+                v-if="props.node.info.uid_customer != '00000000-0000-0000-0000-000000000000' && employees[props.node.info.uid_customer] && props.node.info.uid_customer != currentUserUid"
+                :text="employees[props.node.info.uid_customer].name"
+                :color-bg-class="{ 'border-red-500': currentUserEmail == props.node.info.email_performer, 'bg-gray-400': currentUserEmail != props.node.info.email_performer, 'bg-opacity-50': props.node.info.status == 1 || props.node.info.status == 7, 'bg-red-500': currentUserEmail == props.node.info.email_performer }"
+                :icon-height="15"
+                :image="employees[props.node.info.uid_customer] ? employees[props.node.info.uid_customer].fotolink : ''"
+                class="h-[22px]"
+              />
+              <!-- Performer -->
+              <TaskListTagLabel
+                v-if="props.node.info.email_performer && employeesByEmail[props.node.info.email_performer] && currentUserEmail != props.node.info.email_performer && employees[props.node.info.uid_customer] && employees[props.node.info.uid_customer].email != props.node.info.email_performer"
+                :text="employeesByEmail[props.node.info.email_performer].name"
+                :icon-width="props.node.info.performerreaded ? performerRead.width : performerNotRead.width"
+                :icon-height="props.node.info.performerreaded ? performerRead.height : performerNotRead.height"
+                :icon-box="props.node.info.performerreaded ? performerRead.viewBox : performerNotRead.viewBox"
+                :icon-path="props.node.info.performerreaded ? performerRead.path : performerNotRead.path"
+                :image="employeesByEmail[props.node.info.email_performer] ? employeesByEmail[props.node.info.email_performer].fotolink : ''"
+                :color-bg-class="{ 'bg-gray-400': currentUserEmail != props.node.info.email_performer, 'bg-green-500': currentUserUid == props.node.info.uid_customer, 'bg-opacity-50': props.node.info.status == 1 || props.node.info.status == 7 }"
+                class="h-[22px]"
+              />
+              <!-- Overdue -->
+              <TaskListTagLabel
+                v-if="props.node.info.is_overdue"
+                text="Просрочено"
+                color-text-class="text-red-600"
+                color-bg-class="bg-red-300 opacity-70"
+                :icon-height="15"
+                class="h-[22px]"
+              />
+              <!-- Tags -->
+              <template
+                v-for="(tag, index) in props.node.info.tags"
+                :key="index"
+              >
+                <TaskListTagLabel
+                  v-if="tags[tag]"
+                  :icon-path="tagIcon.path"
+                  :icon-box="tagIcon.viewBox"
+                  :text="tags[tag].name"
+                  :color-bg-style="{ backgroundColor: tags[tag] ? tags[tag].back_color : '' }"
+                  class="h-[22px]"
+                />
+              </template>
+              <!-- Project -->
+              <TaskListTagLabel
+                v-if="taskListSource && props.node.info.uid_project != '00000000-0000-0000-0000-000000000000' && projects[props.node.info.uid_project] && props.node.info.uid_project !== taskListSource.param"
+                :icon-path="project.path"
+                :icon-box="project.viewBox"
+                :text="projects[props.node.info.uid_project].name"
+                :color-bg-class="{ 'bg-yellow-400': true, 'bg-opacity-50': props.node.info.status == 1 || props.node.info.status == 7 }"
+                class="h-[22px]"
+              />
+              <!-- Files -->
+              <TaskListIconLabel
+                v-if="props.node.info.has_files"
+                :icon-path="file.path"
+                :icon-box="file.viewBox"
+                icon-width="11"
+                icon-height="15"
+                class="h-[22px]"
+              />
+              <!-- Checklist -->
+              <TaskListIconLabel
+                v-if="props.node.info.checklist"
+                :icon-path="checklist.path"
+                :icon-box="checklist.viewBox"
+                :text="`${countChecklist(props.node.info.checklist).done} / ${countChecklist(props.node.info.checklist).undone}`"
+                icon-height="15"
+                icon-width="14"
+                class="h-[22px]"
+              />
+              <!-- Access -->
+              <TaskListIconLabel
+                v-if="props.node.info.emails"
+                :icon-path="inaccess.path"
+                :icon-box="inaccess.viewBox"
+                icon-width="15"
+                icon-height="15"
+                class="h-[22px]"
+              />
+              <!-- Messages -->
+              <TaskListIconLabel
+                v-if="props.node.info.has_msgs"
+                :icon-path="msgs.path"
+                :icon-box="msgs.viewBox"
+                icon-height="15"
+                class="h-[22px]"
+                :icon-class="{ 'text-blue-600': props.node.info.is_inspectable }"
+              />
+              <!-- Comment -->
+              <TaskListIconLabel
+                v-if="props.node.info.comment.replace(/\r?\n|\r/g, '')"
+                :icon-path="taskcomment.path"
+                :icon-box="taskcomment.viewBox"
+                icon-height="14"
+                class="h-[22px]"
+              />
+            </div>
+
+            <TaskListActionHoverPanel
+              :id="`hover-panel-${props.node.id}`"
+              class="absolute right-[8px] top-[calc(50%-18px)] invisible group-hover:visible"
+              :is-my-task="props.node.info.uid_customer == currentUserUid"
+              :can-paste="!!Object.keys(copiedTasks).length"
+              @click.stop
+              @addSubtask="addSubtask(props.node.info)"
+              @changeFocus="changeFocus(props.node.info)"
+              @openMenu="toggleTaskHoverPopper(true, props.node.id)"
+              @closeMenu="toggleTaskHoverPopper(false, props.node.id)"
+              @tomorrow="moveTaskTomorrow(props.node.info)"
+              @copyName="copyTaskName(props.node.info)"
+              @copy="copyTask(props.node.info)"
+              @cut="cutTask(props.node.info)"
+              @paste="pasteCopiedTasks(props.node.id)"
+              @delete="clickDeleteTask(props.node.id)"
             />
           </div>
+        </template>
+      </tree>
+    </div>
 
-          <TaskListActionHoverPanel
-            :id="`hover-panel-${props.node.id}`"
-            class="absolute right-[8px] top-[calc(50%-18px)] invisible group-hover:visible"
-            :is-my-task="props.node.info.uid_customer == currentUserUid"
-            :can-paste="Object.keys(copiedTasks).length"
-            @click.stop
-            @addSubtask="addSubtask(props.node.info)"
-            @changeFocus="changeFocus(props.node.info)"
-            @openMenu="toggleTaskHoverPopper(true, props.node.id)"
-            @closeMenu="toggleTaskHoverPopper(false, props.node.id)"
-            @tomorrow="moveTaskTomorrow(props.node.info)"
-            @copyName="copyTaskName(props.node.info)"
-            @copy="copyTask(props.node.info)"
-            @cut="cutTask(props.node.info)"
-            @paste="pasteCopiedTasks(props.node.id)"
-            @delete="clickDeleteTask(props.node.id)"
-          />
-        </div>
-      </template>
-    </tree>
+    <EmptyTasksListPics
+      v-if="!Object.keys(storeTasks).length && status === 'success'"
+    />
   </div>
 </template>
 
@@ -355,6 +361,7 @@ export default {
     return {
       createTaskText: '',
       lastSelectedTaskUid: '',
+      lastSelectedTask: {},
       showConfirm: false,
       showTasksLimit: false,
       showFreeModal: false,
@@ -497,6 +504,11 @@ export default {
           this.stop = false
         })
       })
+    },
+    lastSelectedTask (newTask, prevTask) {
+      if (newTask.uid !== prevTask.uid && prevTask.name === '') {
+        this.removeTask(prevTask.uid)
+      }
     }
   },
   mounted () {
@@ -555,7 +567,9 @@ export default {
     },
     countChecklist (checklist) {
       const data = { done: 0, undone: 0 }
-      for (const line of checklist.split('\r\n\r\n')) {
+      // нормализуем перенос сторки (разные на windows и на mac)
+      const chlist = checklist.replaceAll('\r\n', '\n').replaceAll('\r', '\n').replaceAll('\n', '\r\n')
+      for (const line of chlist.split('\r\n\r\n')) {
         data.undone++
         if (+line.split('\r\n')[0] === 1) {
           data.done++
@@ -672,8 +686,8 @@ export default {
           // выделяем добавленную задачу
           // и отображаем её свойства
             this.nodeSelected({ id: data.uid, info: resp.data })
-            if (this.navStack && this.navStack[this.navStack.length - 1].uid === '901841d9-0016-491d-ad66-8ee42d2b496b') {
-              this.$store.commit('addDot', new Date(this.navStack[this.navStack.length - 1].param))
+            if (this.navStack && this.navStack[this.navStack.length - 1].value.uid === '901841d9-0016-491d-ad66-8ee42d2b496b') {
+              this.$store.commit('addDot', new Date(data.date_begin))
             }
             document.getElementById('task').firstElementChild.focus({ preventScroll: false })
             setTimeout(() => {
@@ -729,7 +743,7 @@ export default {
     },
     clearTaskFocus (task) {
       if (task.name === '') {
-        this.removeTask(task.uid)
+        // this.removeTask(task.uid)
       } else if (task.name !== '' && !task.enterPress) {
         this.updateTask(event, task)
       }
@@ -813,7 +827,6 @@ export default {
         _isEditable: true,
         _justCreated: true
       }
-      console.log(parent)
       this.$store.dispatch(TASK.SELECT_TASK, newSubtask)
       this.$store.dispatch(TASK.ADD_SUBTASK, newSubtask)
         .then(() => {
@@ -824,6 +837,7 @@ export default {
             this.gotoNode(newSubtask.uid)
           }, 200)
         })
+      this.lastSelectedTask = newSubtask
     },
     copyTask (task) {
       const copiedTask = { ...task }
@@ -838,6 +852,10 @@ export default {
       this.$store.commit(TASK.COPY_TASK, copiedTask)
     },
     nodeSelected (arg) {
+      if (arg.info.name === '') {
+        this.editTaskName(arg.info.uid)
+      }
+      this.lastSelectedTask = arg.info
       if (!this.isPropertiesMobileExpanded && arg.info.name) {
         this.$store.dispatch('asidePropertiesToggle', true)
       }

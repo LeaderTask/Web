@@ -3,13 +3,18 @@ import { removeTask } from '@/websync/task.js'
 import { removeCard } from '@/websync/card.js'
 import { removeEmployee } from '@/websync/employee.js'
 import { removeProject } from '@/websync/project.js'
+import { deleteReglament } from '@/websync/reglaments.js'
 import { removeCardFileMessage } from '@/websync/card_message'
 import { removeTaskFileMessage } from '@/websync/task_message'
 import { removeColor } from '@/websync/colors_dop.js'
 import { removeParentTag, removeTag } from '@/websync/tag'
+import { removeDepartment } from '@/websync/departments'
 
 export default function processRemove (obj) {
   switch (obj.type) {
+    case TYPES.TYPE_OBJECT_REGLAMENT:
+      deleteReglament(obj)
+      break
     case TYPES.TYPE_OBJECT_TAG:
       removeTag(obj)
       removeParentTag(obj)
@@ -52,6 +57,7 @@ export default function processRemove (obj) {
     case TYPES.TYPE_OBJECT_CONTACT_FOTO:
       break
     case TYPES.TYPE_OBJECT_USER_GROUP:
+      removeDepartment(obj.uid)
       break
     case TYPES.TYPE_OBJECT_INVITE:
       break

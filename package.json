@@ -2,12 +2,9 @@
   "name": "leadertask-web",
   "version": "2.0.0",
   "scripts": {
-    "dev": "vite --host",
     "serve": "vue-cli-service serve --mode development",
     "serve-inspector": "vue-cli-service serve --mode inspector",
-    "serve:vite": "vite preview",
     "build": "vue-cli-service build",
-    "build:vite": "vite build",
     "lint": "vue-cli-service lint",
     "lint:fix": "vue-cli-service lint --fix"
   },
@@ -24,6 +21,7 @@
     "@tiptap/vue-3": "^2.0.0-beta.90",
     "@vueform/multiselect": "^2.3.3",
     "@vueform/toggle": "^2.0.1",
+    "@vueup/vue-quill": "^1.0.0-alpha.1",
     "axios": "^0.24.0",
     "base64-img": "^1.0.4",
     "body-parser": "^1.20.0",

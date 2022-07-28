@@ -3,7 +3,6 @@ import {
   NAVIGATOR_REMOVE_DEPARTAMENT
 } from '@/store/actions/navigator'
 import axios from 'axios'
-import { notify } from 'notiwind'
 import * as DEPARTMENTS from '../actions/departments'
 
 const state = {
@@ -27,15 +26,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: DEPARTMENTS.CREATE_DEPARTMENT_REQUEST,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -49,15 +39,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: DEPARTMENTS.UPDATE_DEPARTMENT_REQUEST,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })
@@ -72,15 +53,6 @@ const actions = {
           resolve(resp)
         })
         .catch((err) => {
-          notify(
-            {
-              group: 'api',
-              title: 'REST API Error, please make screenshot',
-              action: DEPARTMENTS.REMOVE_DEPARTMENT_REQUEST,
-              text: err.response?.data ?? err
-            },
-            15000
-          )
           reject(err)
         })
     })

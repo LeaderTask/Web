@@ -8,7 +8,9 @@ const state = {
   navStack: []
 }
 
-const getters = {}
+const getters = {
+  lastNavStackElement: (state) => state.navStack[state.navStack.length - 1]
+}
 
 const actions = {
   gotoNavStackItem: ({ commit, dispatch, rootState }, index) => {

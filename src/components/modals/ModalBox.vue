@@ -12,7 +12,6 @@
           <div class="flex-1 text-[#4c4c4d] font-medium text-[14px] leading-[16px] font-roboto">
             {{ title }}
           </div>
-          <!-- кнопка закрыть -->
           <div
             class="flex-none hover:cursor-pointer"
             @click="onCancel"
@@ -37,7 +36,7 @@
           <slot />
         </div>
         <div
-          v-if="ok || cancel"
+          v-if="ok || cancel || accept || decline"
           class="flex gap-[4px] justify-end mt-4"
         >
           <button
@@ -46,6 +45,20 @@
             @click="onSave"
           >
             {{ ok }}
+          </button>
+          <button
+            v-if="accept"
+            class="focus:ring min-w-[90px] focus:outline-none inline-flex cursor-pointer whitespace-nowrap justify-center items-center duration-150 px-[12px] py-[10px] rounded-md bg-[#ff9123] text-white text-[13px] leading-[15px] font-medium font-roboto"
+            @click="onAccept"
+          >
+            {{ accept }}
+          </button>
+          <button
+            v-if="decline"
+            class="focus:ring min-w-[90px] focus:outline-none inline-flex cursor-pointer whitespace-nowrap justify-center items-center duration-150 px-[12px] py-[10px] rounded-md border border-[#ff9123] bg-white text-[#ff9123] text-[13px] leading-[15px] font-medium font-roboto"
+            @click="onDecline"
+          >
+            {{ cancel }}
           </button>
           <button
             v-if="cancel"
@@ -80,18 +93,32 @@ export default {
       type: String,
       default: ''
     },
+    accept: {
+      type: String,
+      default: ''
+    },
+    decline: {
+      type: String,
+      default: ''
+    },
     cancel: {
       type: String,
       default: ''
     }
   },
-  emits: ['ok', 'cancel'],
+  emits: ['ok', 'accept', 'decline', 'cancel'],
   methods: {
     onCancel () {
       this.$emit('cancel')
     },
     onSave () {
       this.$emit('ok')
+    },
+    onAccept () {
+      this.$emit('accept')
+    },
+    onDecline () {
+      this.$emit('decline')
     }
   }
 }

@@ -111,7 +111,7 @@
         </div>
       </div>
       <template #menu>
-        <div class="max-h-[220px] overflow-y-auto w-[220px]">
+        <div class="max-h-[220px] overflow-y-auto w-[220px] scroll-style">
           <ProjectPropsMenuItemUser
             v-for="user in usersCanAddToAccess"
             :key="user.email"

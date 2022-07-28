@@ -505,7 +505,6 @@ export default {
   }),
   computed: {
     canChangeTime () {
-      console.log('canChangeTime', this.datePickerDate)
       return this.datePickerDate !== null
     }
   },

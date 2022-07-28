@@ -7,9 +7,14 @@ import { removeCardMessage } from '@/websync/card_message'
 import { removeTaskMessage } from '@/websync/task_message'
 import { updateColor } from '@/websync/colors_dop'
 import { updateTag } from '@/websync/tag'
+import { updateDepartment } from '@/websync/departments'
+import { updateReglament } from '@/websync/reglaments.js'
 
 export default function processUpdate (obj) {
   switch (obj.type) {
+    case TYPES.TYPE_OBJECT_REGLAMENT:
+      updateReglament(obj)
+      break
     case TYPES.TYPE_OBJECT_TAG:
       updateTag(obj)
       break
@@ -53,6 +58,7 @@ export default function processUpdate (obj) {
     case TYPES.TYPE_OBJECT_CONTACT_FOTO:
       break
     case TYPES.TYPE_OBJECT_USER_GROUP:
+      updateDepartment(obj)
       break
     case TYPES.TYPE_OBJECT_INVITE:
       break

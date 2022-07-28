@@ -5,7 +5,6 @@ import {
 } from '../actions/localization'
 
 import axios from 'axios'
-import { notify } from 'notiwind'
 
 const state = {
   localization: false,
@@ -32,12 +31,6 @@ const actions = {
           resolve(resp)
         }).catch(err => {
           commit(LOCALIZATION_ERROR, err)
-          notify({
-            group: 'api',
-            title: 'REST API Error, please make screenshot',
-            action: LOCALIZATION_REQUEST,
-            text: err?.response?.data
-          }, 15000)
           reject(err)
         })
     })

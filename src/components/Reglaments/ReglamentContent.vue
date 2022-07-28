@@ -237,7 +237,7 @@ export default {
       return this.$store?.state?.reglaments?.contributors
     },
     currentEditors () {
-      return this.reglament.editors
+      return this.reglament.editors ?? []
     },
     needStartEdit () {
       return this.reglament?.needStartEdit ?? false

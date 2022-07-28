@@ -4,6 +4,8 @@ import { removeCard } from '@/websync/card.js'
 import { removeEmployee } from '@/websync/employee.js'
 import { removeProject } from '@/websync/project.js'
 import { deleteReglament } from '@/websync/reglaments.js'
+import { deleteReglamentQuestion } from '@/websync/reglament_question'
+import { deleteReglamentAnswer } from '@/websync/reglament_answer'
 import { removeCardFileMessage } from '@/websync/card_message'
 import { removeTaskFileMessage } from '@/websync/task_message'
 import { removeColor } from '@/websync/colors_dop.js'
@@ -14,6 +16,12 @@ export default function processRemove (obj) {
   switch (obj.type) {
     case TYPES.TYPE_OBJECT_REGLAMENT:
       deleteReglament(obj)
+      break
+    case TYPES.TYPE_OBJECT_REGLAMENT_QUESTION:
+      deleteReglamentQuestion(obj)
+      break
+    case TYPES.TYPE_OBJECT_REGLAMENT_ANSWER:
+      deleteReglamentAnswer(obj)
       break
     case TYPES.TYPE_OBJECT_TAG:
       removeTag(obj)

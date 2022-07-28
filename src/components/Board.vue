@@ -211,7 +211,7 @@
               :delay="80"
               :touch-start-threshold="10"
               :animation="100"
-              :disabled="!board || board.type_access === 0"
+              :disabled="!board || board.type_access === 0 || isFiltered"
               :move="checkMoveDragCard"
               :scroll-sensitivity="100"
               :force-fallback="true"
@@ -238,7 +238,7 @@
           </div>
           <!--кнопка добавить карточку -->
           <div
-            v-if="column.AddCard && !showOnlyMyCreatedCards && !showOnlyCardsWhereIAmResponsible && !showOnlySearchText"
+            v-if="column.AddCard && !isFiltered"
             class="mt-2 h-[40px]"
           >
             <button
@@ -391,6 +391,9 @@ export default {
     showOnlyCardsWhereIAmResponsible () {
       return this.$store.state.boards.showOnlyCardsWhereIAmResponsible
     },
+    showOnlyCardsWithNoResponsible () {
+      return this.$store.state.boards.showOnlyCardsWithNoResponsible
+    },
     showOnlyMyCreatedCards () {
       return this.$store.state.boards.showOnlyMyCreatedCards
     },
@@ -399,6 +402,9 @@ export default {
     },
     isPropertiesMobileExpanded () {
       return this.$store.state.isPropertiesMobileExpanded
+    },
+    isFiltered () {
+      return this.showOnlyMyCreatedCards || this.showOnlyCardsWithNoResponsible || this.showOnlyCardsWhereIAmResponsible || this.showOnlySearchText
     }
   },
   watch: {
@@ -473,6 +479,11 @@ export default {
       } else if (this.showOnlyCardsWhereIAmResponsible) {
         const currentUserEmail = this.$store.state.user.user.current_user_email.toLowerCase()
         return column.cards.filter(card => card.user.toLowerCase() === currentUserEmail)
+      } else if (this.showOnlyCardsWithNoResponsible && this.showOnlyMyCreatedCards) {
+        const currentUserEmail = this.$store.state.user.user.current_user_email.toLowerCase()
+        return column.cards.filter(card => !card.user && card.email_creator.toLowerCase() === currentUserEmail)
+      } else if (this.showOnlyCardsWithNoResponsible) {
+        return column.cards.filter(card => !card.user)
       } else if (this.showOnlyMyCreatedCards) {
         const currentUserEmail = this.$store.state.user.user.current_user_email.toLowerCase()
         return column.cards.filter(card => card.email_creator.toLowerCase() === currentUserEmail)

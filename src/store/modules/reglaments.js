@@ -265,6 +265,11 @@ const mutations = {
   [REGLAMENTS.REGLAMENT_PUSH_QUESTION]: (state, data) => {
     state.reglamentQuestions.push(data)
   },
+  [REGLAMENTS.REGLAMENT_UPDATE_QUESTION]: (state, question) => {
+    const questionIndex = state.reglamentQuestions.findIndex(elem => elem.uid === question.uid)
+    if (!questionIndex) return
+    state.reglamentQuestions[questionIndex] = { ...state.reglamentQuestions[questionIndex], ...question }
+  },
   [REGLAMENTS.REGLAMENT_DELETE_QUESTION]: (state, uid) => {
     for (let i = 0; i < state.reglamentQuestions.length; i++) {
       if (state.reglamentQuestions[i].uid === uid) {

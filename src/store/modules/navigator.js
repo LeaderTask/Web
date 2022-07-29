@@ -2,7 +2,7 @@ import axios from 'axios'
 import { PUSH_BOARD } from '../actions/boards'
 import { PUSH_COLOR, PUSH_MYCOLOR } from '../actions/colors'
 import { PUSH_DEPARTMENT } from '../actions/departments'
-import { PUSH_EMPLOYEE, PUSH_EMPLOYEE_BY_EMAIL } from '../actions/employees'
+import { PUSH_EMPLOYEE, PUSH_EMPLOYEE_BY_EMAIL, PUSH_DELEGATED_EMPLOYEE } from '../actions/employees'
 import {
   NAVIGATOR_CHANGE_EMPLOYEE_DEPARTMENT,
   NAVIGATOR_ERROR,
@@ -73,6 +73,7 @@ const actions = {
           if (resp.data.delegate_iam) {
             for (const dm of resp.data.delegate_iam.items) {
               dm.parentID = resp.data.delegate_iam.uid
+              commit(PUSH_DELEGATED_EMPLOYEE, dm)
             }
           }
           if (resp.data.delegate_to_me) {

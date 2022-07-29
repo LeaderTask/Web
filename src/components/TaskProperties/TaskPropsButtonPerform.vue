@@ -166,7 +166,7 @@
         >
           <div class="container-employee-popover">
             <div
-              v-for="emp in employees"
+              v-for="emp in employeesSortedByDelegation"
               :key="emp.uid"
             >
               <div
@@ -234,6 +234,7 @@
 
 <script>
 import Popper from 'vue3-popper'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -255,9 +256,7 @@ export default {
   },
   emits: ['changePerformer', 'reAssign'],
   computed: {
-    employees () {
-      return this.$store.state.employees.employees
-    },
+    ...mapGetters(['employeesSortedByDelegation']),
     employeesByEmail () {
       return this.$store.state.employees.employeesByEmail
     }

@@ -151,11 +151,15 @@ export default {
     v-if="isEditing ? true: rightAnswersAmount(question)"
     class="bg-white p-3 rounded-[10px] mb-2"
   >
-    <div class="px-1 flex justify-between items-center group">
+    <div
+      class="px-2"
+      :class="[isEditing ? 'flex justify-between items-center group' : 'block']"
+    >
       <div
         :ref="question.uid + 'input'"
         placeholder="Текст вопроса"
-        class="font-[500] text-[18px] my-3 min-w-[10px] min-h-[10px]"
+        class="font-[500] text-[18px]  min-w-[10px] min-h-[10px]"
+        :class="isEditing ? 'my-3' : 'mt-3'"
         :contenteditable="isEditing && canEdit"
         @blur="changeQuestionName($event)"
         @keydown.enter.exact.prevent="$emit('addQuestion')"
@@ -163,13 +167,13 @@ export default {
       />
       <span
         v-if="rightAnswersAmount(question) === 1"
-        class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] breadcrumbs font-medium"
+        class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 text-[13px] font-medium my-1"
       >
         В данном вопросе один правильный ответ.
       </span>
       <span
         v-if="rightAnswersAmount(question) > 1"
-        class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] breadcrumbs font-medium"
+        class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] font-medium"
       >
         В данном вопросе более одного правильного ответа.
       </span>

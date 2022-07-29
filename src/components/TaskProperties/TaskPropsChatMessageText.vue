@@ -225,8 +225,8 @@
 <script>
 import linkify from 'vue-linkify'
 import ChatLoader from '@/components/CardProperties/ChatLoader'
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 import { ref } from 'vue'
 import { copyText } from 'vue3-clipboard'
 export default {

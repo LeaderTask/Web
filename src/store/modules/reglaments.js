@@ -3,6 +3,7 @@ import * as REGLAMENTS from '../actions/reglaments'
 
 const state = {
   reglaments: {},
+  showAll: false,
   reglamentQuestions: [], // вопросы по текущему регламенту
   contributors: [] // сотрудники, прошедшие текущий регламент
 }

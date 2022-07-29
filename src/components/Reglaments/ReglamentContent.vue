@@ -31,6 +31,27 @@
           </div>
         </template>
       </PopMenu>
+      <PopMenu>
+        <ReglamentSmallButton>
+          {{ currDepTitle }}
+        </ReglamentSmallButton>
+        <template #menu>
+          <div class="max-h-[220px] overflow-y-auto scroll-style max-w-[260px]">
+            <PopMenuItem
+              @click="currDep = ''"
+            >
+              Общий для всех отделов
+            </PopMenuItem>
+            <PopMenuItem
+              v-for="dep in allDepartments"
+              :key="dep.uid"
+              @click="currDep = dep.uid"
+            >
+              {{ dep.name }}
+            </PopMenuItem>
+          </div>
+        </template>
+      </PopMenu>
       <ReglamentSmallButton
         :icon="shouldClear ? 'check' : 'uncheck'"
         @click="shouldClear = !shouldClear"
@@ -85,6 +106,7 @@
       :creator="reglamentCreatorEmail"
       :editors="reglamentEditors"
       :contributors="contributors"
+      :department="reglamentDep"
     />
     <QuillEditor
       v-if="reglamentContent.length && !isTesting"
@@ -181,7 +203,8 @@ import ListBlocAdd from '@/components/Common/ListBlocAdd.vue'
 import ReglamentQuestion from './ReglamentQuestion.vue'
 import ReglamentCompleteMessage from './ReglamentCompleteMessage.vue'
 import ReglamentSmallButton from '@/components/Reglaments/ReglamentSmallButton.vue'
-import PopMenu from '@/components/modals/PopMenu.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 import BoardPropsMenuItemUser from '@/components/Board/BoardPropsMenuItemUser.vue'
 
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
@@ -196,6 +219,7 @@ export default {
     ReglamentWrong,
     ReglamentSmallButton,
     PopMenu,
+    PopMenuItem,
     BoardPropsMenuItemUser,
     ReglamentEditLimit,
     ReglamentTestLimit
@@ -210,8 +234,10 @@ export default {
     return {
       currEditors: [],
       currName: '',
-      showTestLimit: false,
+      currDep: '',
       currText: '',
+      //
+      showTestLimit: false,
       isEditing: false,
       showEditLimit: false,
       isTesting: false,
@@ -237,6 +263,9 @@ export default {
     },
     reglamentCreatorEmail () {
       return this.currReglament?.email_creator ?? ''
+    },
+    reglamentDep () {
+      return this.currReglament?.department_uid ?? ''
     },
     reglamentEditors () {
       return this.currReglament?.editors ?? []
@@ -302,6 +331,28 @@ export default {
         }
       }
       return users
+    },
+    currDepTitle () {
+      const dep = this.$store.state.departments.deps[this.currDep]
+      return dep?.name || 'Общий для всех отделов'
+    },
+    allDepartments () {
+      const deps = Object.values(this.$store.state.departments.deps)
+      deps.sort((item1, item2) => {
+        // сначала по порядку
+        if (item1.order > item2.order) return 1
+        if (item1.order < item2.order) return -1
+        // если одинаковый, то по имени
+        if (item1.name > item2.name) return 1
+        if (item1.name < item2.name) return -1
+        return 0
+      })
+      if (this.showAllReglaments) return deps
+      const currentUserEmail = this.$store.state.user.user.current_user_email.toLowerCase()
+      return deps.filter(dep => dep.emails.find(email => email.toLowerCase() === currentUserEmail))
+    },
+    showAllReglaments () {
+      return this.$store.state.reglaments.showAll
     }
   },
   watch: {
@@ -322,7 +373,6 @@ export default {
           const reglaments = this.$store.state.navigator.navigator.reglaments
           const index = reglaments.items.findIndex(item => item.uid === this.currReglament?.uid)
           if (index !== -1) reglaments.items[index].needStartEdit = false
-
           //
           this.setEdit()
         }
@@ -388,24 +438,25 @@ export default {
         name: '',
         uid_reglament: this.currReglament.uid
       }
+      const answer = {
+        uid: this.uuidv4(),
+        uid_question: question.uid,
+        name: '',
+        is_right: 0
+      }
       this.$store.dispatch('CREATE_REGLAMENT_QUESTION_REQUEST', question).then(() => {
-        const questionToPush = {
-          uid: question.uid,
-          name: question.name,
-          uid_reglament: question.uid_reglament,
-          answers: [
-            {
-              uid: this.uuidv4(),
-              uid_question: question.uid,
-              name: '',
-              is_right: 0
-            }
-          ]
-        }
+        this.$store.dispatch('CREATE_REGLAMENT_ANSWER_REQUEST', answer).then(() => {
+          const questionToPush = {
+            uid: question.uid,
+            name: question.name,
+            uid_reglament: question.uid_reglament,
+            answers: [answer]
+          }
 
-        this.$store.commit(REGLAMENTS.REGLAMENT_PUSH_QUESTION, questionToPush)
-        this.$nextTick(() => {
-          this.gotoNode(questionToPush.uid)
+          this.$store.commit(REGLAMENTS.REGLAMENT_PUSH_QUESTION, questionToPush)
+          this.$nextTick(() => {
+            this.gotoNode(questionToPush.uid)
+          })
         })
       })
     },
@@ -416,7 +467,7 @@ export default {
       })
     },
     setEdit () {
-      if (this.user.tarif !== 'alpha') {
+      if (this.user.tarif !== 'alpha' && this.user.tarif !== 'trial') {
         this.showEditLimit = true
         return
       }
@@ -424,6 +475,7 @@ export default {
         const reglament = { ...this.currReglament }
         reglament.content = this.currText
         reglament.name = this.currName.trim()
+        reglament.department_uid = this.currDep
         reglament.editors = [...this.currEditors]
         if (!reglament.name.length) {
           reglament.name = 'Регламент без названия'
@@ -450,6 +502,7 @@ export default {
         this.currName = this.reglamentTitle
         this.currText = this.reglamentContent
         this.currEditors = [...this.reglamentEditors]
+        this.currDep = this.reglamentDep
       }
     },
     clickComplete () {
@@ -479,7 +532,7 @@ export default {
       return this.currEditors.includes(email)
     },
     startTheReglament () {
-      if (this.user.tarif !== 'alpha') {
+      if (this.user.tarif !== 'alpha' && this.user.tarif !== 'trial') {
         this.showTestLimit = true
         return
       }

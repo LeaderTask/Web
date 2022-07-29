@@ -308,8 +308,8 @@
 
 <script>
 import FileMessage from '@/components/TaskProperties/FileMessage.vue'
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 import { ref } from 'vue'
 import { copyText } from 'vue3-clipboard'
 

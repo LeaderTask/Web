@@ -1123,11 +1123,7 @@ const mutations = {
     state.daysWithTasks = resp.data.calendar.dates_with_tasks
   },
   [TASK.REMOVE_TASK_FROM_LEAVES]: (state, uid) => {
-    for (let i = 0; i < state.newConfig.leaves.length; i++) {
-      if (uid === state.newConfig.leaves[i]) {
-        state.newConfig.leaves.splice(i, 1)
-      }
-    }
+    state.newConfig.leaves = state.newConfig.leaves.filter(item => item !== uid)
   },
   [TASK.ADD_TASK_TO_ROOTS]: (state, taskUid) => {
     if (!state.newConfig.roots.includes(taskUid)) {

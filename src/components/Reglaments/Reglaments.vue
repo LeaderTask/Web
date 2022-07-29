@@ -13,15 +13,15 @@
       @save="onAddNewReglament"
     />
     <div
-      v-for="(value, index) in reglaments"
+      v-for="(reg, index) in reglaments"
       :key="index"
     >
       <div
         class="flex w-full"
-        :class="{ 'justify-between': index == 0, 'mt-[28px]': index == 1 }"
+        :class="{ 'justify-between': index == 0, 'mt-[28px]': index != 0 }"
       >
         <p class="font-['Roboto'] text-[#424242] text-[19px] leading-[22px] font-bold">
-          {{ value.dep }}
+          {{ reg.dep }}
         </p>
         <div
           v-if="index == 0"
@@ -61,7 +61,7 @@
         }"
       >
         <template
-          v-for="reglament in value.items"
+          v-for="reglament in reg.items"
           :key="reglament.uid"
         >
           <ReglamentBlocItem
@@ -69,11 +69,23 @@
             @click.stop="gotoReglamentContent(reglament)"
           />
         </template>
+        <ReglamentBlocEmpty
+          v-if="!reg.is_my_dep && reg.items.length === 0"
+        />
         <ListBlocAdd
-          v-if="index == 0"
-          @click.stop="clickAddReglament"
+          v-if="reg.is_my_dep"
+          @click.stop="clickAddReglament(reg.uid)"
         />
       </div>
+    </div>
+    <div
+      v-if="currentUserIsAdmin"
+      class="flex items-center w-full my-[28px] text-[#7e7e80] hover:text-[#424242] cursor-pointer"
+      @click.stop="clickShowAll"
+    >
+      <p class="font-roboto text-[17px] leading-[22px]">
+        {{ showAllReglaments ? 'Показать только доступные' : 'Показать все регламенты' }}
+      </p>
     </div>
   </div>
   <EmptyTasksListPics v-if="isEmpty" />
@@ -84,6 +96,7 @@ import Icon from '@/components/Icon.vue'
 import BoardModalBoxRename from '@/components/Board/BoardModalBoxRename.vue'
 import { setLocalStorageItem } from '@/store/helpers/functions'
 import ReglamentBlocItem from '@/components/Reglaments/ReglamentBlockItem.vue'
+import ReglamentBlocEmpty from '@/components/Reglaments/ReglamentBlocEmpty.vue'
 import ListBlocAdd from '@/components/Common/ListBlocAdd.vue'
 import ReglamentAddLimit from '@/components/Reglaments/ReglamentAddLimit.vue'
 import EmptyTasksListPics from '@/components/TasksList/EmptyTasksListPics'
@@ -99,6 +112,7 @@ export default {
     Icon,
     BoardModalBoxRename,
     ReglamentBlocItem,
+    ReglamentBlocEmpty,
     ReglamentAddLimit,
     ListBlocAdd,
     EmptyTasksListPics
@@ -112,6 +126,7 @@ export default {
   data () {
     return {
       showAddReglament: false,
+      addReglamentDepartment: '',
       showAddLimit: false,
       gridView,
       listView
@@ -131,9 +146,28 @@ export default {
     user () {
       return this.$store.state.user.user
     },
+    currentUserIsAdmin () {
+      const employees = this.$store.state.employees.employees
+      const userType = employees[this.user.current_user_uid]?.type ?? 0
+      return userType === 1 || userType === 2
+    },
+    allDepartments () {
+      const deps = Object.values(this.$store.state.departments.deps)
+      deps.sort((item1, item2) => {
+        // сначала по порядку
+        if (item1.order > item2.order) return 1
+        if (item1.order < item2.order) return -1
+        // если одинаковый, то по имени
+        if (item1.name > item2.name) return 1
+        if (item1.name < item2.name) return -1
+        return 0
+      })
+      return deps
+    },
     reglaments () {
-      const currentUserEmail = this.user.current_user_email.toLowerCase()
       const reglaments = []
+      /*
+      const currentUserEmail = this.user.current_user_email.toLowerCase()
       const myItems = this.items.filter(reglament => reglament.email_creator.toLowerCase() === currentUserEmail)
       const otherItems = this.items.filter(reglament => reglament.email_creator.toLowerCase() !== currentUserEmail)
       reglaments.push({
@@ -147,6 +181,39 @@ export default {
         })
       }
       return reglaments
+      */
+      const common = {
+        dep: 'Общие регламенты',
+        uid: '',
+        is_my_dep: true,
+        items: []
+      }
+      reglaments.push(common)
+      const currentUserEmail = this.$store.state.user.user.current_user_email.toLowerCase()
+      const departmentMap = {}
+      for (const dep of this.allDepartments) {
+        const reglament = {
+          dep: dep.name,
+          uid: dep.uid,
+          is_my_dep: dep.emails.find(email => email.toLowerCase() === currentUserEmail),
+          items: []
+        }
+        reglaments.push(reglament)
+        departmentMap[reglament.uid] = reglament
+      }
+      for (const item of this.items) {
+        const dep = departmentMap[item.department_uid]
+        if (dep) {
+          dep.items.push(item)
+        } else {
+          common.items.push(item)
+        }
+      }
+      if (this.showAllReglaments) return reglaments
+      return reglaments.filter(reg => reg.is_my_dep)
+    },
+    showAllReglaments () {
+      return this.$store.state.reglaments.showAll
     }
   },
   created () {
@@ -186,14 +253,20 @@ export default {
         ).toString(16)
       )
     },
-    clickAddReglament () {
-      if (this.user.tarif !== 'alpha') {
+    clickShowAll () {
+      this.$store.state.reglaments.showAll = !this.showAllReglaments
+    },
+    clickAddReglament (uid) {
+      if (this.user.tarif !== 'alpha' && this.user.tarif !== 'trial') {
         this.showAddLimit = true
         return
       }
+      this.addReglamentDepartment = uid
       this.showAddReglament = true
     },
     onAddNewReglament (name) {
+      const departmentUid = this.addReglamentDepartment
+      this.addReglamentDepartment = ''
       this.showAddReglament = false
       const title = name.trim()
       if (title) {
@@ -204,6 +277,7 @@ export default {
           email_creator: this.user.current_user_email,
           name: title,
           content: '',
+          department_uid: departmentUid,
           uid: this.uuidv4()
         }
 

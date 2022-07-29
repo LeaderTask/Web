@@ -227,8 +227,8 @@ import EmployeesModalBoxOtherOrg from '@/components/Employees/EmployeesModalBoxO
 import { setLocalStorageItem } from '@/store/helpers/functions'
 import EmployeesModalBoxAdd from '@/components/Employees/EmployeesModalBoxAdd.vue'
 import EmployeesModalBoxMove from '@/components/Employees/EmployeesModalBoxMove.vue'
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 import EmployeesModalBoxAlreadyExist from '@/components/Employees/EmployeesModalBoxAlreadyExist'
 
 import * as EMPLOYEE from '@/store/actions/employees'

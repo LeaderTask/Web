@@ -6,6 +6,15 @@
       {{ title }}
     </div>
     <div class="flex font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] font-medium">
+      Отдел:
+      <div class="flex items-center">
+        <div class="h-[20px] w-0 ml-2" />
+        <span class="text-[12px]">
+          {{ departmentTitle }}
+        </span>
+      </div>
+    </div>
+    <div class="flex font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] font-medium">
       Автор:
       <div class="flex items-center">
         <img
@@ -69,12 +78,16 @@ export default {
       default: ''
     },
     editors: {
-      type: String,
-      default: ''
+      type: Array,
+      default: () => ([])
     },
     contributors: {
       type: Array,
       default: () => ([])
+    },
+    department: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -83,6 +96,10 @@ export default {
     },
     creatorFoto () {
       return this.$store.state.employees.employeesByEmail[this.creator]?.fotolink
+    },
+    departmentTitle () {
+      const dep = this.$store.state.departments.deps[this.department]
+      return dep?.name || 'Общий для всех отделов'
     }
   },
   methods: {

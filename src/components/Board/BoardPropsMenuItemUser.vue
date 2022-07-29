@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 
 export default {
   components: {

@@ -154,8 +154,8 @@
 import * as EMPLOYEE from '@/store/actions/employees'
 import { NAVIGATOR_REMOVE_EMPLOYEE } from '@/store/actions/navigator'
 import ModalBoxDelete from '@/components/Common/ModalBoxDelete.vue'
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 import PropsButtonClose from '@/components/Common/PropsButtonClose.vue'
 import PropsButtonMenu from '@/components/Common/PropsButtonMenu.vue'
 

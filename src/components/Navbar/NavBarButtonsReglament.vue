@@ -31,8 +31,8 @@
 import { copyText } from 'vue3-clipboard'
 import NavBarButtonIcon from '@/components/Navbar/NavBarButtonIcon.vue'
 import ModalBoxDelete from '@/components/Common/ModalBoxDelete.vue'
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 
 import { DELETE_REGLAMENT_REQUEST } from '@/store/actions/reglaments'
 import { NAVIGATOR_REMOVE_REGLAMENT } from '@/store/actions/navigator'

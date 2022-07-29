@@ -30,7 +30,8 @@ export function shouldAddTaskIntoList (task) {
     checkShouldAddTaskToTagRequest(lastNavStackElement, task) ||
     checkShouldAddTaskToColorRequest(lastNavStackElement, task) ||
     ifTaskHasParent(lastNavStackElement, task) ||
-    addToUnsortedList(lastNavStackElement, task)
+    addToUnsortedList(lastNavStackElement, task) ||
+    ifInTaskUserNoHasAccess(lastNavStackElement, task)
   ) {
     return true
   }
@@ -252,6 +253,12 @@ function checkShouldAddTaskToColorRequest (lastNavStackElement, task) {
 
 function ifTaskHasParent (lastNavStackElement, task) {
   if (task.uid_parent && task.uid_parent !== '00000000-0000-0000-0000-000000000000') {
+    return true
+  }
+}
+
+function ifInTaskUserNoHasAccess (lastNavStackElement, task) {
+  if (task.uid_parent && task.uid_customer !== user.value.current_user_uid) {
     return true
   }
 }

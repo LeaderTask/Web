@@ -16,6 +16,7 @@ const state = {
   selectedBoard: undefined,
   showArchive: false,
   showOnlyCardsWhereIAmResponsible: false,
+  showOnlyCardsWithNoResponsible: false,
   showOnlyMyCreatedCards: false,
   showOnlySearchText: undefined
 }
@@ -302,11 +303,11 @@ const mutations = {
   [BOARD.SHOW_BOARD_ARCHIVE]: (state, showArchive) => {
     state.showArchive = showArchive
   },
-  [BOARD.SHOW_BOARD_MY_CARDS_WHERE_IAM_RESPONSIBLE]: (
-    state,
-    showCardsWhereIAmResponsible
-  ) => {
-    state.showOnlyCardsWhereIAmResponsible = showCardsWhereIAmResponsible
+  [BOARD.SHOW_BOARD_MY_CARDS_WHERE_IAM_RESPONSIBLE]: (state, show) => {
+    state.showOnlyCardsWhereIAmResponsible = show
+  },
+  [BOARD.SHOW_BOARD_CARDS_WITH_NO_RESPONSIBLE]: (state, show) => {
+    state.showOnlyCardsWithNoResponsible = show
   },
   [BOARD.SHOW_BOARD_MY_CREATED_CARDS]: (state, showMyCreatedCards) => {
     state.showOnlyMyCreatedCards = showMyCreatedCards
@@ -317,6 +318,7 @@ const mutations = {
   [BOARD.BOARD_CLEAR_FILTER]: (state) => {
     state.showArchive = false
     state.showOnlyCardsWhereIAmResponsible = false
+    state.showOnlyCardsWithNoResponsible = false
     state.showOnlyMyCreatedCards = false
   }
 }

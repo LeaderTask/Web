@@ -2,6 +2,8 @@ import { showNotify } from '@/store/helpers/functions'
 import store from '@/store/index.js'
 import { createCard } from '@/websync/card.js'
 import { createReglament } from '@/websync/reglaments.js'
+import { createReglamentQuestion } from '@/websync/reglament_question'
+import { createReglamentAnswer } from '@/websync/reglament_answer'
 import { createCardMessage } from '@/websync/card_message.js'
 import { createColor } from '@/websync/colors_dop.js'
 import { createEmployee } from '@/websync/employee.js'
@@ -28,6 +30,12 @@ export default function processCreate (obj) {
   switch (obj.type) {
     case TYPES.TYPE_OBJECT_REGLAMENT:
       createReglament(obj)
+      break
+    case TYPES.TYPE_OBJECT_REGLAMENT_QUESTION:
+      createReglamentQuestion(obj)
+      break
+    case TYPES.TYPE_OBJECT_REGLAMENT_ANSWER:
+      createReglamentAnswer(obj)
       break
     case TYPES.TYPE_OBJECT_TAG:
       createTag(obj)

@@ -54,7 +54,7 @@
       >
     </div>
     <QuillEditor
-      v-model:content="text"
+      v-model:content="currText"
       content-type="html"
       :toolbar="'full'"
       class="h-auto mb-5 bg-white"
@@ -81,14 +81,14 @@
     </div>
     <ReglamentInfo
       v-if="!isTesting"
-      :title="reglament?.name ?? ''"
-      :creator="reglament?.email_creator ?? ''"
-      :editors="currentEditors"
+      :title="reglamentTitle"
+      :creator="reglamentCreatorEmail"
+      :editors="reglamentEditors"
       :contributors="contributors"
     />
     <QuillEditor
-      v-if="text?.length && !isTesting"
-      v-model:content="text"
+      v-if="reglamentContent.length && !isTesting"
+      v-model:content="reglamentContent"
       content-type="html"
       :read-only="true"
       :toolbar="['']"
@@ -208,9 +208,10 @@ export default {
   },
   data () {
     return {
-      currName: this.reglament?.name ?? '',
+      currEditors: [],
+      currName: '',
       showTestLimit: false,
-      text: this.reglament?.content ?? '',
+      currText: '',
       isEditing: false,
       showEditLimit: false,
       isTesting: false,
@@ -222,8 +223,23 @@ export default {
     }
   },
   computed: {
+    currReglament () {
+      return this.$store.state.reglaments.reglaments[this.reglament?.uid]
+    },
     questions () {
       return this.$store?.state?.reglaments?.reglamentQuestions
+    },
+    reglamentTitle () {
+      return this.currReglament?.name ?? ''
+    },
+    reglamentContent () {
+      return this.currReglament?.content ?? ''
+    },
+    reglamentCreatorEmail () {
+      return this.currReglament?.email_creator ?? ''
+    },
+    reglamentEditors () {
+      return this.currReglament?.editors ?? []
     },
     isContributor () {
       for (let i = 0; i < this.contributors.length; i++) {
@@ -236,18 +252,15 @@ export default {
     contributors () {
       return this.$store?.state?.reglaments?.contributors
     },
-    currentEditors () {
-      return this.reglament.editors
-    },
     needStartEdit () {
-      return this.reglament?.needStartEdit ?? false
+      return this.currReglament?.needStartEdit ?? false
     },
     editorsCanEdit () {
-      return this.reglament?.editors?.includes(this.$store.state.user.user.current_user_email)
+      return this.currReglament?.editors?.includes(this.$store.state.user.user.current_user_email)
     },
     canEdit () {
       const userType = this.$store.state.employees.employees[this.$store.state.user.user.current_user_uid].type
-      return (this.reglament?.email_creator === this.user.current_user_email) || (this.editorsCanEdit) || (userType === 2 || userType === 1)
+      return (this.currReglament?.email_creator === this.user.current_user_email) || (this.editorsCanEdit) || (userType === 2 || userType === 1)
     },
     user () {
       return this.$store.state.user.user
@@ -279,9 +292,9 @@ export default {
     usersCanAddToAccess () {
       const users = []
       const employees = Object.values(this.$store.state.employees.employees)
-      const editors = this.currentEditors || {}
+      const creator = this.reglamentCreatorEmail.toLowerCase()
       for (const emp of employees) {
-        if (editors[emp.uid] === undefined && emp.email !== this.reglament.email_creator) {
+        if (emp.email.toLowerCase() !== creator) {
           users.push({
             uid: emp.uid,
             email: emp.email
@@ -307,8 +320,9 @@ export default {
         if (val) {
           // убираем needStartEdit - чтобы следующий раз не редактировался
           const reglaments = this.$store.state.navigator.navigator.reglaments
-          const index = reglaments.items.findIndex(item => item.uid === this.reglament?.uid)
+          const index = reglaments.items.findIndex(item => item.uid === this.currReglament?.uid)
           if (index !== -1) reglaments.items[index].needStartEdit = false
+
           //
           this.setEdit()
         }
@@ -316,8 +330,9 @@ export default {
     }
   },
   mounted () {
-    this.$store.dispatch(REGLAMENTS.REGLAMENT_REQUEST, this.reglament.uid)
-    this.$store.dispatch(REGLAMENTS.GET_USERS_REGLAMENT_ANSWERS, this.reglament.uid)
+    if (!this.currReglament) return
+    this.$store.dispatch(REGLAMENTS.REGLAMENT_REQUEST, this.currReglament?.uid)
+    this.$store.dispatch(REGLAMENTS.GET_USERS_REGLAMENT_ANSWERS, this.currReglament?.uid)
     try {
       if (!this.isEditing) {
         document.querySelector('div.ql-toolbar').remove()
@@ -371,7 +386,7 @@ export default {
       const question = {
         uid: this.uuidv4(),
         name: '',
-        uid_reglament: this.reglament.uid
+        uid_reglament: this.currReglament.uid
       }
       this.$store.dispatch('CREATE_REGLAMENT_QUESTION_REQUEST', question).then(() => {
         const questionToPush = {
@@ -406,9 +421,10 @@ export default {
         return
       }
       if (this.isEditing) {
-        const reglament = { ...this.reglament }
-        reglament.content = this.text
+        const reglament = { ...this.currReglament }
+        reglament.content = this.currText
         reglament.name = this.currName.trim()
+        reglament.editors = [...this.currEditors]
         if (!reglament.name.length) {
           reglament.name = 'Регламент без названия'
         }
@@ -431,18 +447,20 @@ export default {
         })
       } else if (this.canEdit) {
         this.isEditing = true
-        this.currName = this.reglament?.name
+        this.currName = this.reglamentTitle
+        this.currText = this.reglamentContent
+        this.currEditors = [...this.reglamentEditors]
       }
     },
     clickComplete () {
       const data = {
         uid_user: this.user.current_user_uid,
-        uid_reglament: this.reglament.uid,
+        uid_reglament: this.currReglament.uid,
         answerJson: JSON.stringify(this.questions)
       }
       console.log(this.questions)
       this.$store.dispatch('CRATE_USER_REGLAMENT_ANSWER', data).then((resp) => {
-        const reglament = { ...this.reglament }
+        const reglament = { ...this.currReglament }
         reglament.is_passed = resp.data.is_passed
         this.$store.commit('NAVIGATOR_UPDATE_REGLAMENT', reglament)
         this.showCompleteMessage = true
@@ -450,16 +468,15 @@ export default {
       })
     },
     addReglamentEditor (email) {
-      for (let i = 0; i < this.currentEditors.length; i++) {
-        if (this.currentEditors[i] === email) {
-          this.currentEditors.splice(i, 1)
-          return
-        }
+      const index = this.currEditors.findIndex(editor => editor.toLowerCase() === email.toLowerCase())
+      if (index !== -1) {
+        this.currEditors.splice(index, 1)
+      } else {
+        this.currEditors.push(email)
       }
-      this.currentEditors.push(email)
     },
     checkEditor (email) {
-      return this.currentEditors?.includes(email)
+      return this.currEditors.includes(email)
     },
     startTheReglament () {
       if (this.user.tarif !== 'alpha') {

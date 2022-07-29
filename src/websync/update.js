@@ -9,11 +9,19 @@ import { updateColor } from '@/websync/colors_dop'
 import { updateTag } from '@/websync/tag'
 import { updateDepartment } from '@/websync/departments'
 import { updateReglament } from '@/websync/reglaments.js'
+import { updateReglamentQuestion } from '@/websync/reglament_question'
+import { updateReglamentAnswer } from '@/websync/reglament_answer'
 
 export default function processUpdate (obj) {
   switch (obj.type) {
     case TYPES.TYPE_OBJECT_REGLAMENT:
       updateReglament(obj)
+      break
+    case TYPES.TYPE_OBJECT_REGLAMENT_QUESTION:
+      updateReglamentQuestion(obj)
+      break
+    case TYPES.TYPE_OBJECT_REGLAMENT_ANSWER:
+      updateReglamentAnswer(obj)
       break
     case TYPES.TYPE_OBJECT_TAG:
       updateTag(obj)

@@ -76,9 +76,6 @@ const cardDateCreate = computed(() => {
         >
           Отображать файлы и сообщения
         </PopMenuItem>
-        <PopMenuItem>
-          Копировать как ссылку
-        </PopMenuItem>
         <PopMenuItem
           v-if="props.canEdit"
           @click="$emit('clickRemoveButton')"

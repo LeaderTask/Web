@@ -49,6 +49,7 @@ const actions = {
       const url = process.env.VUE_APP_INSPECTOR_API + 'reglaments'
       axios({ url: url, method: 'POST', data: data })
         .then((resp) => {
+          commit(REGLAMENTS.REGLAMENT_CHANGE_REGLAMENTS, [data])
           resolve(resp)
         })
         .catch((err) => {
@@ -81,7 +82,10 @@ const actions = {
         })
     })
   },
-  [REGLAMENTS.GET_USERS_REGLAMENT_ANSWERS]: ({ commit, dispatch }, uidReglament) => {
+  [REGLAMENTS.GET_USERS_REGLAMENT_ANSWERS]: (
+    { commit, dispatch },
+    uidReglament
+  ) => {
     return new Promise((resolve, reject) => {
       const url =
         process.env.VUE_APP_INSPECTOR_API +
@@ -97,7 +101,10 @@ const actions = {
         })
     })
   },
-  [REGLAMENTS.DELETE_USERS_REGLAMENT_ANSWERS]: ({ commit, dispatch }, uidReglament) => {
+  [REGLAMENTS.DELETE_USERS_REGLAMENT_ANSWERS]: (
+    { commit, dispatch },
+    uidReglament
+  ) => {
     return new Promise((resolve, reject) => {
       const url =
         process.env.VUE_APP_INSPECTOR_API +
@@ -155,7 +162,7 @@ const mutations = {
     const seen = []
     const cleared = []
     for (let i = 0; i < contributors.length; i++) {
-      if (!(seen.includes(contributors[i].uid_user))) {
+      if (!seen.includes(contributors[i].uid_user)) {
         seen.push(contributors[i].uid_user)
         cleared.push(contributors[i])
       }
@@ -228,11 +235,17 @@ const mutations = {
         if (state.reglamentQuestions[i].uid === data[0].uid_question) {
           for (let j = 0; j < state.reglamentQuestions[i].answers.length; j++) {
             // убираем selected с предыдущего вопроса
-            if (state.reglamentQuestions[i].answers[j].selected && (state.reglamentQuestions[i].answers[j].uid !== data[0].uid)) {
+            if (
+              state.reglamentQuestions[i].answers[j].selected &&
+              state.reglamentQuestions[i].answers[j].uid !== data[0].uid
+            ) {
               state.reglamentQuestions[i].answers[j].selected = false
             }
             // ставим selected новому вопросу
-            if (!state.reglamentQuestions[i].answers[j].selected && (state.reglamentQuestions[i].answers[j].uid === data[0].uid)) {
+            if (
+              !state.reglamentQuestions[i].answers[j].selected &&
+              state.reglamentQuestions[i].answers[j].uid === data[0].uid
+            ) {
               state.reglamentQuestions[i].answers[j].selected = true
             } else {
               state.reglamentQuestions[i].answers[j].selected = false
@@ -264,6 +277,16 @@ const mutations = {
   },
   [REGLAMENTS.REGLAMENT_PUSH_QUESTION]: (state, data) => {
     state.reglamentQuestions.push(data)
+  },
+  [REGLAMENTS.REGLAMENT_UPDATE_QUESTION]: (state, question) => {
+    const questionIndex = state.reglamentQuestions.findIndex(
+      (elem) => elem.uid === question.uid
+    )
+    if (!questionIndex) return
+    state.reglamentQuestions[questionIndex] = {
+      ...state.reglamentQuestions[questionIndex],
+      ...question
+    }
   },
   [REGLAMENTS.REGLAMENT_DELETE_QUESTION]: (state, uid) => {
     for (let i = 0; i < state.reglamentQuestions.length; i++) {

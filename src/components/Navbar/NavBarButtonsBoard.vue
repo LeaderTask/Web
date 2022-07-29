@@ -10,7 +10,7 @@
     <PopMenu>
       <NavBarButtonIcon
         icon="filter"
-        :colored="showOnlyMyCreatedCards || showOnlyCardsWhereIAmResponsible || showArchive"
+        :colored="isFilterSet"
       />
       <template #menu>
         <PopMenuItem
@@ -18,6 +18,12 @@
           @click="clickBoardMyCards"
         >
           Ответственный я
+        </PopMenuItem>
+        <PopMenuItem
+          :icon="showOnlyCardsWithNoResponsible ? 'check' : 'uncheck'"
+          @click="clickBoardNoResponsibleCards"
+        >
+          Нет ответственного
         </PopMenuItem>
         <PopMenuItem
           :icon="showOnlyMyCreatedCards ? 'check' : 'uncheck'"
@@ -32,10 +38,10 @@
           Архив
         </PopMenuItem>
         <PopMenuDivider
-          v-if="showOnlyMyCreatedCards || showOnlyCardsWhereIAmResponsible || showArchive"
+          v-if="isFilterSet"
         />
         <PopMenuItem
-          v-if="showOnlyMyCreatedCards || showOnlyCardsWhereIAmResponsible || showArchive"
+          v-if="isFilterSet"
           icon="uncheck"
           @click="clickBoardFilterClear"
         >
@@ -112,11 +118,17 @@ export default {
     showOnlyCardsWhereIAmResponsible () {
       return this.$store.state.boards.showOnlyCardsWhereIAmResponsible
     },
+    showOnlyCardsWithNoResponsible () {
+      return this.$store.state.boards.showOnlyCardsWithNoResponsible
+    },
     showOnlyMyCreatedCards () {
       return this.$store.state.boards.showOnlyMyCreatedCards
     },
     isFavorite () {
       return this.board?.favorite
+    },
+    isFilterSet () {
+      return this.showOnlyMyCreatedCards || this.showOnlyCardsWhereIAmResponsible || this.showArchive || this.showOnlyCardsWithNoResponsible
     }
   },
   methods: {
@@ -147,6 +159,11 @@ export default {
     },
     clickBoardMyCards () {
       this.$store.commit(BOARD.SHOW_BOARD_MY_CARDS_WHERE_IAM_RESPONSIBLE, !this.showOnlyCardsWhereIAmResponsible)
+      this.$store.commit(BOARD.SHOW_BOARD_CARDS_WITH_NO_RESPONSIBLE, false)
+    },
+    clickBoardNoResponsibleCards () {
+      this.$store.commit(BOARD.SHOW_BOARD_MY_CARDS_WHERE_IAM_RESPONSIBLE, false)
+      this.$store.commit(BOARD.SHOW_BOARD_CARDS_WITH_NO_RESPONSIBLE, !this.showOnlyCardsWithNoResponsible)
     },
     clickBoardMyCardsCreated () {
       this.$store.commit(BOARD.SHOW_BOARD_MY_CREATED_CARDS, !this.showOnlyMyCreatedCards)

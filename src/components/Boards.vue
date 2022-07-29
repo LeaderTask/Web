@@ -53,32 +53,34 @@
           />
         </div>
       </div>
-      <div
+      <draggable
+        :list="value.items"
+        animation="400"
+        @change="updateOrderBords($event, value.items)"
         class="grid gap-2 mt-3 grid-cols-1"
         :class="{
           'md:grid-cols-2 lg:grid-cols-4': isGridView,
           'lg:grid-cols-2': isPropertiesMobileExpanded && isGridView
         }"
       >
-        <template
-          v-for="board in value.items"
-          :key="board.uid"
-        >
+        <template #item="{ element }">
           <BoardBlocItem
-            :board="board"
-            @click.stop="gotoChildren(board)"
+            :key="element.uid"
+            :board="element"
+            @click.stop="gotoChildren(element)"
           />
         </template>
         <ListBlocAdd
           v-if="index == 0"
           @click.stop="clickAddBoard"
         />
-      </div>
+      </draggable>
     </div>
   </div>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 import Icon from '@/components/Icon.vue'
 import { setLocalStorageItem } from '@/store/helpers/functions'
 import BoardModalBoxRename from '@/components/Board/BoardModalBoxRename.vue'
@@ -94,6 +96,7 @@ import listView from '@/icons/list-view.js'
 
 export default {
   components: {
+    draggable,
     Icon,
     BoardModalBoxRename,
     BoardModalBoxBoardsLimit,
@@ -123,6 +126,17 @@ export default {
     }
   },
   methods: {
+    updateOrderBords (e, boards) {
+      boards.forEach((board, i) => {
+        if (board.order !== i) {
+          board.order = i
+          this.$store.dispatch(BOARD.CREATE_BOARD_REQUEST, board).then((res) => {
+            this.$store.commit(BOARD.PUSH_BOARD, [board])
+            window.console.log(res)
+          })
+        }
+      })
+    },
     print (val) {
       console.log(val)
     },

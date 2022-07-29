@@ -9,10 +9,19 @@ import * as EMPLOYEE from '../actions/employees'
 const state = {
   employees: {},
   employeesByEmail: {},
+  // Добавление нового стейта для реализации сорировки и добавления из навигатора
+  employeesByDelegation: {},
   selectedEmployee: null
 }
 
-const getters = {}
+const getters = {
+  // сортировка пользователей из навигатора и employees
+  sortedEmployeesByDelegation (state) {
+    return Object.values(state.employeesByDelegation).sort((a, b) => {
+      return state.employeesByDelegation[a.uid] ? -1 : 0
+    })
+  }
+}
 
 const actions = {
   [EMPLOYEE.CREATE_EMPLOYEE_REQUEST]: ({ commit, dispatch }, data) => {
@@ -96,6 +105,10 @@ const mutations = {
   },
   [EMPLOYEE.PUSH_EMPLOYEE_BY_EMAIL]: (state, employee) => {
     state.employeesByEmail[employee.email.toLowerCase()] = employee
+  },
+  // добавление данных в employees из navigator
+  [EMPLOYEE.PUSH_DELIGATE_IN_EMPLOYEE]: (state, deligateIamNavigator) => {
+    state.employeesByDelegation[deligateIamNavigator.uid] = deligateIamNavigator
   },
   [EMPLOYEE.SELECT_EMPLOYEE]: (state, employee) => {
     state.selectedEmployee = employee

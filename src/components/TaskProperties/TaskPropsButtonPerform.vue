@@ -166,7 +166,7 @@
         >
           <div class="container-employee-popover">
             <div
-              v-for="emp in employees"
+              v-for="emp in employeesByDelegationSort"
               :key="emp.uid"
             >
               <div
@@ -234,6 +234,7 @@
 
 <script>
 import Popper from 'vue3-popper'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -255,9 +256,9 @@ export default {
   },
   emits: ['changePerformer', 'reAssign'],
   computed: {
-    employees () {
-      return this.$store.state.employees.employees
-    },
+    // передача массива с данными в новую мапу из геттеров employees
+    // переименование дефолтного названия для полного понимания назначения переменной
+    ...mapGetters(['employeesByDelegationSort']),
     employeesByEmail () {
       return this.$store.state.employees.employeesByEmail
     }

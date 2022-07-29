@@ -58,6 +58,12 @@
         @update-answer-name="updateAnswerName"
       />
     </template>
+    <span
+      v-if="isEditing && !checkQuestionAnswers"
+      class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] font-medium"
+    >
+      Добавьте хотя бы один правильный ответ
+    </span>
     <button
       v-if="canEdit && isEditing"
       class="ml-[5px] mt-2 font-[300] text-[14px] bg-[#F4F5F7] p-1 px-3 rounded-[5px] hover:cursor-pointer transition hover:opacity-[0.6]"
@@ -98,7 +104,8 @@ export default {
     return {
       showDeleteQuestion: false,
       showDeleteAnswer: false,
-      rightAnswer: false
+      rightAnswer: false,
+      question_answers: []
     }
   },
   computed: {
@@ -108,6 +115,10 @@ export default {
     },
     editorsCanEdit () {
       return this.reglament.editors.includes(this.$store.state.user.user.current_user_email)
+    },
+    checkQuestionAnswers () {
+      const answers = this.question.answers
+      return answers.find(elem => elem.is_right)
     }
   },
   methods: {

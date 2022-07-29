@@ -717,7 +717,7 @@ const actions = {
       })
         .then((resp) => {
           commit(TASK.UPDATE_TASK, resp.data.tasks[0])
-          if (resp.data.tasks[0].type === 2) {
+          if (resp.data.tasks[0].type === 2 || resp.data.tasks[0].type === 3) {
             dispatch(NAVIGATOR_UPDATE_ASSIGNMENTS)
           }
           resolve(resp)

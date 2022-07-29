@@ -1,20 +1,3 @@
-<script>
-export default {
-  props: {
-    zIndex: {
-      type: String,
-      default: 'z-50'
-    }
-  },
-  emits: ['overlay-click'],
-  methods: {
-    overlayClick (event) {
-      this.$emit('overlay-click', event)
-    }
-  }
-}
-</script>
-
 <template>
   <div
     class="flex items-center flex-col justify-center overflow-hidden fixed inset-0"
@@ -43,3 +26,20 @@ export default {
     </transition>
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    zIndex: {
+      type: String,
+      default: 'z-50'
+    }
+  },
+  emits: ['overlay-click'],
+  methods: {
+    overlayClick (event) {
+      this.$emit('overlay-click', event)
+    }
+  }
+}
+</script>

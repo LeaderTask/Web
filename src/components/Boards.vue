@@ -61,12 +61,17 @@
         }"
       >
         <template
-          v-for="board in value.items"
+          v-for="(board, itemIndex) in value.items"
           :key="board.uid"
         >
           <BoardBlocItem
             :board="board"
             @click.stop="gotoChildren(board)"
+            draggable="true"
+            @dragstart="onDragStart($event, itemIndex)"
+            @dragend="onDragEnd"
+            @drop="onDrop(itemIndex, value.items)"
+            @dragover.prevent
           />
         </template>
         <ListBlocAdd
@@ -91,6 +96,7 @@ import * as NAVIGATOR from '@/store/actions/navigator'
 
 import gridView from '@/icons/grid-view.js'
 import listView from '@/icons/list-view.js'
+import axios from 'axios'
 
 export default {
   components: {
@@ -111,7 +117,8 @@ export default {
       showAddBoard: false,
       showBoardsLimit: false,
       gridView,
-      listView
+      listView,
+      draggingBoardIndex: null
     }
   },
   computed: {
@@ -123,6 +130,27 @@ export default {
     }
   },
   methods: {
+    onDragStart (event, index) {
+      event.dataTransfer.dropEffect = 'move'
+      event.dataTransfer.effectAllowed = 'move'
+      this.draggingBoardIndex = index
+    },
+    onDrop (index, boards) {
+      if (this.draggingBoardIndex === null || this.draggingBoardIndex === index) {
+        return
+      }
+      axios.post('https://web.leadertask.com/api/v1/board/parent', {
+        uid: boards[this.draggingBoardIndex],
+        parent: boards[this.draggingBoardIndex],
+        order: boards[index].order
+      }).catch(function (_error) {
+        // TODO: обработать ошибку
+      })
+      boards.splice(index, 0, boards.splice(this.draggingBoardIndex, 1)[0])
+    },
+    onDragEnd () {
+      this.draggingBoardIndex = null
+    },
     print (val) {
       console.log(val)
     },

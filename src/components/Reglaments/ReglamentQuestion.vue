@@ -1,3 +1,72 @@
+<template>
+  <BoardModalBoxDelete
+    v-if="showDeleteQuestion"
+    title="Удалить вопрос"
+    text="Вы действительно хотите удалить вопрос?"
+    @cancel="showDeleteQuestion = false"
+    @yes="deleteQuestion"
+  />
+  <div
+    v-if="isEditing ? true: rightAnswersAmount(question)"
+    class="bg-white p-3 rounded-[10px] mb-2"
+  >
+    <div
+      class="px-2"
+      :class="[isEditing ? 'flex justify-between items-center group' : 'block']"
+    >
+      <div
+        :ref="question.uid + 'input'"
+        placeholder="Текст вопроса"
+        class="font-[500] text-[18px]  min-w-[10px] min-h-[10px]"
+        :class="isEditing ? 'my-3' : 'mt-3'"
+        :contenteditable="isEditing && canEdit"
+        @blur="changeQuestionName($event)"
+        @keydown.enter.exact.prevent="$emit('addQuestion')"
+        v-html="question.name"
+      />
+      <span
+        v-if="rightAnswersAmount(question) === 1"
+        class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 text-[13px] font-medium my-1"
+      >
+        В данном вопросе один правильный ответ.
+      </span>
+      <span
+        v-if="rightAnswersAmount(question) > 1"
+        class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] font-medium"
+      >
+        В данном вопросе более одного правильного ответа.
+      </span>
+      <ReglamentQuestionPopMenu
+        v-if="isEditing && canEdit"
+        :question="question"
+        @deleteQuestion="showDeleteQuestion = true"
+      />
+    </div>
+    <template
+      v-for="(answer) in question.answers"
+      :key="answer.uid"
+    >
+      <ReglamentAnswer
+        :ref="answer.uid"
+        class="mb-1"
+        :is-editing="isEditing"
+        :answer="answer"
+        @set-right-answer="setRightAnswer"
+        @onSelectAnswer="onSelectAnswer"
+        @addAnswer="onAddAnswer"
+        @deleteAnswer="onDeleteAnswer"
+        @update-answer-name="updateAnswerName"
+      />
+    </template>
+    <button
+      v-if="canEdit && isEditing"
+      class="ml-[5px] mt-2 font-[300] text-[14px] bg-[#F4F5F7] p-1 px-3 rounded-[5px] hover:cursor-pointer transition hover:opacity-[0.6]"
+      @click.stop="onAddAnswer"
+    >
+      Добавить ответ
+    </button>
+  </div>
+</template>
 <script>
 import ReglamentAnswer from './ReglamentAnswer.vue'
 import * as ANSWER from '@/store/actions/reglament_answers.js'
@@ -138,76 +207,6 @@ export default {
   }
 }
 </script>
-
-<template>
-  <BoardModalBoxDelete
-    v-if="showDeleteQuestion"
-    title="Удалить вопрос"
-    text="Вы действительно хотите удалить вопрос?"
-    @cancel="showDeleteQuestion = false"
-    @yes="deleteQuestion"
-  />
-  <div
-    v-if="isEditing ? true: rightAnswersAmount(question)"
-    class="bg-white p-3 rounded-[10px] mb-2"
-  >
-    <div
-      class="px-2"
-      :class="[isEditing ? 'flex justify-between items-center group' : 'block']"
-    >
-      <div
-        :ref="question.uid + 'input'"
-        placeholder="Текст вопроса"
-        class="font-[500] text-[18px]  min-w-[10px] min-h-[10px]"
-        :class="isEditing ? 'my-3' : 'mt-3'"
-        :contenteditable="isEditing && canEdit"
-        @blur="changeQuestionName($event)"
-        @keydown.enter.exact.prevent="$emit('addQuestion')"
-        v-html="question.name"
-      />
-      <span
-        v-if="rightAnswersAmount(question) === 1"
-        class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 text-[13px] font-medium my-1"
-      >
-        В данном вопросе один правильный ответ.
-      </span>
-      <span
-        v-if="rightAnswersAmount(question) > 1"
-        class="flex whitespace-nowrap font-['Roboto'] text-[#7E7E80] dark:bg-gray-700 dark:text-gray-100 rounded-lg text-[13px] font-medium"
-      >
-        В данном вопросе более одного правильного ответа.
-      </span>
-      <ReglamentQuestionPopMenu
-        v-if="isEditing && canEdit"
-        :question="question"
-        @deleteQuestion="showDeleteQuestion = true"
-      />
-    </div>
-    <template
-      v-for="(answer) in question.answers"
-      :key="answer.uid"
-    >
-      <ReglamentAnswer
-        :ref="answer.uid"
-        class="mb-1"
-        :is-editing="isEditing"
-        :answer="answer"
-        @set-right-answer="setRightAnswer"
-        @onSelectAnswer="onSelectAnswer"
-        @addAnswer="onAddAnswer"
-        @deleteAnswer="onDeleteAnswer"
-        @update-answer-name="updateAnswerName"
-      />
-    </template>
-    <button
-      v-if="canEdit && isEditing"
-      class="ml-[5px] mt-2 font-[300] text-[14px] bg-[#F4F5F7] p-1 px-3 rounded-[5px] hover:cursor-pointer transition hover:opacity-[0.6]"
-      @click.stop="onAddAnswer"
-    >
-      Добавить ответ
-    </button>
-  </div>
-</template>
 
 <style scoped>
 [placeholder]:empty::before {

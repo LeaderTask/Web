@@ -1,7 +1,7 @@
 <script>
 import Icon from '@/components/Icon.vue'
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 
 // Statuses icons
 import readyStatus from '@/icons/ready-status.js'

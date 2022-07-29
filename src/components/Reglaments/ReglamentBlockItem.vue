@@ -1,6 +1,8 @@
 <template>
   <ListBlocItem
     :title="reglament.name"
+    :sub-title="author"
+    sub-title-color="#7E7E80"
     :right-icon="iconCheck"
   >
     <svg
@@ -39,6 +41,11 @@ export default {
     },
     employeesByEmail () {
       return this.$store.state.employees.employeesByEmail
+    },
+    author () {
+      const currentUserEmail = this.$store.state.user.user.current_user_email.toLowerCase()
+      if (this.reglament.email_creator.toLowerCase() === currentUserEmail) return 'Мой'
+      return ''
     }
   }
 }

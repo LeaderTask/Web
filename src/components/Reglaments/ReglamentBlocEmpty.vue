@@ -1,39 +1,14 @@
 <template>
   <div
-    class="flex items-center bg-white rounded-[8px] shadow hover:shadow-md px-[15px] relative h-[48px] cursor-pointer"
-    :class="{ 'border border-[#ff9123] -mx-px': selected }"
+    class="flex items-center px-[15px] relative h-[48px]"
   >
-    <div
-      v-if="haveColor"
-      :style="{ 'border-color': color }"
-      class="w-full h-full border-t-4 absolute top-0 right-0 rounded-t-[8px]"
-    />
     <div class="w-full">
       <div class="flex items-center relative">
-        <div
-          v-if="count > 0"
-          class="min-w-[13px] min-h-[13px] absolute rounded-[3px] bg-[#4c4c4d] -top-0.5 -left-0.5 flex items-center justify-center"
-        >
-          <span
-            class="text-white font-['Roboto'] text-[10px] leading-[12px] font-medium px-0.5"
-          >
-            {{ count }}
-          </span>
-        </div>
-        <div class="flex-none h-[20px] w-[20px]">
-          <slot />
-        </div>
         <div class="flex-initial ml-[10px] overflow-hidden w-full">
           <p
-            class="font-roboto text-[13px] leading-[15px] font-medium truncate"
+            class="font-roboto text-[13px] text-[#7E7E80] leading-[15px] font-medium truncate"
           >
-            {{ title }}
-          </p>
-          <p
-            class="font-roboto text-[12px] leading-[14px] truncate"
-            :style="{ 'color': subTitleColor }"
-          >
-            {{ subTitle }}
+            Нет регламентов
           </p>
         </div>
         <div
@@ -104,42 +79,10 @@
 
 <script>
 export default {
-  props: {
-    count: {
-      type: Number,
-      default: 0
-    },
-    color: {
-      type: String,
-      default: ''
-    },
-    title: {
-      type: String,
-      default: ''
-    },
-    subTitle: {
-      type: String,
-      default: ''
-    },
-    subTitleColor: {
-      type: String,
-      default: ''
-    },
-    rightIcon: {
-      type: String,
-      default: ''
-    },
-    selected: {
-      type: Boolean,
-      default: false
-    }
-  },
-  computed: {
-    haveColor () {
-      return this.color !== '' && this.color !== '#A998B6'
-    }
-  }
+
 }
 </script>
 
-<style scoped></style>
+<style>
+
+</style>

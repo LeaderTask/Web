@@ -203,8 +203,8 @@ import ListBlocAdd from '@/components/Common/ListBlocAdd.vue'
 import ReglamentQuestion from './ReglamentQuestion.vue'
 import ReglamentCompleteMessage from './ReglamentCompleteMessage.vue'
 import ReglamentSmallButton from '@/components/Reglaments/ReglamentSmallButton.vue'
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
 import BoardPropsMenuItemUser from '@/components/Board/BoardPropsMenuItemUser.vue'
 
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
@@ -347,7 +347,12 @@ export default {
         if (item1.name < item2.name) return -1
         return 0
       })
-      return deps
+      if (this.showAllReglaments) return deps
+      const currentUserEmail = this.$store.state.user.user.current_user_email.toLowerCase()
+      return deps.filter(dep => dep.emails.find(email => email.toLowerCase() === currentUserEmail))
+    },
+    showAllReglaments () {
+      return this.$store.state.reglaments.showAll
     }
   },
   watch: {

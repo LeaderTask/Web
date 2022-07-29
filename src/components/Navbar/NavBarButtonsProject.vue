@@ -41,9 +41,9 @@
 
 <script>
 import NavBarButtonIcon from '@/components/Navbar/NavBarButtonIcon.vue'
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
-import PopMenuDivider from '@/components/modals/PopMenuDivider.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
+import PopMenuDivider from '@/components/Common/PopMenuDivider.vue'
 import BoardModalBoxDelete from '@/components/Board/BoardModalBoxDelete.vue'
 
 import {

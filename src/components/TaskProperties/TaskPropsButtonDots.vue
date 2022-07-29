@@ -40,9 +40,9 @@
 </template>
 
 <script>
-import PopMenu from '@/components/modals/PopMenu.vue'
-import PopMenuItem from '@/components/modals/PopMenuItem.vue'
-import PopMenuHeader from '@/components/modals/PopMenuHeader.vue'
+import PopMenu from '@/components/Common/PopMenu.vue'
+import PopMenuItem from '@/components/Common/PopMenuItem.vue'
+import PopMenuHeader from '@/components/Common/PopMenuHeader.vue'
 
 export default {
   components: {

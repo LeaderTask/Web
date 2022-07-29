@@ -9,6 +9,7 @@ import AsideMenuList from '@/components/AsideMenuList.vue'
 import AsideMenuSkeleton from './AsideMenuSkeleton.vue'
 import AccOption from '@/components/AccOption.vue'
 import AccKarma from '@/components/AccKarma.vue'
+import AccImport from '@/components/AccImport.vue'
 import 'v-calendar/dist/style.css'
 import { UID_TO_ACTION } from '@/store/helpers/functions'
 
@@ -30,7 +31,8 @@ export default {
     AsideMenuSkeleton,
     AsideMenuList,
     AccOption,
-    AccKarma
+    AccKarma,
+    AccImport
   },
   props: {
     menu: {
@@ -222,6 +224,7 @@ export default {
       else if (this.currentSettingsTab === 'tarif') return ('Тариф')
       else if (this.currentSettingsTab === 'main') return ('Основное')
       else if (this.currentSettingsTab === 'karma') return ('Карма')
+      else if (this.currentSettingsTab === 'import') return ('Импорт')
     },
     goToBoard (board) {
       if (this.isPropertiesMobileExpanded) {
@@ -330,6 +333,10 @@ export default {
     />
     <acc-karma
       v-if="currentSettingsTab === 'karma'"
+    />
+    <acc-import
+      v-if="currentSettingsTab === 'import'"
+      class="text-lg"
     />
   </modal-box>
   <!-- /Profile modal -->
